@@ -15,7 +15,7 @@ if ~exist('mthd','var'), mthd='corase'; end
 
 switch mthd
     case 'corase'
-        fcsSetting='AFSET X=50 Y=2000';
+        cmdStg='AFSET X=50 Y=2000';
         fcsDo='AF x=5';
     case 'corase2'
         fcsSetting='AFSET X=10 Y=1000';
@@ -34,10 +34,15 @@ cmdStg(rS,fcsDo);
 
 
 %% wait for the autofocus to end
-bsy='B';
-while ~isempty(strfind(bsy,'B')),
-    [ok,bsy]=cmdStg(rS,'/');
+n=0;
+while get(rS,'stageBusy')
+    pasue(0.2)
+    if n>100, 
+        warning('Stoped waiting for stage, something is taking to long...');
+        break
+    end
 end
+
 
 %% 4 return the current focus score if needed
 if nargout>0
