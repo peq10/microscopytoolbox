@@ -34,7 +34,7 @@ MiscData.Experiment='testing throopi the roboscope';
 Pos=createAcqPattern('timelapse',[0 0 0],20,5); %Where to image, Number of images, dt
 
 % use all defualt values for acquisition functions
-acqFns.acq='';
+acqFns.acq='acq_simple.';
 acqFns.astart='';
 acqFns.stop='';
 acqFns.error='';
