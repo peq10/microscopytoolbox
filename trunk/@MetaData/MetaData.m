@@ -29,7 +29,7 @@ if nargin==2 && n>1
     return
 end
 
-%% read the xml from the tiff/xml file
+%% read the xml from the tiff header /xml file itself
 
 [pathstr, name, ext] = fileparts(filename);
 switch ext

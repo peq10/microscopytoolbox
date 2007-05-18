@@ -27,14 +27,13 @@ rS=Scope(ScopeConfigFileName);
 % Misc data - names, objective etc. 
 MiscData.ProjectName='InitialTest';
 MiscData.DatasetName='Tst1';
-MiscData.Objective='10x';
 MiscData.Experimenter='Roy Wollman';
 MiscData.Experiment='testing throopi the roboscope';
 
 Pos=createAcqPattern('timelapse',[0 0 0],20,5); %Where to image, Number of images, dt
 
 % use all defualt values for acquisition functions
-acqFns.acq='acq_simple.';
+acqFns.acq='acq_simple';
 acqFns.astart='';
 acqFns.stop='';
 acqFns.error='';
@@ -51,7 +50,8 @@ ExposureDetails(4).exposure=500;
 %% start single time lapse
 
 TimerName='Moshe';
-start(createAcqSeqTimer(MiscData,Pos,ExposureDetails,acqFns,TimerName));
+t=createAcqSeqTimer(MiscData,Pos,ExposureDetails,acqFns,TimerName);
+start(t);
 
 
 
