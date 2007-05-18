@@ -1,6 +1,6 @@
 function varargout = get(rS,varargin)
-%GET Summary of this function goes here
-%   Detailed explanation goes here
+%GET properties of the Score object rS
+%   for details on what the properties are see developer guide. 
 
 varargout={};
 % get: 
@@ -19,10 +19,6 @@ for i=1:length(varargin)
             [ok,zpos]=cmdStg(rS,'where','Z');
             if ~ok, warning('Stage cmd failed'); end %#ok
             varargout=[varargout; {zpos}];
-        case 'fcsscr' %uses direct serial communication
-            [ok,fcsscr]=cmdStg(rS,'fcsscr');
-            if ~ok, warning('Stage cmd failed'); end %#ok
-            varargout=[varargout; {fcsscr}];
         case 'channel'
              varargout=[varargout; {rS.mmc.getCurrentConfig('Channel')}];
         case 'exposure'
@@ -35,15 +31,21 @@ for i=1:length(varargin)
             varargout=[varargout; {rS.mmc.getImageBitDepth}];
         case 'rootfolder'
             varargout=[varargout; {rS.rootFolder}];
-        case 'pixelsizestruct'
+        case 'pixelsize'
+        case 'objective'
+            varargout=[varargout; {rS.mmc.getStateLabel('Objective')}];
+        case 'focusmethod'
+            varargout=[varargout; {rS.focusMethod}];
         case 'stagebusy'
             [ok,bsy]=cmdStg(rS,'getStatus');
             varargout=[varargout; bsy];
-        case 'finefocusrange'
-            [ok,param]=cmdStg('getFocusParam');
-            
-        case 'focusspeed'
-            
+        case {'focusscore',...
+              'focusrange',...
+              'focusspeed',...
+              'focussearchdirection',...
+              'focususehilldetect',...
+              'focushilldetectheight'}
+          varargout=[varargout; {getFocusParams(rS,varargin{i})}];
         otherwise
             warning(['property: ' varargin{i} ' does not exist in Scope class']) %#ok
     end
