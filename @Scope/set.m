@@ -25,8 +25,8 @@ for i=1:2:n
             end
             % create the parameter struct
             for j=1:length(varargin{i})
-                param(j).axis=varargin{i}(j);
-                param(j).position=varargin{i+1}(j);
+                param(j).axis=varargin{i}(j); %#ok
+                param(j).position=varargin{i+1}(j); %#ok
             end
             ok=cmdStg(rS,'move',param);
             if ~ok
@@ -57,8 +57,14 @@ for i=1:2:n
             if ~ischar(varargin{i+1}) || ~exist(varargin{i+1},'dir')
                 error('rootFolder must be a string and a legit folder, please check');
             end
-            rS.rootFolder=varargout
+            rS.rootFolder=varargin{i+1};
+        case {'focusrange',...
+              'focusspeed',...
+              'focussearchdirection',...
+              'focususehilldetect',...
+              'focushilldetectheight'}
+             setFocusParams(rS,varargin{i},varargin{i+1});
         otherwise
-            warning('Unrecognized attribute')
+            warning('Unrecognized attribute') %#ok
     end
 end
