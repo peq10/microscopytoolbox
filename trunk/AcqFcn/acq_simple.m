@@ -1,4 +1,4 @@
-function simpleAcq(obj, event,imshowFlag) %#ok<INUSD>
+function acq_simple(obj, event) %#ok
 %SIMPLEACQ callback function to be used by by AcqSeq objects
 %   
 % Outline: 
@@ -15,9 +15,9 @@ crnt=get(obj,'tasksExecuted')+1;
 
 %% get the crnt acq details 
 UserData=get(obj,'UserData');
-OMEs=UserData.OMEs;
+MDs=UserData.MDs;
 
-[X,Y,Z,ExposureDetails]=get(OMEs(crnt),'stage.X','stage.Y','stage.Z','ExposureDetails');
+[X,Y,Z,ExposureDetails]=get(MDs(crnt),'stage.X','stage.Y','stage.Z','ExposureDetails');
 
 %% goto XYZ
 set(rS,'xyz',[X Y Z]);
@@ -32,7 +32,7 @@ img=acqImg(rS,ExposureDetails);
 UserData.lastImage=img;
 
 %% Write image to disk
-imwrite(OMEs(crnt),img); 
+imwrite(MDs(crnt),img); 
 
 %% imshow if necessary
 if nargin > 2 || imshowFlag==1
