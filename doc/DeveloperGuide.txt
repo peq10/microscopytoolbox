@@ -11,16 +11,14 @@ Y  - The current Y position of the stage
 Z  - The current Z position of the stage
 Channel -  The current filter configuration, as defined by MMC config file 
 exposure  -  The camera exposure time (ms) 
-width  -  Image width in pixels (READONLY)
-height  -  Image height in pixels (READONLY)
-bitdepth  - Image bitdepth (2^n) (READONLY)
+width  -  Image width in pixels  - READONLY
+height  -  Image height in pixels - READONLY
+bitdepth  - Image bitdepth (2^n)  - READONLY
 rootFolder  -  Where to save all the images. 
-pixelsize   -  Current pixel size (READONLY)
-Objective   -  Current Optics configuration 
-               Defiened as objective + multiplier, basically any combination
-               that determines the pixel size). 
+pixelsize   -  Current pixel size  - READONLY
+Objective   -  Current Optics configuration. Defiened as objective + multiplier, basically any combination that determines the pixel size). 
 focusMethod - currently only ASI, in the future will suport other (FPGA, software, PFS, etc.) 
-stageBusy   - a flag to say if Stage is busy (READONLY)
+stageBusy   - a flag to say if Stage is busy - READONLY
 
 %% the following are properties that any future focus methods will need to support
 %% to allow modularity, get/set will use private methods getFocusParam/setFocusParame
@@ -30,7 +28,7 @@ focusSpeed  - percent of maximal stage speed (1-100).
 focusRange  - the range to look atm in 0.1 micron units. 
 focusUseHillDetect - a 1/0 flag that says whther to stop detection after the hill pick 
 focusHillDetectHeight - percent after the pick to stop in...  
-focusScore  -  The current focus score of the images (READONLY)
+focusScore  -  The current focus score of the images - READONLY
 
 
 Methods:
