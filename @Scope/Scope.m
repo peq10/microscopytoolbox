@@ -41,7 +41,7 @@ rS.mmc.setState('Objective',ObjectiveLbl);
 
 % load the pixel sizes from file
 pxlsz=csvread('PixelSizeList.csv');
-pxlsz=sorrows(pxlsz);
+pxlsz=sortrows(pxlsz);
 rS.pxlsz=pxlsz(:,2);
 
 %% add AcqFcn to the path

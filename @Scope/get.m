@@ -32,6 +32,7 @@ for i=1:length(varargin)
         case 'rootfolder'
             varargout=[varargout; {rS.rootFolder}];
         case 'pixelsize'
+            varargout=[varargout; {rS.pxlsz(rS.mmc.getState('Objective'))}];
         case 'objective'
             varargout=[varargout; {rS.mmc.getStateLabel('Objective')}];
         case 'focusmethod'

@@ -1,14 +1,14 @@
-function t = AcqSeq(MiscData,AcqPos,ExposureDetails,acqFns,Name,Tag)
+function t = createAcqSeqTimer(MiscData,AcqPos,ExposureDetails,acqFns,Name,Tag)
 % AcqSeq constractor, gathers all acquisition details for the Dataset that
 % will be acquired. It sets up a array of MetaData objects, one for each planned
 % image. Each MetaData object will contain all the necessary details for
 % acquisition, e.g. X,Y,Z,T, Image Name etc. 
 % 
 % Usage:
-% MiscData           - struct with misc data: Names, Objective, 
-% Pos                   - struct with the arrays: X,Y,Z,T. 
-% ExposureDetails - struct with exposure details (2 fields: channel,exposure)
-% acqFns              - struct with names of all 4 functions (empty means default)
+% MiscData           - struct with misc data: Names of project, dataset, etc.  
+% Pos                - struct with the arrays: X,Y,Z,T. 
+% ExposureDetails    - struct with exposure details (2 fields: channel,exposure)
+% acqFns             - struct with names of all 4 functions (empty means default)
 
 % % These are all the initializing data structures, they are used to create
 % % the MetaData array which is how AcqSeq object wil store the data. In the debug
@@ -24,25 +24,26 @@ if ~exist('Tag','var')
     Tag='';
 end
 
+global rS;
 
 %% Generate the MetaData array
 
 % Create MDs from template. Array length is the 
 % length of AcqPos which is the number of sites in the sequence
 % For each image there is a MetaData object
-MDs=MetaData(length(AcqPos.X)); % generate the default MetaData object
+MDs=MetaData('Template.ome',length(AcqPos.X)); % generate the default MetaData object
 
 % first set all the 'global' attributes, all the non image related
 MDs=set(MDs,...
                 'Project.Name',MiscData.ProjectName,...
                 'Dataset.Name',MiscData.DatasetName,...
-                'Objective',MiscData.Objective,...
+                'Objective',get(rS,'objective'),...
                 'Experimenter',MiscData.Experimenter,...
                 'Experiment',MiscData.Experiment);
 
  % set pixel size - same is all images
-global rS;
-PixelSizeStruct=get(rS,'PixelSizeStruct');               % rS is holding the table of pixels sizes
+
+PixelSizeStruct=get(rS,'PixelSize');               % rS is holding the table of pixels sizes
 if ~isfield(PixelSizeStruct,MiscData.Objective); 
     error(['Objective ' MiscData.Objective ' is not valid, please check']); 
 end
@@ -86,7 +87,7 @@ t=timer(...
     'StopFcn',acqFns.stop,...
     'ErrorFcn',acqFns.error,...
     'tag',Tag,...
-    'Name',Name
+    'Name',Name...
     );
 
 %% make the class
