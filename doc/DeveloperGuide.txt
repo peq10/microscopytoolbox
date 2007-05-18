@@ -1,0 +1,154 @@
+Throopi the Roboscope - developer guide
+=======================================
+
+Scope class
+===========
+
+Properties:
+
+X  - The current X position of the stage
+Y  - The current Y position of the stage
+Z  - The current Z position of the stage
+Channel -  The current filter configuration, as defined by MMC config file 
+exposure  -  The camera exposure time (ms)
+width  -  Image width in pixels
+height  -  Image height in pixels
+bitdepth  - Image bitdepth (2^n)
+rootFolder  -  Where to save all the images. 
+pixelsize   -  Current pixel size
+Objective   -  Current Optics configuration 
+               Defiened as objective + multiplier, basically any combination
+               that determines the pixel size). 
+focusMethod - currently only ASI, in the future will suport other (FPGA, software, PFS, etc.) 
+stageBusy   - a flag to say if Stage is busy
+
+%% the following are properties that any future focus methods will need to support
+%% to allow modularity, get/set will use private methods getFocusParam/setFocusParame
+
+focusSearchDirection - UP / DOWN / SPLIT
+focusSpeed  - percent of maximal stage speed (1-100). 
+focusRange  - the range to look atm in 0.1 micron units. 
+focusUseHillDetect - a 1/0 flag that says whther to stop detection after the hill pick 
+focusHillDetectHeight - percent after the pick to stop in...  
+focusScore  -  The current focus score of the images
+
+
+Methods:
+
+Scope (constructor) 
+set       - set properties, see above list
+get       - get properties, see above list
+display   - command line status of devices
+unload    - unload devices from MMC, should always be called at the end, a destructor. 
+acqImg    - acquires image based on rS properties
+autofocus - perform autofocus using current focus method and its currnet settings
+
+Private methods:
+
+cmdStg
+setFocusParams
+getFocusParams
+
+Class MetaData
+===============
+
+Properties:
+
+project.name
+dataset.name
+image.name
+objective
+experimenter
+experiment
+pixelsizex
+pixelsizey
+pixelsizez
+stage.x
+stage.y
+stage.z
+channels
+creationdate
+display.r
+display.g
+display.b
+display.r_levels
+display.g_levels
+display.b_levels
+display.gray
+display.gray_levels
+dimension_order
+sizex
+sizey
+sizez
+sizet
+sizec
+firstt
+firstc
+firstz
+dt
+
+
+Methods:
+
+MetaData
+get
+set
+display
+writeTiff
+readTiff
+show
+
+Other non class based important interfaces / conventions: 
+=========================================================
+
+AcqSeqData:
+===========
+This is saved within the UserData property of the Timer
+and is created using the createAcqSeqTimer function. 
+
+MDs  ­  the meta-data
+AcqFlag  ­  a true/false flag to say if the image was already aquired
+lastImage  -  Saves the pixels of the last image to be acquired. 
+
+Stage interface:
+===============
+Currently stage is 'hard wired' e.g. all interaction are happening using 
+ascii serial port commants. To make it more flexible a single function 
+cmdStg is responssible to all the serial calls and their interpertation.
+cmdStg is private method of rS to minimize its exposure. 
+Any future implmentation will need to perserve these capabilities: 
+
+[ok,arg]=cmdStg(rS,cmd,param)
+
+ok - is a 1/0 answer to note if the command/query was completed successfuly. 
+arg - is the answer to the query, if its a command and not a query returns ''
+
+cmd could be:
+
+move/moverel - requires param to be an array of structs with fields 
+where  -  
+zero
+fcsscr
+getfocusparam
+setfocusspeed
+setfocusrange
+setfocushillheight
+autofocus
+getstatus
+
+
+
+===========================================================================
+
+Necessary configuration files: 
+==============================
+
+Scope.cfg (or any other name you chose)
+----------------------------------------
+Result of the Micor-Manager wizard, however must iunclude several config groups/ labels: 
+
+PixelSizeList.csv (Name is fixed! )
+-----------------------------------
+first column is label number ala the Scope.cfg flabel defenitions
+second column is the pixel size in mm for each possible optices. 
+
