@@ -47,8 +47,14 @@ for i=1:length(varargin)
               'focususehilldetect',...
               'focushilldetectheight'}
           varargout=[varargout; {getFocusParams(rS,varargin{i})}];
+        case 'currnettaskid'
+            varargout=[varargout; {rS.taskID}];
+        case 'tasksfinished'
+            varargout=[varargout; {sum(get(rS.TaskBuffer,'executed'))}];
+        case 'isrunning'
+            varargout=[varargout; {rS.isRunning}];
         otherwise
-            warning(['property: ' varargin{i} ' does not exist in Scope class']) %#ok
+            warning('Throopi:Property:get:Scope',['property: ' varargin{i} ' does not exist in Scope class']) 
     end
 end
 

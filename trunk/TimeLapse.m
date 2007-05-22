@@ -3,8 +3,8 @@
 % (no gui involved...). 
 % "Algorithm" outline
 % =========================
-% 1. Initialize the scope, slide and image database 
-% 2. get 
+% 1. Initialize the scope. 
+% 2. set up acquisition details in a few 
 %     3.1 Initialize a acqusition data secquence that contains the
 %           position, exposures etc for all the sites within this well.
 %     3.2 Initialize an acquisition sequence based on the AcqData object
@@ -18,7 +18,7 @@
 ScopeConfigFileName='Scope_noStage.cfg';
 
 % call the constractor of the Scope 
-global rS; % name of the scope (rS=roboScope)
+global rS; % name of the scope variable (rS=roboScope)
 rS=Scope(ScopeConfigFileName);
 
 
@@ -29,15 +29,11 @@ MiscData.ProjectName='InitialTest';
 MiscData.DatasetName='Tst1';
 MiscData.Experimenter='Roy Wollman';
 MiscData.Experiment='testing throopi the roboscope';
+MiscData.ImageName='Img'; 
 
-Pos=createAcqPattern('timelapse',[0 0 0],20,5); %Where to image, Number of images, dt
+Pos=createAcqPattern('timelapse',[0 0 0],20); %Pattern, Where to image, Number of images
 
-% use all defualt values for acquisition functions
-acqFns.acq='acq_simple';
-acqFns.astart='';
-acqFns.stop='';
-acqFns.error='';
-
+% Details of all channels.
 ExposureDetails(1).channel='White';
 ExposureDetails(1).exposure=10;
 ExposureDetails(2).channel='DAPI';
@@ -47,11 +43,14 @@ ExposureDetails(3).exposure=500;
 ExposureDetails(4).channel='Cy3';
 ExposureDetails(4).exposure=500;
 
-%% start single time lapse
+%% Create a series of dependent tasks
+Tsks = createTaskSeries(MiscData,Pos,ExposureDetails,'acq_simple');
 
-TimerName='Moshe';
-t=createAcqSeqTimer(MiscData,Pos,ExposureDetails,acqFns,TimerName);
-start(t);
+% add to rS (this will automatically update the Task schedule). 
+rS=addTasks(rS,Tsks); 
+
+%% startacquisition
+run(rS); 
 
 
 

@@ -33,4 +33,6 @@ switch lower(argin)
         argout=params.hill_offset; 
     case 'focusscore'
         [ok,argout]=cmdStg(rS,'fcsscr');
+    case 'focustime'
+        argout=1; %TODO do proper calculation of how long focus will take based on range, speed and hill
 end

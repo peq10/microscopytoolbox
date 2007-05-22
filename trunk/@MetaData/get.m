@@ -40,7 +40,7 @@ for i=1:length(varargin)
             filename=[sub_get(md.xml,'/OME/Image','Name') '.tif'];
             varargout=[varargout {filename}];
         case 'fullfilename'
-            varargout=[varargout fullfile(get(md,'path'),get(md,'filename')];
+            varargout=[varargout fullfile(get(md,'path'),get(md,'filename'))];
         case 'path'
             pth=[get(rS,'rootFolder') filesep ...
                 sub_get(md.xml,'/OME/Project','Name') filesep
@@ -52,8 +52,8 @@ for i=1:length(varargin)
             objMag=sub_get(md.xml,'/OME/Instrument/Objective/Magnification');
             if iscell(obj)
                 objdesc=cells(length(obj),1);
-                for i=1:length(obj)
-                    objdesc{i}=[obj{i}.Manufacturer ' ' obj{i}.Model ' NA: ' num2str(objNA{i}) 'Mag: '  num2str(objMag{i})];
+                for j=1:length(obj)
+                    objdesc{j}=[obj{j}.Manufacturer ' ' obj{j}.Model ' NA: ' num2str(objNA{j}) 'Mag: '  num2str(objMag{j})];
                 end
             else
                 objdesc=[obj.Manufacturer ' ' obj.Model ' NA: ' num2str(objNA) 'Mag: '  num2str(objMag)];
@@ -140,7 +140,7 @@ for i=1:length(varargin)
         case 'dt'
             varargout=[varargout {str2double(sub_get(md.xml,'/OME/Image','TimeIncrement'))}];
         otherwise
-            warning([varargin{i} ' is no a supported md property']) ;  %#ok
+            warning('Throopi:Property:get:MetaData',[varargin{i} ' is no a supported md property']) ; 
     end %switch of varargin{i}
     if length(varargout)>1 && isempty(varargout{end})
          warning(['property:  "' varargin{i}  '"  has no value - does that property exist?']); %#ok
