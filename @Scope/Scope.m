@@ -16,14 +16,28 @@ Stg.Terminator='CR';
 fopen(Stg);
 rS.Stg=Stg;
 
-%% Additional properties not part of Stage or MMC: 
+%% Additional properties not part of Stage or MMC:
+% task ID
+rS.taskID=0;
+
 %root folder
 rS.rootFolder='D:\';
 
 %focus method
 rS.focusMethod='ASI';
 
-%Current Objective 
+% the last image captured, only saving that one (but could be a 3 channel
+% image as well...
+rS.lastImage=0;
+
+% the task buffer
+rS.TaskBuffer=[];
+rS.TaskSchedule=[]; 
+
+% a flag to note whether scope is currently executing tasks
+rS.isRunning=false;
+
+%Current Objective - TODO: get objective name from mmc config file. 
 % if value was not supplied, ask the user
 if ~exist('ObjectiveLbl','var')
     
@@ -44,9 +58,14 @@ pxlsz=csvread('PixelSizeList.csv');
 pxlsz=sortrows(pxlsz);
 rS.pxlsz=pxlsz(:,2);
 
-%% add AcqFcn to the path
-addpath AcqFcn
+%% add folder to the path
+addpath TaskFcns
 
+% additional toolboxes
+addpath(['ThirdParty' filesep 'xmltree'])
+addpath(['ThirdParty' filesep 'scheduling'])
+
+%% create the object from struct
 rS=class(rS,'Scope');
 
 

@@ -64,6 +64,8 @@ for i=1:2:n
               'focususehilldetect',...
               'focushilldetectheight'}
              setFocusParams(rS,varargin{i},varargin{i+1});
+        case 'lastimage'
+            rS.lastImage=varargin{i+1};
         otherwise
             warning('Unrecognized attribute') %#ok
     end
