@@ -37,6 +37,8 @@ for i=1:length(varargin)
             varargout=[varargout; {rS.mmc.getStateLabel('Objective')}];
         case 'focusmethod'
             varargout=[varargout; {rS.focusMethod}];
+        case 'schedulingmethod'
+            varargout=[varargout; {rS.schedulingMethod}];
         case 'stagebusy'
             [ok,bsy]=cmdStg(rS,'getStatus');
             varargout=[varargout; bsy];

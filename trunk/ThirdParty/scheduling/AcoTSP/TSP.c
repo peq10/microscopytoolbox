@@ -63,7 +63,13 @@
 #include "ls.h"
 #include "utilities.h"
 
+#ifndef M_PI
 #define M_PI 3.14159265358979323846264
+#endif 
+
+#define malloc mxMalloc
+#define calloc mxCalloc
+#define free mxFree
 
 long int n;          /* number of cities in the instance to be solved */
 
@@ -192,7 +198,7 @@ long int ** compute_distances(void)
     long int     i, j;
     long int     **matrix;
 
-    if((matrix = malloc(sizeof(long int) * n * n +
+    if((matrix = (long int *)malloc(sizeof(long int) * n * n +
 			sizeof(long int *) * n	 )) == NULL){
 	fprintf(stderr,"Out of memory, exit.");
 	exit(1);
@@ -229,12 +235,12 @@ long int ** compute_nn_lists( void )
     
     TRACE ( printf("nn = %ld ... \n",nn); ) 
 
-    if((m_nnear = malloc(sizeof(long int) * n * nn
+    if((m_nnear = (long int *)malloc(sizeof(long int) * n * nn
 			     + n * sizeof(long int *))) == NULL){
 	exit(EXIT_FAILURE);
     }
-    distance_vector = calloc(n, sizeof(long int));
-    help_vector = calloc(n, sizeof(long int));
+    distance_vector = (long int *)calloc(n, sizeof(long int));
+    help_vector = (long int *)calloc(n, sizeof(long int));
  
     for ( node = 0 ; node < n ; node++ ) {  /* compute cnd-sets for all node */
 	m_nnear[node] = (long int *)(m_nnear + n) + node * nn;

@@ -57,6 +57,10 @@
 
 #include "timer.h"
 
+#define malloc mxMalloc
+#define calloc mxCalloc
+#define free mxFree
+
 
 clock_t start_time;
 

@@ -23,7 +23,7 @@ NumberOfTasks - number of tasks (also returns their priorities - READONLY
 currnetTaskID - current task ID (does not update the field! use getNewTaskIDs for new IDs)
 lastImage - an adjusted last image based on its OME specs.  - READONLY
 isRunning - a 1/0 status flag to say if its currently runnint
-tasksFinished - an small array of the number of tasks finished since init. 
+TaskSchedule - a nx2 matrix of planned task execution time
 
 
 %% the following are properties that any future focus methods will need to support

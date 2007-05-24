@@ -59,6 +59,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "mex.h"
+
 #include "ants.h"
 #include "utilities.h"
 #include "InOut.h"
@@ -66,7 +68,9 @@
 #include "timer.h"
 #include "ls.h"
 
-
+#define malloc mxMalloc
+#define calloc mxCalloc
+#define free mxFree
 
 long int termination_condition( void )
 /*    
@@ -540,10 +544,41 @@ void pheromone_trail_update( void )
 }
 
 
+/*--- mex gateway function ------------------------------------------------*/
+/* The gateway routine */
+void mexFunction(int nlhs, mxArray *plhs[],
+                 int nrhs, const mxArray *prhs[])
+{
+  char *argv[200]; /* no more then 200 input arguments...*/
+  int argc,i;
+  
+  /* Create "fake" argc and argv from mxArray pointer prhs */
+  
+  
+  /* first argv is the calling file name */ 
+  argv[0]=(char *)calloc(7,sizeof(char));
+  argv[0][0]='a';
+  argv[0][1]='c';
+  argv[0][2]='o';
+  argv[0][3]='t';
+  argv[0][4]='s';
+  argv[0][5]='p';
+  argv[0][6]=(char)NULL;
+  
+  /* now move all the prhs to argv*/
+  for (i=0; i<nlhs; i++) {
+      argv[i+1]=mxArrayToString(prhs[i]);
+  }
+  
+  argc=nlhs+1;
+      
+  /* Call the C subroutine. */
+  acotsp(argc,argv);
+}
 
 /* --- main program ------------------------------------------------------ */
 
-int main(int argc, char *argv[]) {
+int acotsp(int argc, char *argv[]) {
 /*    
       FUNCTION:       main control for running the ACO algorithms
       INPUT:          none

@@ -66,6 +66,10 @@ for i=1:2:n
              setFocusParams(rS,varargin{i},varargin{i+1});
         case 'lastimage'
             rS.lastImage=varargin{i+1};
+        case 'schedulingmethod'
+            rS.schedulingMethod=varargin{i+1};
+        case 'focusmethod'
+            rS.focusMethod=varargin{i+1};
         otherwise
             warning('Unrecognized attribute') %#ok
     end

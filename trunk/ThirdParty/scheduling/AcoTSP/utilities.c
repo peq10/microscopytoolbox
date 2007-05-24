@@ -62,6 +62,10 @@
 #include "ants.h"
 #include "timer.h"
 
+#define malloc mxMalloc
+#define calloc mxCalloc
+#define free mxFree
+
 
 long int seed = 12345678;
 
@@ -358,7 +362,7 @@ long int ** generate_int_matrix( long int n, long int m)
   long int i;
   long int **matrix;
 
-  if((matrix = malloc(sizeof(long int) * n * m +
+  if((matrix = (long int *)malloc(sizeof(long int) * n * m +
 		      sizeof(long int *) * n	 )) == NULL){
     printf("Out of memory, exit.");
     exit(1);
@@ -384,7 +388,7 @@ double ** generate_double_matrix( long int n, long int m)
   long int i;
   double **matrix;
 
-  if((matrix = malloc(sizeof(double) * n * m +
+  if((matrix = (double *)malloc(sizeof(double) * n * m +
 		      sizeof(double *) * n	 )) == NULL){
     printf("Out of memory, exit.");
     exit(1);
