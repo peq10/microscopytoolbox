@@ -66,6 +66,9 @@
 #include "ls.h"
 #include "parse.h"
 
+#define malloc mxMalloc
+#define calloc mxCalloc
+#define free mxFree
 
 long int *best_in_try;
 long int *best_found_at;
@@ -263,7 +266,7 @@ struct point * read_etsp(const char *tsp_file_name)
 	exit(1);
     }
 
-    if( (nodeptr = malloc(sizeof(struct point) * n)) == NULL )
+    if( (nodeptr = (struct point *)malloc(sizeof(struct point) * n)) == NULL )
 	exit(EXIT_FAILURE);
     else {
 	for ( i = 0 ; i < n ; i++ ) {
@@ -374,7 +377,7 @@ void population_statistics ( void )
     long int *l;
     double   pop_mean, pop_stddev, avg_distance = 0.0;
     
-    l = calloc(n_ants, sizeof(long int));
+    l = (long int *)calloc(n_ants, sizeof(long int));
     for( k = 0 ; k < n_ants ; k++ ) {
 	l[k] = ant[k].tour_length;
     }
@@ -410,7 +413,7 @@ double node_branching(double l)
   double    avg;
   double    *num_branches;
 
-  num_branches = calloc(n, sizeof(double));
+  num_branches = (double *)calloc(n, sizeof(double));
 
   for ( m = 0 ; m < n ; m++ ) {
     /* determine max, min to calculate the cutoff value */
@@ -557,10 +560,10 @@ void init_program( long int argc, char *argv[] )
   assert (nn_ls > 0);
   assert (max_tries <= MAXIMUM_NO_TRIES);
   
-  best_in_try = calloc(max_tries, sizeof(long int));
-  best_found_at = calloc(max_tries, sizeof(long int));
-  time_best_found = calloc(max_tries, sizeof(double));
-  time_total_run = calloc(max_tries, sizeof(double));
+  best_in_try = (long int *)calloc(max_tries, sizeof(long int));
+  best_found_at = (long int *)calloc(max_tries, sizeof(long int));
+  time_best_found = (double *)calloc(max_tries, sizeof(double));
+  time_total_run = (double *)calloc(max_tries, sizeof(double));
    
   seed = (long int) time( NULL );
   
@@ -708,7 +711,7 @@ void printProbabilities(void)
   double   sum_prob;
 
   printf("Selection Probabilities, iteration: %ld\n",iteration);
-  p = calloc( n, sizeof(double) );
+  p = (double *)calloc( n, sizeof(double) );
 
   for (i=0; i < n; i++) {
     printf("From %ld:  ",i);

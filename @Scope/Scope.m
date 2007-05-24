@@ -23,8 +23,11 @@ rS.taskID=0;
 %root folder
 rS.rootFolder='D:\';
 
-%focus method
+% default focus method
 rS.focusMethod='ASI';
+
+% default scheduling method
+rS.schedulingMethod='Ants_TSP'; 
 
 % the last image captured, only saving that one (but could be a 3 channel
 % image as well...
