@@ -65,9 +65,7 @@
 #include "utilities.h"
 #include "timer.h"
 
-#define malloc mxMalloc
-#define calloc mxCalloc
-#define free mxFree
+
 
 ant_struct *ant;
 ant_struct *best_so_far_ant;
@@ -122,35 +120,35 @@ void allocate_ants ( void )
 {
     long int i;
   
-    if((ant = (ant_struct *) malloc(sizeof( ant_struct ) * n_ants +
+    if((ant = malloc(sizeof( ant_struct ) * n_ants +
 		     sizeof(ant_struct *) * n_ants	 )) == NULL){
 	printf("Out of memory, exit.");
 	exit(1);
     }
     for ( i = 0 ; i < n_ants ; i++ ) {
-	ant[i].tour        = (long int *)calloc(n+1, sizeof(long int));
-	ant[i].visited     = (char *)calloc(n, sizeof(char));
+	ant[i].tour        = calloc(n+1, sizeof(long int));
+	ant[i].visited     = calloc(n, sizeof(char));
     }
 
-    if((best_so_far_ant = (ant_struct *)malloc(sizeof( ant_struct ) )) == NULL){
+    if((best_so_far_ant = malloc(sizeof( ant_struct ) )) == NULL){
 	printf("Out of memory, exit.");
 	exit(1);
     }
     for ( i = 0 ; i < n_ants ; i++ ) {
-	(*best_so_far_ant).tour        = (long int *)calloc(n+1, sizeof(long int));
-	(*best_so_far_ant).visited     = (char *)calloc(n, sizeof(char));
+	(*best_so_far_ant).tour        = calloc(n+1, sizeof(long int));
+	(*best_so_far_ant).visited     = calloc(n, sizeof(char));
     }
 
-    if((restart_best_ant = (ant_struct *)malloc(sizeof( ant_struct ) )) == NULL){
+    if((restart_best_ant = malloc(sizeof( ant_struct ) )) == NULL){
 	printf("Out of memory, exit.");
 	exit(1);
     }
     for ( i = 0 ; i < n_ants ; i++ ) {
-	(*restart_best_ant).tour        = (long int *)calloc(n+1, sizeof(long int));
-	(*restart_best_ant).visited     = (char *)calloc(n, sizeof(char));
+	(*restart_best_ant).tour        = calloc(n+1, sizeof(long int));
+	(*restart_best_ant).visited     = calloc(n, sizeof(char));
     }
 
-    if((prob_of_selection = (double *)malloc(sizeof( double ) * nn_ants )) == NULL){
+    if((prob_of_selection = malloc(sizeof( double ) * nn_ants )) == NULL){
 	printf("Out of memory, exit.");
 	exit(1);
     }
@@ -784,7 +782,7 @@ void bwas_worst_ant_update( ant_struct *a1, ant_struct *a2)
 
     TRACE ( printf("bwas specific: best-worst pheromone update\n"); );
 
-    pos2 = (long int *)malloc(n * sizeof(long int));
+    pos2 = malloc(n * sizeof(long int));
     for ( i = 0 ; i < n ; i++ ) {
 	pos2[(*a2).tour[i]] = i;
     }
@@ -939,7 +937,7 @@ long int distance_between_ants( ant_struct *a1, ant_struct *a2)
     long int    distance;
     long int    *pos2;        /* positions of cities in tour of ant a2 */ 
 
-    pos2 = (long int *)malloc(n * sizeof(long int));
+    pos2 = malloc(n * sizeof(long int));
     for ( i = 0 ; i < n ; i++ ) {
 	pos2[(*a2).tour[i]] = i;
     }

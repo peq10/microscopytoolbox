@@ -66,9 +66,6 @@
 #include "ls.h"
 #include "parse.h"
 
-#define malloc mxMalloc
-#define calloc mxCalloc
-#define free mxFree
 
 long int *best_in_try;
 long int *best_found_at;
@@ -102,7 +99,7 @@ long int restart_found_best;/* iteration in which restart-best solution is found
 
 /* ------------------------------------------------------------------------ */
 
-FILE *report, *comp_report, *stat_report;
+FILE *report, *comp_report, *stat_report,*tour_report;
 
 char name_buf[LINE_BUF_LEN];
 int  opt;
@@ -266,7 +263,7 @@ struct point * read_etsp(const char *tsp_file_name)
 	exit(1);
     }
 
-    if( (nodeptr = (struct point *)malloc(sizeof(struct point) * n)) == NULL )
+    if( (nodeptr = malloc(sizeof(struct point) * n)) == NULL )
 	exit(EXIT_FAILURE);
     else {
 	for ( i = 0 ; i < n ; i++ ) {
@@ -377,7 +374,7 @@ void population_statistics ( void )
     long int *l;
     double   pop_mean, pop_stddev, avg_distance = 0.0;
     
-    l = (long int *)calloc(n_ants, sizeof(long int));
+    l = calloc(n_ants, sizeof(long int));
     for( k = 0 ; k < n_ants ; k++ ) {
 	l[k] = ant[k].tour_length;
     }
@@ -413,7 +410,7 @@ double node_branching(double l)
   double    avg;
   double    *num_branches;
 
-  num_branches = (double *)calloc(n, sizeof(double));
+  num_branches = calloc(n, sizeof(double));
 
   for ( m = 0 ; m < n ; m++ ) {
     /* determine max, min to calculate the cutoff value */
@@ -560,10 +557,10 @@ void init_program( long int argc, char *argv[] )
   assert (nn_ls > 0);
   assert (max_tries <= MAXIMUM_NO_TRIES);
   
-  best_in_try = (long int *)calloc(max_tries, sizeof(long int));
-  best_found_at = (long int *)calloc(max_tries, sizeof(long int));
-  time_best_found = (double *)calloc(max_tries, sizeof(double));
-  time_total_run = (double *)calloc(max_tries, sizeof(double));
+  best_in_try = calloc(max_tries, sizeof(long int));
+  best_found_at = calloc(max_tries, sizeof(long int));
+  time_best_found = calloc(max_tries, sizeof(double));
+  time_total_run = calloc(max_tries, sizeof(double));
    
   seed = (long int) time( NULL );
   
@@ -579,6 +576,7 @@ void init_program( long int argc, char *argv[] )
   sprintf(temp_buffer,"cmp.%s",instance.name);
   TRACE ( printf("%s\n",temp_buffer); )
   comp_report = fopen(temp_buffer, "w");
+
   sprintf(temp_buffer,"stat.%s",instance.name);
   TRACE ( printf("%s\n",temp_buffer); )
   stat_report = fopen(temp_buffer, "w");
@@ -711,7 +709,7 @@ void printProbabilities(void)
   double   sum_prob;
 
   printf("Selection Probabilities, iteration: %ld\n",iteration);
-  p = (double *)calloc( n, sizeof(double) );
+  p = calloc( n, sizeof(double) );
 
   for (i=0; i < n; i++) {
     printf("From %ld:  ",i);
@@ -770,14 +768,13 @@ void printTourFile( long int *t )
 */
 {
     long int   i;
-
-    fprintf(comp_report,"begin solution\n");
+    FILE * tour_report; 
+     tour_report = fopen("Tour.txt","w");
     for( i = 0 ; i < n ; i++ ) {
-	fprintf(comp_report,"%ld ", t[i]);
+	fprintf(tour_report,"%ld ", t[i]);
     }
-    fprintf(comp_report,"\n");
-    fprintf(comp_report,"Tour length %ld\n",compute_tour_length( t ));
-    fprintf(comp_report,"end solution\n");
+    fprintf(tour_report,"\n");
+    fclose(tour_report);
 }
 
 

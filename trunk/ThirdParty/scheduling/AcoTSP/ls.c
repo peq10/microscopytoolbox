@@ -60,10 +60,6 @@
 #include "ants.h"
 #include "utilities.h"
 
-#define malloc mxMalloc
-#define calloc mxCalloc
-#define free mxFree
-
 long int ls_flag;          /* indicates whether and which local search is used */ 
 long int nn_ls;            /* maximal depth of nearest neighbour lists used in the 
 			      local search */ 
@@ -84,7 +80,7 @@ long int * generate_random_permutation( long int n )
    double    rnd;
    long int  *r;
 
-   r = (long int *)malloc(n * sizeof(long int));  
+   r = malloc(n * sizeof(int));  
 
    for ( i = 0 ; i < n; i++) 
      r[i] = i;
@@ -130,8 +126,8 @@ void two_opt_first( long int *tour )
     long int *pos;               /* positions of cities in tour */ 
     long int *dlb;               /* vector containing don't look bits */ 
   
-    pos = (long int *)malloc(n * sizeof(long int));
-    dlb = (long int *)malloc(n * sizeof(long int));
+    pos = malloc(n * sizeof(long int));
+    dlb = malloc(n * sizeof(long int));
     for ( i = 0 ; i < n ; i++ ) {
 	pos[tour[i]] = i;
 	dlb[i] = FALSE;
@@ -295,8 +291,8 @@ void two_h_opt_first( long int *tour )
     long int *pos;               /* positions of cities in tour */ 
     long int *dlb;               /* vector containing don't look bits */ 
   
-    pos = (long int *)malloc(n * sizeof(long int));
-    dlb = (long int *)malloc(n * sizeof(long int));
+    pos = malloc(n * sizeof(long int));
+    dlb = malloc(n * sizeof(long int));
     for ( i = 0 ; i < n ; i++ ) {
 	pos[tour[i]] = i;
 	dlb[i] = FALSE;
@@ -547,10 +543,10 @@ void three_opt_first( long int *tour )
     long int *hh_tour;           /* help vector for performing exchange move */ 
     long int *random_vector;
 
-    pos = (long int *)malloc(n * sizeof(long int));
-    dlb = (long int *)malloc(n * sizeof(long int));
-    h_tour = (long int *)malloc(n * sizeof(long int));
-    hh_tour = (long int *)malloc(n * sizeof(long int));
+    pos = malloc(n * sizeof(long int));
+    dlb = malloc(n * sizeof(long int));
+    h_tour = malloc(n * sizeof(long int));
+    hh_tour = malloc(n * sizeof(long int));
 
     for ( i = 0 ; i < n ; i++ ) {
 	pos[tour[i]] = i;
