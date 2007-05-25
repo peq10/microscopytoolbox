@@ -11,10 +11,6 @@
 #include "ants.h"
 #include "ls.h"
 
-#define malloc mxMalloc
-#define calloc mxCalloc
-#define free mxFree
-
 
 #ifndef STR_ERR_UNKNOWN_LONG_OPT
 # define STR_ERR_UNKNOWN_LONG_OPT   "%s: unrecognized option `--%s'\n"
