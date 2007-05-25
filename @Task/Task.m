@@ -59,7 +59,6 @@ end
 
 % run time: acqTime and stageMoveTime and fucosTime
 Tsk.acqTime=0;
-Tsk.stageMoveTime=0;
 Tsk.focusTime=0;
 
 % dependencies
