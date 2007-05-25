@@ -33,18 +33,20 @@ MiscData.ImageName='Img';
 
 Pos=createAcqPattern('timelapse',[0 0 0],20); %Pattern, Where to image, Number of images
 
+T=linspace(0,19*3,20);
+
 % Details of all channels.
 ExposureDetails(1).channel='White';
 ExposureDetails(1).exposure=10;
-ExposureDetails(2).channel='DAPI';
-ExposureDetails(2).exposure=500;
-ExposureDetails(3).channel='FITC';
-ExposureDetails(3).exposure=500;
-ExposureDetails(4).channel='Cy3';
-ExposureDetails(4).exposure=500;
+% ExposureDetails(2).channel='DAPI';
+% ExposureDetails(2).exposure=500;
+% ExposureDetails(3).channel='FITC';
+% ExposureDetails(3).exposure=500;
+% ExposureDetails(4).channel='Cy3';
+% ExposureDetails(4).exposure=500;
 
 %% Create a series of dependent tasks
-Tsks = createTaskSeries(MiscData,Pos,ExposureDetails,'acq_simple');
+Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,'acq_simple');
 
 % add to rS (this will automatically update the Task schedule). 
 rS=addTasks(rS,Tsks); 

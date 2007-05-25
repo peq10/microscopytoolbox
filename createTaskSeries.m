@@ -5,6 +5,7 @@ function Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,acqFcn)
 % Usage:
 % MiscData           - struct with misc data: Names of project, dataset, etc.  
 % Pos                - array of structs with the fields: X,Y,Z. 
+% T                  - array of time to image each object (t0=0);
 % ExposureDetails    - struct with exposure details (2 fields: channel,exposure)
 % acqFns             - the acq function (will be the same for all Tasks)
 
@@ -17,7 +18,7 @@ exptime=sum([chnls{2,:}])/1000; % sum all channels and change units to seconds
 chnls=chnls(1,:);
 
 
-for i=1:length(Pos.X)
+for i=1:length(Pos)
     
     %% create the MetaData object
     % 1. constructor call
@@ -37,7 +38,7 @@ for i=1:length(Pos.X)
         'Stage.Z',Pos(i).Z,...
         'channels',chnls,...
         'exposuredetails',ExposureDetails,...
-        'image.name',[Misc.ImageName '_' num2str(i)]);
+        'image.name',[MiscData.ImageName '_' num2str(i)]);
        
     %% create the Task, dependencies exist from i>1
     if i==1

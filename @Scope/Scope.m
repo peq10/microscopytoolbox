@@ -51,7 +51,7 @@ if ~exist('ObjectiveLbl','var')
     disp('3 - Nikon 20X Plan Fluor')
     disp('4 - Nikon 10X Plan Fluor')
 
-    ObjectiveLbl=input('Please chose a number (1/2/3/4)')
+    ObjectiveLbl=input('Please chose a number (1/2/3/4)');
 end
 % set it in mmc
 rS.mmc.setState('Objective',ObjectiveLbl);
@@ -70,6 +70,6 @@ addpath(['ThirdParty' filesep 'scheduling'])
 
 %% create the object from struct
 rS=class(rS,'Scope');
-
+% set(rS,'channel','white');
 
 

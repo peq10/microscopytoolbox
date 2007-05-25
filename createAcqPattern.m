@@ -16,11 +16,10 @@ switch lower(pattern)
     case 'timelapse'
         center=varargin{1}; 
         N=varargin{2};
-        T=cumsum([0 dt*ones(N-1,1)]); 
         for i=1:N
-            Pos(i).X=ones(N,1).*center(:,1);
-            Pos(i).Y=ones(N,1).*center(:,2);
-            Pos(i).Z=ones(N,1).*center(:,3);
+            Pos(i).X=center(:,1);
+            Pos(i).Y=center(:,2);
+            Pos(i).Z=center(:,3);
         end
      case 'grid'
         %TODO write the 'grid' option for the createAcqPattern funcrion
