@@ -49,6 +49,7 @@ Tsks = createTaskSeries(MiscData,Pos,ExposureDetails,'acq_simple');
 % add to rS (this will automatically update the Task schedule). 
 rS=addTasks(rS,Tsks); 
 
+
 %% startacquisition
 run(rS); 
 

@@ -39,7 +39,7 @@ for i=1:length(varargin)
         case 'dependencies'
             varargout=[varargout; {Tsk.dep}];
         case 'runtime'
-            varargout=[varargout; {Tsk.acqTime+Tsk.stageMoveTime+Tsk.focusTime}];
+            varargout=[varargout; {Tsk.acqTime+Tsk.focusTime}];
         case 'userdata'
             varargout=[varargout; {Tsk.UserData}];
         case 'executed'
