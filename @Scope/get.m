@@ -32,7 +32,7 @@ for i=1:length(varargin)
         case 'rootfolder'
             varargout=[varargout; {rS.rootFolder}];
         case 'pixelsize'
-            varargout=[varargout; {rS.pxlsz(rS.mmc.getState('Objective'))}];
+            varargout=[varargout; {rS.pxlsz}];
         case 'objective'
             varargout=[varargout; {rS.mmc.getStateLabel('Objective')}];
         case 'focusmethod'
@@ -47,7 +47,8 @@ for i=1:length(varargin)
               'focusspeed',...
               'focussearchdirection',...
               'focususehilldetect',...
-              'focushilldetectheight'}
+              'focushilldetectheight',...
+              'focustime'}
           varargout=[varargout; {getFocusParams(rS,varargin{i})}];
         case 'currnettaskid'
             varargout=[varargout; {rS.taskID}];
@@ -55,6 +56,18 @@ for i=1:length(varargin)
             varargout=[varargout; {sum(get(rS.TaskBuffer,'executed'))}];
         case 'isrunning'
             varargout=[varargout; {rS.isRunning}];
+        case 'stagespeed.x'
+            [ok,spd]=cmdStg(rS,'getSpeed','X');
+            if ~ok, warning('Stage cmd failed'); end %#ok
+            varargout=[varargout; {spd}];
+        case 'stagespeed.y'
+            [ok,spd]=cmdStg(rS,'getSpeed','Y');
+            if ~ok, warning('Stage cmd failed'); end %#ok
+            varargout=[varargout; {spd}];
+        case 'stagespeed.z'
+            [ok,spd]=cmdStg(rS,'getSpeed','Z');
+            if ~ok, warning('Stage cmd failed'); end %#ok
+            varargout=[varargout; {spd}];
         otherwise
             warning('Throopi:Property:get:Scope',['property: ' varargin{i} ' does not exist in Scope class']) 
     end

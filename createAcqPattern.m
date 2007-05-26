@@ -8,9 +8,9 @@ function Pos = createAcqPattern( pattern,varargin )
 %    varargin will contain a pattern dependent set of varialbe: 
 %
 %   timelapse:  Pos = createAcqPattern('singleSpot',center,N)
-%   grid:          Pos = createAcqPattern('grid',center,N)
+%   grid:          Pos = createAcqPattern('grid',center,r,c,dist,z)
 %   circle:        Pos = createAcqPattern('circle',center,N)
-%   userdef:     Pos = createAcqPattern('userdef',N)
+%   userdef:     Pos = createAcqPattern('userdef',X,Y,Z)
 
 switch lower(pattern)
     case 'timelapse'
@@ -22,8 +22,25 @@ switch lower(pattern)
             Pos(i).Z=center(:,3);
         end
      case 'grid'
-        %TODO write the 'grid' option for the createAcqPattern funcrion
+         if length(varargin)~=5, 
+             error('''grid'' option requires 5 input arguments');
+         end
+         center=varargin{1}; 
+         r=varargin{2}; 
+         c=varargin{3}; 
+         dist=varargin{4}; 
+         z=num2cell(varargin{5}); 
+         xy=fullfact([r c]);
+         x=num2cell((xy(:,1)-r/2)*dist+center(1)); 
+         y=num2cell((xy(:,2)-c/2)*dist+center(2)); 
+         Pos=struct('X',x,'Y',y,'Z',z);
     case 'circle'
         %TODO write the 'circle' option for the createAcqPattern function
     case 'userdef'
+        Pos=struct('X',num2cell(varargin{1}),...
+                   'Y',num2cell(varargin{1}),...
+                   'Z',num2cell(varargin{1}));
+    otherwise
+        Pos=struct('X',{},'Y',{},'Z',{});
+        warning('Unknown pattern, please try again') %#ok
 end

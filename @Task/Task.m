@@ -8,10 +8,11 @@ function Tsk = Task(xy,fcn,dependencies,priority,UserData)
 %  priority - (optional) a positive integer which is the priority of the Task, default = 1; 
 %  UseData  -  (optional) additional user data that will be accessed by the TaskFcn fcn.  
                                                    
+global rS;
 
 %% if MetaData is supplied, get the X,Y from the metadata object
 if strcmp(class(xy),'MetaData')
-    [x,y]=get(xy,'x','y');
+    [x,y]=get(xy,'stage.x','stage.y');
 else
     x=xy(1); 
     y=xy(2); 
@@ -38,17 +39,17 @@ end
 %% create the Tsk struct
 
 % get the ID from the rS object
-Tsk.id=getNewTaskID(rS);
+Tsk.id=getNewTaskIDs(rS);
 
 % update x and y
-Tsk.x=x(i);
-Tsk.y=y(i);
+Tsk.x=x;
+Tsk.y=y;
 
 %update priority
-Tsk.priority=priority(i);
+Tsk.priority=priority;
 
 % get function handles
-Tsk.fcn=fcn{i};
+Tsk.fcn=fcn;
 
 % metadata (if applicable)
 if strcmp(class(xy),'MetaData')
@@ -63,7 +64,7 @@ Tsk.focusTime=0;
 
 % dependencies
 if exist('dependencies','var') && ~isempty(dependencies)
-    Tsk.dep=dependencies{i};
+    Tsk.dep=dependencies;
 else
     Tsk.dep=[];
 end

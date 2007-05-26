@@ -98,11 +98,18 @@ switch lower(cmd)
         % perform the commnad
         sub_cmdStg(cmdstr);
         % update the arg output
-        if strcmp(cnf,'B')
+        if ~isempty(findstr(cnf,'B'))
             arg=1;
-        else %cnf should be N
+        else %cnf should include N
             arg=0;
         end
+    case 'getspeed'
+        cmdstr=['S ' param '?'];
+        sub_cmdStg(cmdstr);
+        arg=str2double(cnf(7:end))*1000;
+    case 'setspeed'
+        cmdstr=['S ' param.axis '=' num2str(param.speed)];
+        sub_cmdStg(cmdstr);
     otherwise
         error([cmd ' is not a valid command for the sate']);
 end
