@@ -1,13 +1,25 @@
-function argout = getFocusParams(rS,argin)
+function argout = getFocusParams(rSin,argin)
 %GETFOCUSPARAMS a private method that isolates the call for focus related
 %properties. 
 
-% Query all parameters from the Stage. 
-[ok,params]=cmdStg(rS,'getfocusparam');
+% this trick make sure rS is updated 
+% notice that rSin MUST be the same global rS object. 
+global rS;
+rS=rSin;
 
-if ~ok
-    error('Could not communicate with the stage to query focus params');
+% deterine if rS has all these parameters
+if isempty(rS.focusParams)
+    % Query all parameters from the Stage.
+    [ok,params]=cmdStg(rS,'getfocusparam');
+    if ~ok
+        error('Could not communicate with the stage to query focus params');
+    end
+    rS.focusParams=params; 
 end
+
+% get the params. 
+params=rS.focusParams;
+
 
 switch lower(argin)
     case 'focusrange'

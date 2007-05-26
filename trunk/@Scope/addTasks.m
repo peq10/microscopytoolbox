@@ -1,4 +1,10 @@
-function rS = addTasks(rS,Tsks)
+function addTasks(rSin,Tsks)
 %ADDTASKS to the rS object
-rS.TaskBuffer=[rS.TaskBuffer; Tsks]; 
-rS=updateTaskSchedule(rS);
+
+% this trick make sure rS is updated 
+% notice that rSin MUST be the same global rS object. 
+global rS;
+rS=rSin;
+
+rS.TaskBuffer=[rS.TaskBuffer; Tsks']; 
+updateTaskSchedule(rS);

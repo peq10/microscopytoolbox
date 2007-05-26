@@ -23,8 +23,5 @@ autofocus(rS);
 %% snap images
 img=acqImg(rS,ExposureDetails);
 
-%% Replace last image in rS 
-set(rS,'LastImage',img);
-
 %% Write image to disk
 writeTiff(md,img); 

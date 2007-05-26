@@ -590,9 +590,9 @@ int main(int argc, char *argv[]) {
 	exit_try(n_try);
     }
     exit_program();
-
-    printTourFile( (*best_so_far_ant).tour);
     
+    printTourFile((*best_so_far_ant).tour);
+
     free( instance.distance );
     free( instance.nn_list );
     free( pheromone );

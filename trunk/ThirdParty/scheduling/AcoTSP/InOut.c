@@ -99,7 +99,7 @@ long int restart_found_best;/* iteration in which restart-best solution is found
 
 /* ------------------------------------------------------------------------ */
 
-FILE *report, *comp_report, *stat_report,*tour_report;
+FILE *report, *comp_report, *stat_report;
 
 char name_buf[LINE_BUF_LEN];
 int  opt;
@@ -576,7 +576,6 @@ void init_program( long int argc, char *argv[] )
   sprintf(temp_buffer,"cmp.%s",instance.name);
   TRACE ( printf("%s\n",temp_buffer); )
   comp_report = fopen(temp_buffer, "w");
-
   sprintf(temp_buffer,"stat.%s",instance.name);
   TRACE ( printf("%s\n",temp_buffer); )
   stat_report = fopen(temp_buffer, "w");
@@ -768,13 +767,14 @@ void printTourFile( long int *t )
 */
 {
     long int   i;
-    FILE * tour_report; 
-     tour_report = fopen("Tour.txt","w");
+    FILE *tour_file;
+    tour_file=fopen("Tour.txt","w");
+
     for( i = 0 ; i < n ; i++ ) {
-	fprintf(tour_report,"%ld ", t[i]);
+	fprintf(tour_file,"%ld ", t[i]);
     }
-    fprintf(tour_report,"\n");
-    fclose(tour_report);
+    fprintf(tour_file,"\n");
+    fclose(tour_file);
 }
 
 

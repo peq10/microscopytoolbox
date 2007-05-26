@@ -31,9 +31,11 @@ MiscData.Experimenter='Roy Wollman';
 MiscData.Experiment='testing throopi the roboscope';
 MiscData.ImageName='Img'; 
 
-Pos=createAcqPattern('timelapse',[0 0 0],20); %Pattern, Where to image, Number of images
+N=25;
 
-T=linspace(0,19*3,20);
+Pos=createAcqPattern('grid',[0 0],10,10,1000,zeros(100,1)); %Pattern, Where to image, Number of images
+
+T=linspace(0,19*3,100);
 
 % Details of all channels.
 ExposureDetails(1).channel='White';
@@ -49,7 +51,7 @@ ExposureDetails(1).exposure=10;
 Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,'acq_simple');
 
 % add to rS (this will automatically update the Task schedule). 
-rS=addTasks(rS,Tsks); 
+addTasks(rS,Tsks); 
 
 
 %% startacquisition

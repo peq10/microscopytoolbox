@@ -1,6 +1,9 @@
-function set(rS, varargin)
+function set(rSin, varargin)
 %SET sets rS internal properties. 
 % call set(rs) for list of arguments
+
+global rS;
+rS=rSin;
 
 n=length(varargin);
 allowed_properties={...
@@ -31,6 +34,14 @@ for i=1:2:n
             ok=cmdStg(rS,'move',param);
             if ~ok
                 warning('Could not move to sepecified position') %#ok
+            end
+        case {'stagespeed.x','stagespeed.y','stagespeed.z'}
+            [bla,ax]=strtok(varargin{i},'.');
+            param.axis=upper(ax(2));
+            param.speed=varargin{i+1}/1000; 
+            ok=cmdStg(rS,'setspeed',param);
+            if ~ok
+                warning('Could not set stage speed appropriatly.') %#ok
             end
         case 'channel'
             % check that config is char
@@ -63,7 +74,7 @@ for i=1:2:n
               'focussearchdirection',...
               'focususehilldetect',...
               'focushilldetectheight'}
-             setFocusParams(rS,varargin{i},varargin{i+1});
+             rS=setFocusParams(rS,varargin{i},varargin{i+1});
         case 'lastimage'
             rS.lastImage=varargin{i+1};
         case 'schedulingmethod'

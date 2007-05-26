@@ -59,7 +59,9 @@ rS.mmc.setState('Objective',ObjectiveLbl);
 % load the pixel sizes from file
 pxlsz=csvread('PixelSizeList.csv');
 pxlsz=sortrows(pxlsz);
-rS.pxlsz=pxlsz(:,2);
+rS.pxlsz=pxlsz(ObjectiveLbl,2);
+
+rS.focusParams=[]; %will be updated in first call for getFocusParams
 
 %% add folder to the path
 addpath TaskFcns

@@ -1,6 +1,11 @@
-function setFocusParams(rS,argin,param)
+function setFocusParams(rSin,argin,param)
 %GETFOCUSPARAMS a private method that isolates the call for focus related
 %properties. 
+
+% this trick make sure rS is updated without ading it to the output arguments. 
+% notice that rSin MUST be the same global rS object. 
+global rS;
+rS = rSin;
 
 switch lower(argin)
     case 'focusrange'
@@ -44,3 +49,6 @@ switch lower(argin)
     otherwise
         warning('Focus Property does not exist or cannot be chagned'); %#ok
 end
+
+rS.focusParams=[];
+get(rS,'focusRange'); 

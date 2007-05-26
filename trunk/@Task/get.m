@@ -45,7 +45,7 @@ for i=1:length(varargin)
         case 'executed'
             varargout=[varargout; {Tsk.executed}];
         otherwise
-            warning('Throopi:Property:get:Task',['property: ' varargin{i} ' does not exist in Scope class']);
+            error('Throopi:Property:get:Task',['property: ' varargin{i} ' does not exist in Task class']);
     end
 end
             

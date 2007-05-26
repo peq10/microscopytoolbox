@@ -86,6 +86,7 @@ for i=1:2:n
             % stage position must be numeric
             if ~isa(varargin{i+1},'numeric'), warning('Stage position must be numeric'); end %#ok
             [bla,ax]=strtok(varargin{i},'.'); %#ok 
+            ax=ax(2:end);
             ax=upper(ax);
             xml=sub_set(xml,'/OME/Image/StageLabel',ax,num2str(varargin{i+1}));
         case 'channels'
@@ -94,7 +95,7 @@ for i=1:2:n
             % TODO need to renumber the channels
             if ~fnd, warning('Channels do not exist - please check'); end %#ok
         case 'exposuredetails'
-            md.exposuredetails=varargin{i+1};
+            md.ExposureDetailes=varargin{i+1};
         case 'creationdate'
             % converts to correct format using matlab's datenum, make sure
             % datenum gets you the right date...
