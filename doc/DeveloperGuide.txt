@@ -49,7 +49,7 @@ display   - command line status of devices
 unload    - unload devices from MMC, should always be called at the end, a destructor. 
 acqImg    - acquires image based on rS properties
 autofocus - perform autofocus using current focus method and its currnet settings
-
+waitFor   - wait for device
 %% Need to write (until END): 
 
 updateTasksExecutionTimes

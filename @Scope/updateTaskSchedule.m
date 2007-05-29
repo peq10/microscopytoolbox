@@ -42,11 +42,6 @@ switch lower(mthd)
         if range(x)+range(y)==0
             tr=1:length(id);
         else
-            % first make sure there are more then 20 (why 20??) points
-            mltp=ceil(20/length(id));
-            x=repmat(x,mltp,1);
-            y=repmat(x,mltp,1);
-
             % create a .tsp file
             fid=fopen('Tasks.tsp','w');
             fprintf(fid,'NAME : Tasks\n');
@@ -61,11 +56,15 @@ switch lower(mthd)
 
             % run ACOTSP
             cmd='acotsp -i Tasks.tsp -r 1 -t 3';
-            system(cmd);
-            tr = dlmread('Tour.txt');
-            tr=tr(1:length(id));
-            tr=tr+1;
-
+            msg=system(cmd); %#ok<NASGU>
+            if msg==0
+                tr = dlmread('Tour.txt');
+                tr=tr(1:length(x));
+                tr=tr+1;
+            else
+                warning('Scheduling failed!!!!! no idea why... ')
+                tr=1:length(x);
+            end
 
         end
         

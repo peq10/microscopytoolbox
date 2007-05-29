@@ -10,6 +10,16 @@ for i=1:2:length(varargin)
             Tsk.stageMoveTime=varargin{i+1};
         case 'focustime'
             Tsk.focusTime=varargin{i+1};
+        case 'metadata'
+            if ~strcmp(class(varargin{i+1}),'MetaData')
+                error('Task MetaData must be of class MetaData - DAh!');
+            end
+            Tsk.md=varargin{i+1};
+        case 'executed'
+            if ~islogical(varargin{i+1})
+                error('executed state must be logical (true/false)');
+            end
+            Tsk.executed=varargin{i+1};
         otherwise
             warning('Throopi:Task:UpdateTimes','Cannot set this property');
     end
