@@ -10,7 +10,7 @@ function [Tsks,indx] = getTasks( rS,idx,bysch )
 
 % fill in default values
 if ~exist('bysch','var')
-    bysch=true;
+    bysch=1;
 end
     
 % transform char into indexes
@@ -35,7 +35,7 @@ switch bysch
         indx=idx;
     case 1 %index is for schedule
         %validate input
-        if isempty(rS.TaskSchedule) || idx > size(rS.TaskSchedule,1)
+        if isempty(rS.TaskSchedule) || max(idx) > size(rS.TaskSchedule,1)
             error('Task requested is outside of current schedule, please update schedule and try again');
         end
         % find the shared ids between buffer and schedule

@@ -1,16 +1,9 @@
 % This script is an example of how to run Throopi the Roboscope. 
-% This example shows a simple time lapse and it is initialized via script
-% (no gui involved...). 
-% "Algorithm" outline
-% =========================
+% Performed setps
 % 1. Initialize the scope. 
-% 2. set up acquisition details in a few 
-%     3.1 Initialize a acqusition data secquence that contains the
-%           position, exposures etc for all the sites within this well.
-%     3.2 Initialize an acquisition sequence based on the AcqData object
-%           from 3.1
-%     3.3 starts and waits for the dequence to end. 
-% 
+% 2. get some acuisition details 
+% 3. create and add tasks base on step 2. 
+% 4. run Throopi. 
 
 %% Init Scope
 
@@ -30,8 +23,6 @@ MiscData.DatasetName='Tst1';
 MiscData.Experimenter='Roy Wollman';
 MiscData.Experiment='testing throopi the roboscope';
 MiscData.ImageName='Img'; 
-
-N=25;
 
 Pos=createAcqPattern('grid',[0 0],10,10,1000,zeros(100,1)); %Pattern, Where to image, Number of images
 
