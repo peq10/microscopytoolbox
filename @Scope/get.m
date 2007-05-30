@@ -68,6 +68,8 @@ for i=1:length(varargin)
             [ok,spd]=cmdStg(rS,'getSpeed','Z');
             if ~ok, warning('Stage cmd failed'); end %#ok
             varargout=[varargout; {spd}];
+        case 'lastimage'
+            varargout=[varargout; {rS.lastImage}];
         otherwise
             warning('Throopi:Property:get:Scope',['property: ' varargin{i} ' does not exist in Scope class']) 
     end

@@ -29,14 +29,15 @@ Pos=createAcqPattern('grid',[0 0],10,10,1000,zeros(100,1)); %Pattern, Where to i
 T=linspace(0,19*3,100);
 
 % Details of all channels.
+ExposureDetails=[];
 ExposureDetails(1).channel='White';
 ExposureDetails(1).exposure=10;
+ExposureDetails(1).channel='Cy3';
+ExposureDetails(1).exposure=300;
+
 % ExposureDetails(2).channel='DAPI';
 % ExposureDetails(2).exposure=500;
-% ExposureDetails(3).channel='FITC';
-% ExposureDetails(3).exposure=500;
-% ExposureDetails(4).channel='Cy3';
-% ExposureDetails(4).exposure=500;
+
 
 %% Create a series of dependent tasks
 Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,'acq_simple');
