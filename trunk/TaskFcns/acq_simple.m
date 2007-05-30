@@ -18,10 +18,15 @@ md=get(Tsk,'MetaData');
 set(rS,'xyz',[X Y Z]);
 
 %% autofocus
-autofocus(rS);
+% autofocus(rS);
 
 %% snap images
 img=acqImg(rS,ExposureDetails);
 
 %% Write image to disk
 writeTiff(md,img); 
+
+set(rS,'lastImage',img(:,:,2)); 
+
+figure(1)
+imshow(img(:,:,2),[]); 

@@ -1,7 +1,4 @@
 % This script is an example of how to run Throopi the Roboscope. 
-% This example shows an application in which the user choses multiple
-% acquisition sites and the roboscope cycle between them to create time
-% lapse movies. 
 %
 % "Algorithm" outline
 % =========================
@@ -35,46 +32,19 @@ MiscData.Objective='10x';
 MiscData.Experimenter='Roy Wollman';
 MiscData.Experiment='testing throopi the roboscope';
 
-AcqPos=createAcqPattern('singleSpot',10,3);
-
-% use all defualt values for acquisition functions
-acqFns.acq='';
-acqFns.astart='';
-acqFns.stop='';
-acqFns.error='';
+r=5;
+c=5;
+Pos=createAcqPattern('grid',[0 0],r,c,100,zeros(r*c,1));
 
 ExposureDetails(1).channel='White';
 ExposureDetails(1).exposure=10;
-ExposureDetails(2).channel='DAPI';
-ExposureDetails(2).exposure=500;
-ExposureDetails(3).channel='FITC';
-ExposureDetails(3).exposure=500;
-ExposureDetails(4).channel='Cy3';
-ExposureDetails(4).exposure=500;
+ExposureDetails(2).channel='Cy3';
+ExposureDetails(2).exposure=1000;
 
-%% ask the user to start multiple acquisition sequences
+Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,'acq_simple');
+removeTasks(rS,'all');
+addTasks(rS,Tsks);
 
-%TODO: create user input GUI
-
-
-%% ask user to click on multiple dividng cells, stop by left click
-fig=figure;
-b=1;
-while b~=3
-    uiwait(msgbox('please identify cell in scope - press button to show image'));
-    img=acqImg(rS);
-    imshow(img,fig);
-    uiwait(msgbox('please confirm site'));
-    [X,Y,Z]=get(rS,'X','Y','Z');
-    AcqPos=[AcqPos; [X Y Z]];
-end
-
-%% start acquisition - create array of AcqSeq objects and start them. 
-
-for i=1:size(AcqPos,1)
-    pattern={'singleSpot',AcqPos(i,:)};
-    AqSq(i)=AcqSeq(Sld,pattern,NumberOfSites,ExposureDetails,'tst');
-    start(AqSq(i));
-end
-
+%%
+run(rS)
 

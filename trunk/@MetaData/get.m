@@ -42,8 +42,8 @@ for i=1:length(varargin)
         case 'fullfilename'
             varargout=[varargout fullfile(get(md,'path'),get(md,'filename'))];
         case 'path'
-            pth=[get(rS,'rootFolder') filesep ...
-                sub_get(md.xml,'/OME/Project','Name') filesep
+            pth=[get(rS,'rootFolder') ...
+                sub_get(md.xml,'/OME/Project','Name') filesep ...
                 sub_get(md.xml,'/OME/Dataset','Name')];
             varargout=[varargout {pth}];
         case 'objective'
@@ -136,7 +136,7 @@ for i=1:length(varargin)
             str=save(md.xml);
             varargout=[varargout {str}];
         case 'exposuredetails'
-            varargout=[varargout {md.ExposureDetails}];
+            varargout=[varargout {md.ExposureDetailes}];
         case 'dt'
             varargout=[varargout {str2double(sub_get(md.xml,'/OME/Image','TimeIncrement'))}];
         otherwise

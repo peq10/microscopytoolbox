@@ -74,7 +74,7 @@ for i=1:2:n
               'focussearchdirection',...
               'focususehilldetect',...
               'focushilldetectheight'}
-             rS=setFocusParams(rS,varargin{i},varargin{i+1});
+             setFocusParams(rS,varargin{i},varargin{i+1});
         case 'lastimage'
             rS.lastImage=varargin{i+1};
         case 'schedulingmethod'
