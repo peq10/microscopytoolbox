@@ -1,4 +1,4 @@
-function Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,acqFcn)
+function Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,acqFcn,UserData)
 % createTaskSeries: create an array of serially dependent tasks. 
 %                   it gathers all acquisition details and creates Tasks objects. 
 % 
@@ -16,6 +16,10 @@ global rS;
 chnls=squeeze(struct2cell(ExposureDetails));
 exptime=sum([chnls{2,:}])/1000; % sum all channels and change units to seconds
 chnls=chnls(1,:);
+
+if ~exist('UserData','var')
+    UserData=[];
+end
 
 %% create the first task 
 MD=MetaData('Template.ome');
@@ -36,6 +40,7 @@ MD = set(MD,...
     'exposuredetails',ExposureDetails,...
     'image.name',[MiscData.ImageName '_' num2str(1)]);
 Tsks(1) = Task(MD,acqFcn);
+Tsks(1) = set(Tsks(1),'UserData',UserData);
 
 %% create rest of tasks by changing MD and adding dependencies
 for i=2:length(Pos);
@@ -46,6 +51,8 @@ for i=2:length(Pos);
     dt=T(i)-T(i-1);
     Tsks(i) = Task(MD,acqFcn,[get(Tsks(i-1),'id') dt]);
     Tsks(i)=set(Tsks(i),'acqTime',exptime,'focusTime',get(rS,'focusTime'));
+    
+    Tsks(i) = set(Tsks(i),'UserData',UserData);
 end
    
 

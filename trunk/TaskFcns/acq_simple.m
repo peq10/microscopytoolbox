@@ -15,10 +15,12 @@ md=get(Tsk,'MetaData');
 [X,Y,Z,ExposureDetails]=get(md,'stage.X','stage.Y','stage.Z','ExposureDetails');
 
 %% goto XYZ
-set(rS,'xyz',[X Y Z]);
-
+set(rS,'xy',[X Y]);
+set(rS,'z',Z);
+figure(3)
+plot(X,Y,'or');
 %% autofocus
-% autofocus(rS);
+autofocus(rS);
 
 %% snap images
 img=acqImg(rS,ExposureDetails);
@@ -26,7 +28,7 @@ img=acqImg(rS,ExposureDetails);
 %% Write image to disk
 writeTiff(md,img); 
 
-set(rS,'lastImage',img(:,:,2)); 
+set(rS,'lastImage',img(:,:,1)); 
 
 figure(1)
-imshow(img(:,:,2),[]); 
+imshow(img(:,:,1),[])

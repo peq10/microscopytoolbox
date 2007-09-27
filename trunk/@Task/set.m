@@ -20,6 +20,8 @@ for i=1:2:length(varargin)
                 error('executed state must be logical (true/false)');
             end
             Tsk.executed=varargin{i+1};
+        case 'userdata'
+            Tsk.UserData=varargin{i+1};
         otherwise
             warning('Throopi:Task:UpdateTimes','Cannot set this property');
     end

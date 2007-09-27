@@ -8,19 +8,13 @@ varargout={};
 for i=1:length(varargin)
     switch lower(varargin{i})
         case 'x'
-            [ok,xpos]=cmdStg(rS,'where','X');
-            if ~ok, warning('Stage cmd failed'); end %#ok
-            varargout=[varargout; {xpos}];
+            varargout=[varargout; {rS.mmc.getXPosition(rS.XYstageName)}];
         case 'y'
-            [ok,ypos]=cmdStg(rS,'where','Y');
-            if ~ok, warning('Stage cmd failed'); end %#ok
-            varargout=[varargout; {ypos}];
+            varargout=[varargout; {rS.mmc.getYPosition(rS.XYstageName)}];
         case 'z'
-            [ok,zpos]=cmdStg(rS,'where','Z');
-            if ~ok, warning('Stage cmd failed'); end %#ok
-            varargout=[varargout; {zpos}];
+            varargout=[varargout; {rS.mmc.getPosition(rS.ZstageName)}];
         case 'channel'
-             varargout=[varargout; {rS.mmc.getCurrentConfig('Channel')}];
+             varargout=[varargout; {char(rS.mmc.getCurrentConfig('Channel'))}];
         case 'exposure'
             varargout=[varargout; {rS.mmc.getExposure}];
         case 'width'
@@ -40,10 +34,16 @@ for i=1:length(varargin)
         case 'schedulingmethod'
             varargout=[varargout; {rS.schedulingMethod}];
         case 'stagebusy'
-            [ok,bsy]=cmdStg(rS,'getStatus');
-            varargout=[varargout; bsy];
-        case {'focusscore',...
-              'focusrange',...
+            varargout=[varargout; rS.mmc.deviceBusy(rS.XYstageName)];
+        case 'focusscore'
+            % this is "hack" will need to change with autofocus device
+            % it contains ASI specifics that should go away...
+            cmdstr='rdadc z';
+            rS.mmc.setSerialPortCommand(rS.COM,cmdstr,char(13))
+            str=char(rS.mmc.getSerialPortAnswer(rS.COM,char(13)));
+            str=regexprep(str,':A','');
+            varargout=[varargout; str2double(str)];
+        case {'focusrange',...
               'focusspeed',...
               'focussearchdirection',...
               'focususehilldetect',...
@@ -70,6 +70,10 @@ for i=1:length(varargin)
             varargout=[varargout; {spd}];
         case 'lastimage'
             varargout=[varargout; {rS.lastImage}];
+        case 'binning'
+            varargout=[varargout; {str2double(rS.mmc.getProperty('DigitalCamera','Binning'))}];
+        case 'autoshutter'
+            varargout=[varargout; {rS.getAutoShutter}];
         otherwise
             warning('Throopi:Property:get:Scope',['property: ' varargin{i} ' does not exist in Scope class']) 
     end

@@ -1,9 +1,11 @@
-function display(md)
-%DISPLAY the MetaData
+function display( md )
+%DISPLAY Summary of this function goes here
+%   Detailed explanation goes here
 
-if length(md)==1
-    save(md.xml)
-else
-    str=[inputname(1) ' is an array with ' num2str(length(md)) ' MetaData objects'];
-    disp(str);
-end
+str=get(md,'xml');
+
+%% pretty it up (very limited for now...)
+%TODO improve command line output of MetaData xml
+str=regexprep(str,'<Image>','\n<Image>');
+str=regexprep(str,'<DisplayOptions','\n<DisplayOptions');
+disp(str)

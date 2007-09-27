@@ -2,14 +2,12 @@ function waitFor(rS,dv)
 %WAITFOR Summary of this function goes here
 %   Detailed explanation goes here
 
-
-
 switch dv
     case 'stage'
         fprintf('waiting for stage');
         while get(rS,'stageBusy')
             fprintf('.')
-            pause(0.01)
+            pause(0.05)
         end
         fprintf('done\n');
     otherwise

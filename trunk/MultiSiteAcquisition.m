@@ -14,33 +14,33 @@
 %% Init Scope
 
 % the scope configuration file that will be passed to MicroManager
-ScopeConfigFileName='Scope_noStage.cfg';
+ScopeConfigFileName='ScopeWithStageFocusThroughMMserial.cfg';
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)
 rS=Scope(ScopeConfigFileName);
 
-
 %%  Create the structures needed for acquisitions
-
-% This will be done by a GUI in the future. 
 
 % not sure what will get here. 
 MiscData.ProjectName='InitialTest';
 MiscData.DatasetName='Tst1';
-MiscData.Objective='10x';
+MiscData.Objective='40x';
 MiscData.Experimenter='Roy Wollman';
 MiscData.Experiment='testing throopi the roboscope';
+MiscData.ImageName='img';
 
 r=5;
 c=5;
 Pos=createAcqPattern('grid',[0 0],r,c,100,zeros(r*c,1));
 
 ExposureDetails(1).channel='White';
-ExposureDetails(1).exposure=10;
-ExposureDetails(2).channel='Cy3';
+ExposureDetails(1).exposure=1;
+ExposureDetails(2).channel='FITC';
 ExposureDetails(2).exposure=1000;
 
+%%
+T=zeros(r*c,1);
 Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,'acq_simple');
 removeTasks(rS,'all');
 addTasks(rS,Tsks);

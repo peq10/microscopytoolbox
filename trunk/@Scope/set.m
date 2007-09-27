@@ -22,19 +22,20 @@ if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
-        case {'x','y','z','xy','xz','yz','xyz'}
-            if ~isreal(varargin{i+1}) && numel(varargin{i+1})~=numel(varargin{i})
-                error(['Send ' varargin{i} ' as REAL number such that number of axis equal to positions']);
-            end
-            % create the parameter struct
-            for j=1:length(varargin{i})
-                param(j).axis=varargin{i}(j); %#ok
-                param(j).position=varargin{i+1}(j); %#ok
-            end
-            ok=cmdStg(rS,'move',param);
-            if ~ok
-                warning('Could not move to sepecified position') %#ok
-            end
+        case 'x'
+            x=varargin{i+1};
+            y=rS.mmc.getYPosition(rS.XYstageName);
+            rS.mmc.setXYPosition(rS.XYstageName,x,y);
+        case 'y'
+            x=rS.mmc.getXPosition(rS.XYstageName);
+            y=varargin{i+1};
+            rS.mmc.setXYPosition(rS.XYstageName,x,y);
+        case 'xy'
+            x=varargin{i+1}(1);
+            y=varargin{i+1}(2);
+            rS.mmc.setXYPosition(rS.XYstageName,x,y);
+        case'z'
+            rS.mmc.setPosition(rS.ZstageName,varargin{i+1})
         case {'stagespeed.x','stagespeed.y','stagespeed.z'}
             [bla,ax]=strtok(varargin{i},'.');
             param.axis=upper(ax(2));
@@ -44,9 +45,9 @@ for i=1:2:n
                 warning('Could not set stage speed appropriatly.') %#ok
             end
         case 'channel'
-            % check that config is char
+             % check that config is char
             if ~ischar(varargin{i+1}), error('Channel state must be char!'); end
-            % Capitalize channel
+            % Capitalize channel first letter
             varargin{i+1}=regexprep(varargin{i+1}, '(^.)', '${upper($1)}');
             % check that config state is "legal"
             if ~(rS.mmc.isConfigDefined('Channel',varargin{i+1}))
@@ -62,8 +63,6 @@ for i=1:2:n
                 error('Exposure must be a double scalar!');
             end
             rS.mmc.setExposure(varargin{i+1});
-        case 'whiteshutter'
-        case 'flourshutter'
         case 'rootFolder'
             if ~ischar(varargin{i+1}) || ~exist(varargin{i+1},'dir')
                 error('rootFolder must be a string and a legit folder, please check');
@@ -81,6 +80,10 @@ for i=1:2:n
             rS.schedulingMethod=varargin{i+1};
         case 'focusmethod'
             rS.focusMethod=varargin{i+1};
+        case 'binning'
+            rS.mmc.setProperty('DigitalCamera','Binning',num2str(varargin{i+1}));
+        case 'autoshutter'
+            rS.mmc.setAutoShutter(logical(varargin{i+1}))
         otherwise
             warning('Unrecognized attribute') %#ok
     end

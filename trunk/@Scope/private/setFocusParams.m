@@ -9,46 +9,46 @@ rS = rSin;
 
 switch lower(argin)
     case 'focusrange'
-        cmdStg(rS,'setfocusrange',param); % Assuming param is in micron
+        cmdstr=['AFSET Y=' num2str(param*10)]; % param should be in micron
+        rS.mmc.setSerialPortCommand(rS.COM,cmdstr,char(13));
     case 'focusspeed'
-        cmdStg(rS,'setfocusspeed',param);
-    case 'focushilldetectheight'
-        cmdStg(rS,'setfocushillheight',param);
-    case 'focussearchdirection'
-        switch param
-            case 'UP'
-                fcstype=2;
-            case 'DOWN'
-                fcstype=4;
-            case 'SPLIT'
-                fcstype=6;
-        end
-        if get(rS,'focususehilldetect')
-                fcstype=fcstype+6;
-        end
-        crntrng=get(rS,'focusrange');
-        set(rS,'focusrange',0);
-        cmdStg(rS,'autofocus',fcstype);
-        set(rS,'focusrange',crntrng);
-    case 'focususehilldetect'
-        switch get(rS,'focussearchdirection')
-             case 'UP'
-                fcstype=2;
-            case 'DOWN'
-                fcstype=4;
-            case 'SPLIT'
-                fcstype=6;
-        end
-        if param
-                fcstype=fcstype+6;
-        end
-        crntrng=get(rS,'focusrange');
-        set(rS,'focusrange',0);
-        cmdStg('autofocus',fcstype);
-        set(rS,'focusrange',crntrng);
+        cmdstr=['AFSET X=' num2str(param)]; % param should be in micron
+        rS.mmc.setSerialPortCommand(rS.COM,cmdstr,char(13));
+%     case 'focushilldetectheight'
+%         cmdStg(rS,'setfocushillheight',param);
+%     case 'focussearchdirection'
+%         switch param
+%             case 'UP'
+%                 fcstype=2;
+%             case 'DOWN'
+%                 fcstype=4;
+%             case 'SPLIT'
+%                 fcstype=6;
+%         end
+%         if get(rS,'focususehilldetect')
+%                 fcstype=fcstype+6;
+%         end
+%         crntrng=get(rS,'focusrange');
+%         set(rS,'focusrange',0);
+%         cmdStg(rS,'autofocus',fcstype);
+%         set(rS,'focusrange',crntrng);
+%     case 'focususehilldetect'
+%         if (crntfcsparams.type<=6) && param
+%             fcstype=crntfcsparams.type+6;
+%             crntrng=get(rS,'focusrange');
+%             set(rS,'focusrange',0);
+%             cmdStg(rS,'autofocus',fcstype);
+%             set(rS,'focusrange',crntrng);
+%         elseif (rS.focusParams.type>6) && ~param
+%             fcstype=rS.focusParams.type-6;
+%             crntrng=get(rS,'focusrange');
+%             set(rS,'focusrange',0);
+%             cmdStg(rS,'autofocus',fcstype);
+%             set(rS,'focusrange',crntrng);
+%         end
     otherwise
         warning('Focus Property does not exist or cannot be chagned'); %#ok
 end
 
 rS.focusParams=[];
-get(rS,'focusRange'); 
+

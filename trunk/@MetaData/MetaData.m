@@ -1,47 +1,37 @@
-function md=MetaData(filename,n)
-% MetaData constructor
-% Usage: 
-% filename  -  either  .tiff .xml or .ome
-% n (optional) - number of array elements to create. 
-%
-%  Remark: 
-%  MetaData in its current implementation uses xmltree, so make sure it exist in the path
+function md = MetaData( varargin )
+%METADATAconstructor of the MetaData class
+%   few alternative calls: 
+%      md=MetaData(filename)   -   where filename is I3-tiff or xml
+%      md=MetaData;                -   this will construct a skeleton
+%      md=MetaData('PropertyName',PropertyValue,...) - Build a default and
+%                                                                              changes it accordngly
 
 
-%% check input arguments
-
-error(nargchk(0,1,nargin))
-
-if ~ischar(filename)
-    error('Filename should be charachter');
-end
-
-if ~exist(filename,'file')
-    error(['could not find the filename ' filename ' please check']);
-end
-
-%% create an array if necessary. 
-
-if nargin==2 && n>1
-    for i=1:n
-        md(i)=MetaData; 
-    end
+% Here I deal with the case of an empty MetaData object
+% All default values are defined in the default.xml file in the private
+% folder
+if nargin ==0
+    md=MetaData('private/default.xml');
     return
 end
 
-%% read the xml from the tiff header /xml file itself
-
-[pathstr, name, ext] = fileparts(filename);
-switch ext
-    case {'.tif','.tiff'}
-        info=imfinfo(filename);
-        xml=xmltree(info(1).ImageDescription);
-    case {'.xml','.ome'}
-        xml=xmltree(filename);
-    otherwise
-        error([filename ' is not a supported type, should be tiff, tif ome or xml']);
+% Here I deal with the possibility of building it from file
+if nargin == 1 
+    filename=varargin{1};
+    [pathstr, name, ext] = fileparts(filename); %#ok
+    switch ext
+        case {'.tif','.tiff'}
+            info=imfinfo(filename);
+            md=xml2struct(info(1).ImageDescription);
+        case {'.xml'}
+            md=loadXML(filename);
+        otherwise
+            error([filename ' is not a supported type, should be tiff, tif or xml']);
+    end
+    md=md.III;
+    md=class(md,'MetaData');
+    return
 end
-
-md.ExposureDetailes=[];
-md.xml=xml;
-md=class(md,'MetaData');
+% Here I deal with the case of pairs of properties name and values
+md = MetaData; 
+md= set(md,varargin);
