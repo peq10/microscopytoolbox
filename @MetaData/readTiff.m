@@ -1,73 +1,51 @@
-function img=readTiff(md)
+function img=readTiff(md,pth)
 % readTiff - a method of an MetaData object, get the filename from the md
 % object and reads it 
-% reads an OME-tiff file and returns an image and meta-data structure.
+% reads an multi-plane tiff file and returns an image checks if img
+% meta-data structure is the same is input object md
 % It will reshape the img multi-D array acording to metadata 
 %
 % This is done with a few steps: 
 % 1. get tiff header 2. parse xml 3. get img atr 4. get img 5.trans img. 
 % 
-% depends on package xmltree 
 
 %% get the filename & check it
-filename=get(md,'fullfilename');
+filename=[pth get(md,'filename')];
 
 % checks to see that filename exists
 if ~exist(filename,'file')
     error([filename 'does not exist, please check the MetaData object validity']);
 end
 
-%% get Image sizes attributes 
-[SizeX,SizeY,SizeZ,SizeT,SizeC,dimensionOrder]=get(md,'SizeX','SizeY','SizeZ','SizeT','SizeC','dimension_order');
-
-%% validate that the number of planes is appropriate - only warnings...
-Nexist=length(info); 
-Nneeded=SizeZ*SizeT*SizeC;
-
-if Nexist>Nneeded
-    warning(['Image has MORE planes then defnined in metadata - discarding ' num2str(Nexist-Nneeded) ' planes']) %#ok
-    N=Nneeded;
-elseif Nexist<Nneeded
-    warning(['Image has LESS planes then defnined in metadata - missing ' num2str(Nneeded-Nexist) ' planes'])  %#ok 
-    N=Nexist;
-else
-    N=Nneeded;
+% checks to file metadata is equal to MD
+md_fromfile=MetaData([pth filename]);
+if ~isequal(md_fromfile,md)
+    error(['MetaData in file is different from suppleid MD object\n'...
+             'If you changed somthing in MD, please update the file using updateTiffMetaData first']);
 end
+clear md_fromfile;
 
-% To allow creating large stack from images, Init says at what plane to
-% start. 
-Init=1;
+%% get number of planes
+tiffinfo=imfinfo([pth filename]);
+N=lemgth(tiffinfo);
 
+dim=get(md,'dimensionsize');
 
-%% get all image planes
-fprintf('\n');
-img=zeros(SizeX,SizeY,N-Init+1);
-for i=Init:(N)
-    img(:,:,i-Init+1)=imread(filename,i);
-    fprintf('.');
-end
-fprintf('\n');
-        
+if N ~= prod(dim), error('Number of planes in file is different that expected by attribute DimensionSize, please check'); end
 
-%% Transform dimensionality 
- 
-switch dimensionOrder
-    case 'XYZTC'
-        dim=[SizeZ SizeT SizeC];
-    case 'XYZCT'
-        dim=[SizeZ SizeC SizeT];
-    case 'XYCTZ'
-        dim=[SizeC SizeT SizeZ];
-    case 'XYCZT'
-        dim=[SizeC SizeZ SizeT];
-    case 'XYTCZ'
-        dim=[SizeT SizeC SizeZ];
-    case 'XYTZC'
-        dim=[SizeT SizeZ SizeC];
-    otherwise
-        error('Pixels DimensionOrder is invalid, check the xml header of this OME-tiff');
-end
+%% read image
+% fprintf('\n');
+% img=zeros(SizeX,SizeY,N-Init+1);
+% for i=1:(N)
+%     img(:,:,i)=imread(filename,i);
+%     fprintf('\b\b\b\b%04i',i);
+% end
+% fprintf('\n');
 
+% Nedelec's version is faster that Matlab's (or should be...);
+img=tiffread(filename);
+
+%% trandform to 5D if needed
 [ii,jj,kk]=ind2sub(dim,1:N);
 
 imgT=zeros(size(img,1),size(img,2),max(ii),max(jj),max(kk));
@@ -75,5 +53,5 @@ for i=1:N
     imgT(:,:,ii(i),jj(i),kk(i))=img(:,:,i);
 end
 
-
+img=imgT;
 

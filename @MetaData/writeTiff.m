@@ -1,11 +1,7 @@
-function writeTiff(md,img)
+function writeTiff(md,img,pth)
 % writeTiff to disk using md properties for filename 
 
-[fullfilename,pth]=get(md,'fullfilename','path');
-
-if ~exist(pth,'dir')
-    mkdir(pth)
-end
+filename=[pth get(md,'filename')];
 
 if length(md)>1
     warning('You supplied an array, using only the first MetaData object in it');  %#ok<WNTAG>
@@ -23,7 +19,7 @@ plns=prod(dim)/dim(1)/dim(2);
 img=reshape(img,[dim(1) dim(2) plns]);
 
 %% write tiff
-imwrite(img(:,:,1),fullfilename,'description',str);
+imwrite(img(:,:,1),filename,'description',str);
 for i=2:size(img,3)
-    imwrite(img(:,:,i),fullfilename,'writemode','append');
+    imwrite(img(:,:,i),filename,'writemode','append');
 end

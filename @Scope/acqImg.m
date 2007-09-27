@@ -8,6 +8,7 @@ function img = acqImg(rS,ExpDetails)
 %                    * exposure: the exposure time for this channel
 
 [w,h,bd]=get(rS,'Width','Height','BitDepth');
+crnt_chnl=get(rS,'channel');
 
 % if no exposure settings, use current rS setting
 if ~exist('ExpDetails','var')
@@ -16,13 +17,21 @@ end
 
 n=length(ExpDetails);
 img=zeros(h,w,n); % notice the traspose element in the loop
+
 for i=1:n
-    set(rS,'Channel',ExpDetails(i).channel,'Exposure',ExpDetails(i).exposure);
+    % set autoshutter only for whitelight
+    autoshutter=1;
+    if strcmpi(ExpDetails(i).channel,'White')
+        autoshutter=0;
+    end
+    set(rS,'AutoShutter',autoshutter,...
+           'Channel',ExpDetails(i).channel,...
+           'Exposure',ExpDetails(i).exposure);
     rS.mmc.snapImage;
-    set(rS,'Channel','White');
     imgtmp=rS.mmc.getImage;
     img(:,:,i)=reshape(double(imgtmp)./(2^bd),w,h)';
 end
 
+set(rS,'channel',crnt_chnl);
 
 

@@ -6,7 +6,7 @@ function [ok,arg]=cmdStg(rS,cmd,param)
 % This is a private method for @Scope, interface with stage should be done
 % via the set/get commands
 %
-% For Possible cmd values see DEveloper Guide
+% For Possible cmd values see Developer Guide
 % 
 % Note, all units are in microns, if ASI doesn't use microns, I corrent
 % accordingly.
@@ -20,36 +20,12 @@ cnf='';
 arg=cnf;
 
 switch lower(cmd)
-    case {'move','moverel'} % deal with both cases at once
-        switch cmd
-            case 'move'
-                cmdstr='M ';
-            case 'moverel'
-                cmdstr='R ';
-        end
-        for i=1:length(param)
-            cmdstr=[cmdstr param(i).axis '=' num2str(param(i).position*10) ' ']; %#ok<AGROW>
-        end
-        % perform the commnad
-        sub_cmdStg(cmdstr);
-    case 'where'
-        cmdstr=['W ' param];
-        % perform the commnad
-        sub_cmdStg(cmdstr);
-        %return the position
-        arg=str2double(cnf(4:end))/10; 
     case 'zero'
         cmdstr=['Z ' param];
         % perform the commnad
         sub_cmdStg(cmdstr);
         %return the success value
         arg=ok; 
-    case 'fcsscr'
-        cmdstr='rdadc z';
-        % perform the commnad
-        sub_cmdStg(cmdstr);
-        %return the position
-        arg=str2double(cnf(4:end)); 
     case 'getfocusparam'
         cmdstr='AF X?';
         % perform the commnad
@@ -68,7 +44,7 @@ switch lower(cmd)
                 case 'Y=travel fine'
                     arg.range_fine=parseASI(cnf{jj})*1000;
                 case 'Y=travel coarse'
-                    arg.range_corase=parseASI(cnf{jj});
+                    arg.range_corase=parseASI(cnf{jj})*1000;
                 case 'F=hill_offset'
                     arg.hill_offset=parseASI(cnf{jj});
             end
@@ -87,7 +63,7 @@ switch lower(cmd)
         sub_cmdStg(cmdstr);
     case 'autofocus'
         if exist('param','var')
-            cmdstr=['AF ' num2str(param)];
+            cmdstr=['AF X=' num2str(param)];
         else
             cmdstr='AF';
         end
@@ -125,22 +101,22 @@ end
             n=1;
             
         end
-        fprintf(rS.Stg,cmdstr);
+        rS.mmc.setSerialPortCommand(rS.COM,cmdstr,char(13));
         
         for ii=1:n
             
-            cnf{ii}=fgetl(rS.Stg); %#ok
+            cnf{ii}=char(rS.mmc.getSerialPortAnswer(rS.COM,char(13))); %#ok
         end
         
         if n==1
             cnf=cnf{1}; 
         end
 
-        % try again in case of timeout (good for autofocusing or something like that)
-        if ~isempty(lastwarn)
-            cnf=fscanf(rS.Stg);
-            disp('repeating fscanf');
-        end
+%         % try again in case of timeout (good for autofocusing or something like that)
+%         if ~isempty(lastwarn)
+%             cnf=fscanf(rS.Stg);
+%             disp('repeating fscanf');
+%         end
         
         if ~iscell(cnf)
             ok=isempty(strfind(cnf,'N'));

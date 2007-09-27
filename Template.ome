@@ -119,6 +119,14 @@
 			ID = "urn:lsid:throopi.the.roboscope:Pixels:123456"
             SizeX = "1030" SizeY = "1300" SizeZ = "1" SizeC = "5" SizeT = "1">
              <TiffData />
+             <Plane TheZ="1" TheT="3" TheC="2">
+                               <PlaneTiming DeltaT="0.24" ExposureTime="0.025"/> 
+                               <StagePosition 
+                                       PositionX="1.2"
+                                       PositionY="1.3"
+                                       PositionZ="1.1"
+                               /> 
+             </Plane>
 		</Pixels>
 	</Image>
 </OME>
