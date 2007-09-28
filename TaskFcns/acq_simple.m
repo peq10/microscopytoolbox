@@ -11,19 +11,21 @@ function acq_simple(Tsk)
 global rS;
 
 %% get the crnt acq details 
-md=get(Tsk,'MetaData'); 
-[X,Y,Z,ExposureDetails]=get(md,'stage.X','stage.Y','stage.Z','ExposureDetails');
-
+[X,Y,Z,Exposure,Channels,Binning]=get(Tsk,'stageX',...
+                                          'stageY',...
+                                          'stageZ',...
+                                          'Exposure',...
+                                          'Channels',...
+                                          'Binning');
 %% goto XYZ
-set(rS,'xy',[X Y]);
-set(rS,'z',Z);
+set(rS,'xy',[X Y],'z',Z);
 figure(3)
 plot(X,Y,'or');
 %% autofocus
 autofocus(rS);
 
 %% snap images
-img=acqImg(rS,ExposureDetails);
+img=acqImg(rS,Channels,Exposure);
 
 %% Write image to disk
 writeTiff(md,img); 

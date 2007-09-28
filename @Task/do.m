@@ -13,7 +13,7 @@ disp(['Im about to perform Task with id: ' num2str(get(Tsk,'id'))]);
 if Tsk.executed
     warning('Throopi:Task:singleExecution','This task was already executed, please create a new Task'); 
 else
-    Tsk.fcn(Tsk); 
+    Tsk.fcn(Tsk); % call the functio handle
     Tsk.executed=true;
 end
 

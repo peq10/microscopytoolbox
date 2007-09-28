@@ -62,4 +62,7 @@ else
     str=str_2d{1};
 end
 
+%% add '' around NaNs
+str=regexprep(str,'NaN','''NaN''');
+
     

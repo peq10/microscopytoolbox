@@ -16,18 +16,16 @@
             <Number>1</Number>
             <ChannelName></ChannelName>
             <Content></Content>
-            <ChannelType></ChannelType>
     </ChannelInfo>
     <ChannelInfo>
            <Number>2</Number>
            <ChannelName></ChannelName>
            <Content></Content>
-           <ChannelType></ChannelType>
      </ChannelInfo>
 	 <DimensionOrder>XYCZT</DimensionOrder>
      <DimensionSize>{1,1,1}</DimensionSize>
      <PlaneData>
-             <ImgHeight>{}</ImgHeight>
+            <ImgHeight>{}</ImgHeight>
             <ImgWidth>{}</ImgWidth>
             <StageX>{}</StageX>
             <StageY>{}</StageY>

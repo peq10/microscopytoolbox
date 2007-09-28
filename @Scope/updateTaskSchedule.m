@@ -55,7 +55,7 @@ switch lower(mthd)
             fclose(fid);
 
             % run ACOTSP
-            cmd='acotsp -i Tasks.tsp -r 1 -t 3';
+            cmd=sptinrf('acotsp -i Tasks.tsp -r 1 -t 3 -g %i',min(length(id),20));
             msg=system(cmd); %#ok<NASGU>
             if msg==0
                 tr = dlmread('Tour.txt');

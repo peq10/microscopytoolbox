@@ -1,19 +1,29 @@
-function Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,acqFcn,UserData)
+function Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,Binning,acqFcn,UserData)
 % createTaskSeries: create an array of serially dependent tasks. 
 %                   it gathers all acquisition details and creates Tasks objects. 
 % 
 % Usage:
-% MiscData           - struct with misc data: Names of project, dataset, etc.  
+% Collections        - struct with Coll data, fields: CollType CollName
+%                      if Collections is array must be the size of Pos               
 % Pos                - array of structs with the fields: X,Y,Z. 
-% T                  - array of time to image each object (t0=0);
+% T                  - array of time to image each object (t0=0), any task that is non time
+%                      dependent should have T==NaN
 % ExposureDetails    - struct with exposure details (2 fields: channel,exposure)
+%                      ExposureDetails(i).exposure could be array but then must be the same size of Pos 
+% Binning            - value of binng to use, if array must be same size of Pos
 % acqFns             - the acq function (will be the same for all Tasks)
 
 %% 
 
 global rS;
+N=length(Pos);
+
 % set channels
-chnls=squeeze(struct2cell(ExposureDetails));
+chnls=squeeze({ExposureDetails(:).channel});
+% find out exposure, if scalar turn to 2D matrix (Exp x Channel x Pos)
+for i=1:length(ExposureDetails)
+    if length(ExposureDetails(i).exposure)==1
+        ExposureDetails(i).exposure=repmat(ExposureDetails(i).exposure,length(
 exptime=sum([chnls{2,:}])/1000; % sum all channels and change units to seconds
 chnls=chnls(1,:);
 

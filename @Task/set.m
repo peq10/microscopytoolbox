@@ -1,7 +1,14 @@
 function Tsk = set(Tsk, varargin )
-%UPDATEEXECUTIONTIME update any of the three times: stageMove, acq, focus
-%   Detailed explanation goes here
+%SET method for the Task class
 
+if numel(Tsk)~=1
+    error('Can only set a single Task at a time');
+end
+
+%% load the list of MetaDataAttributes from file
+MetaDataAttributes=textread(['@Task' filesep 'MetaDataAttributes'], '%s');
+
+%% Set the calues
 for i=1:2:length(varargin)
     switch lower(varargin{i})
         case 'acqtime'
@@ -10,11 +17,6 @@ for i=1:2:length(varargin)
             Tsk.stageMoveTime=varargin{i+1};
         case 'focustime'
             Tsk.focusTime=varargin{i+1};
-        case 'metadata'
-            if ~strcmp(class(varargin{i+1}),'MetaData')
-                error('Task MetaData must be of class MetaData - DAh!');
-            end
-            Tsk.md=varargin{i+1};
         case 'executed'
             if ~islogical(varargin{i+1})
                 error('executed state must be logical (true/false)');
@@ -22,7 +24,9 @@ for i=1:2:length(varargin)
             Tsk.executed=varargin{i+1};
         case 'userdata'
             Tsk.UserData=varargin{i+1};
+        case MetaDataAttributes %deligates the attributes to the MetaData class
+            Tsk.MetaData=set(Tsk.MetaData,varargin{i},varargin{i+1});
         otherwise
-            warning('Throopi:Task:UpdateTimes','Cannot set this property');
+            warning('Throopi:Task:UpdateTimes','Cannot set property %s',varargin{i});
     end
 end
