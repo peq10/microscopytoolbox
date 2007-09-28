@@ -41,6 +41,8 @@ for i=1:length(varargin)
           varargout{i}=md.Image.Qdata;
         case 'planenum'
             varargout{i}=md.Image.PlaneData.PlaneNum;
+        case 'binning'
+            varargout{i}=str2arr(md.Image.PlaneData.Binning);
         case 'stagex'
             varargout{i}=str2arr(md.Image.PlaneData.StageX);
         case 'stagey'

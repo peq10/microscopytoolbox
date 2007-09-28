@@ -69,10 +69,10 @@ for i=1:2:length(varargin)
             end
             md.Image.PixelSizeZ=num2str(varargin{i+1});
         case 'channels'
-            if sum(ismember(fieldnames(varargin{i+1}),{   'Number'; 'ChannelName'; 'Content'; 'ChannelType'}))~=4
+            if sum(ismember(fieldnames(varargin{i+1}),{'Number'; 'ChannelName'; 'Content'}))~=3
                 error('Wrong fields for Channel struct')
             end
-            varargin{i+1}=orderfields(varargin{i+1},{'Number'; 'ChannelName'; 'Content'; 'ChannelType'});
+            varargin{i+1}=orderfields(varargin{i+1},{'Number'; 'ChannelName'; 'Content'});
             md.Image.ChannelInfo=varargin{i+1};
         case 'dimensionorder'
             if ~ischar(varargin{i+1})
@@ -85,42 +85,42 @@ for i=1:2:length(varargin)
             end
             md.Image.PlaneData.DimensionSize=num2str(varargin{i+1});
         case 'imgheight'
-            if ~isa(varargin{i+1},'numeric') || legnth(size(varargin{i+1})) > 3
+            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
                 error('ImgHeight must be numeris and <= 3D')
             end
             mds.Image.PlaneData.ImgHeight=arr2str(varargin{i+1});
         case 'imgwidth'
-            if ~isa(varargin{i+1},'numeric') || legnth(size(varargin{i+1})) > 3
+            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
                 error('ImgWidth must be numeris and <= 3D')
             end
             mds.Image.PlaneData.ImgWidth=arr2str(varargin{i+1});
         case 'stagex'
-            if ~isa(varargin{i+1},'numeric') || legnth(size(varargin{i+1})) > 3
+            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
                 error('StageX must be numeris and <= 3D')
             end
             mds.Image.PlaneData.StageX=arr2str(varargin{i+1});
         case 'stagey'
-            if ~isa(varargin{i+1},'numeric') || legnth(size(varargin{i+1})) > 3
+            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
                 error('StageY must be numeris and <= 3D')
             end
             mds.Image.PlaneData.StageY=arr2str(varargin{i+1});
         case 'stagez'
-            if ~isa(varargin{i+1},'numeric') || legnth(size(varargin{i+1})) > 3
+            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
                 error('StageZ must be numeris and <= 3D')
             end
             mds.Image.PlaneData.StageZ=arr2str(varargin{i+1});
         case 'planetime'
-            if ~isa(varargin{i+1},'numeric') || legnth(size(varargin{i+1})) > 3
-                error('PlaneTime must be numeris and <= 3D')
+            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
+                error('PlaneTime must be numeric and <= 3D')
             end
             mds.Image.PlaneData.PlaneTime=arr2str(varargin{i+1});
         case 'exposuretime'
-            if ~isa(varargin{i+1},'numeric') || legnth(size(varargin{i+1})) > 3
+            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
                 error('ExposureTime must be numeris and <= 3D')
             end
             mds.Image.PlaneData.ExposureTime=arr2str(varargin{i+1});
         case 'binning'
-            if ~isa(varargin{i+1},'numeric') || legnth(size(varargin{i+1})) > 3
+            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
                 error('Binning must be numeris and <= 3D')
             end
             mds.Image.PlaneData.Binning=arr2str(varargin{i+1});

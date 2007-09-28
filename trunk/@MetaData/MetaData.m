@@ -4,7 +4,7 @@ function md = MetaData( varargin )
 %      md=MetaData(filename)   -   where filename is I3-tiff or xml
 %      md=MetaData;                -   this will construct a skeleton
 %      md=MetaData('PropertyName',PropertyValue,...) - Build a default and
-%                                                                              changes it accordngly
+%                                                      changes it accordngly
 
 
 % Here I deal with the case of an empty MetaData object
@@ -16,7 +16,7 @@ if nargin ==0
 end
 
 % Here I deal with the possibility of building it from file
-if nargin == 1 
+if nargin == 1 && ischar(varargin{1}) && exist(varargin{1},'file')
     filename=varargin{1};
     [pathstr, name, ext] = fileparts(filename); %#ok
     switch ext
@@ -31,7 +31,16 @@ if nargin == 1
     md=md.III;
     md=class(md,'MetaData');
     return
+else 
+    error('Input for MetaData is wrong - if you supply a single input it should be a filename');
 end
+
 % Here I deal with the case of pairs of properties name and values
+if ~mod(length(varargin),2) %#ok<NODEF>
+    error('Must Supply PAIRS of property name, value')
+end
+
 md = MetaData; 
-md= set(md,varargin);
+for i=1:2:length(varargin)
+    md= set(md,varargin{i},varargin{i+1});
+end

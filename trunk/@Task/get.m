@@ -2,7 +2,7 @@ function varargout = get( Tsk,varargin )
 %GET Summary of this function goes here
 %   Detailed explanation goes here
 
-%% check to see if md is an array, if so run foreach element seperatly.
+%% check to see if Tsk is an array, if so run foreach element seperatly.
 % this chunk is a big ugly, could flip the loop and avoid the second loop,
 % but who cares...
 if length(Tsk)>1
@@ -19,31 +19,31 @@ if length(Tsk)>1
     return
 end
 
+%% load the list of MetaDataAttributes from file
+MetaDataAttributes=textread(['@Task' filesep 'MetaDataAttributes'], '%s');
+
 %% get whatever is asked for a single Tsk ...
-varargout={};
+varargout=cell(length(varargin),1);
 
 for i=1:length(varargin)
     switch lower(varargin{i})
         case 'id'
-            varargout=[varargout; {Tsk.id}];
+            varargout{i}=Tsk.id;
         case 'fcn'
-            varargout=[varargout; {Tsk.fcn}];
-        case 'x'
-            varargout=[varargout; {Tsk.x}];
-        case 'y'
-            varargout=[varargout; {Tsk.y}];
-        case 'metadata'
-            varargout=[varargout; {Tsk.md}];
-        case 'priority'
-            varargout=[varargout; {Tsk.priority}];
-        case 'dependencies'
-            varargout=[varargout; {Tsk.dep}];
+            varargout{i}=Tsk.fcn;
+        case 'timedependent'
+            % Check to see if any of the values in md planetime is non NaN. 
+            % if it is this means that at least a single plane is time
+            % dependent which makes the whole thing time dependent.
+             varargout{i}=max(~isnan(get(Tsk.MetaData,'planetime')));
         case 'runtime'
-            varargout=[varargout; {Tsk.acqTime+Tsk.focusTime}];
+            varargout{i}=Tsk.acqTime+Tsk.focusTime;
         case 'userdata'
-            varargout=[varargout; {Tsk.UserData}];
+            varargout{i}=Tsk.UserData;
         case 'executed'
-            varargout=[varargout; {Tsk.executed}];
+            varargout{i}=Tsk.executed;
+        case MetaDataAttributes %deligates the attributes to the MetaData class
+            varargout{i}=get(Tsk.MetaData,varargin{i});
         otherwise
             error('Throopi:Property:get:Task',['property: ' varargin{i} ' does not exist in Task class']);
     end

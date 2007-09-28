@@ -17,6 +17,11 @@ if length(str) < 3
     return
 end
 
+%% add '' around NaNs
+str=regexprep(str,'''NaN''','NaN');
+
+%% main switch based on dimensionality
+
 switch  length(strfind(str(1:3),'{'))
     case 0
         arr=str2double(str); 
