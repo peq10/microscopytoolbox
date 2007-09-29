@@ -24,8 +24,6 @@ end
 
 %% make sure fcn is a single function handle and it exist in the PATH as a .m file
 
-
-
 % if string convert to function handle
 switch class(fcn)
     case 'char'

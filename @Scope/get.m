@@ -53,7 +53,9 @@ for i=1:length(varargin)
         case 'currnettaskid'
             varargout=[varargout; {rS.taskID}];
         case 'tasksfinished'
-            varargout=[varargout; {sum(get(rS.TaskBuffer,'executed'))}];
+            cnt=get(rS.TaskBuffer,'executed');
+            cnt=[cnt{:}];
+            varargout=[varargout; {sum(cnt)}];
         case 'isrunning'
             varargout=[varargout; {rS.isRunning}];
         case 'stagespeed.x'

@@ -18,8 +18,8 @@ id=[];
 for i=1:length(rS.TaskBuffer)
     exec=get(rS.TaskBuffer(i),'executed'); 
     if ~exec
-        x=[x; get(rS.TaskBuffer(i),'X')]; 
-        y=[y; get(rS.TaskBuffer(i),'Y')];
+        x=[x; get(rS.TaskBuffer(i),'stageX')]; 
+        y=[y; get(rS.TaskBuffer(i),'stageY')];
         id=[id; get(rS.TaskBuffer(i),'ID')];
     end
 end
@@ -55,7 +55,8 @@ switch lower(mthd)
             fclose(fid);
 
             % run ACOTSP
-            cmd=sptinrf('acotsp -i Tasks.tsp -r 1 -t 3 -g %i',min(length(id),20));
+            cmd=sprintf('acotsp -i Tasks.tsp -r 1 -t 3 -g %i',min(length(id),20));
+%             cmd=sprintf('acotsp -i Tasks.tsp -r 1 -t 3');
             msg=system(cmd); %#ok<NASGU>
             if msg==0
                 tr = dlmread('Tour.txt');
@@ -63,6 +64,7 @@ switch lower(mthd)
                 tr=tr+1;
             else
                 warning('Scheduling failed!!!!! no idea why... ')
+                keyboard
                 tr=1:length(x);
             end
 
@@ -78,21 +80,20 @@ switch lower(mthd)
         dx=sqrt((x(2:length(id_srt))-x(1:length(id_srt)-1)).^2+(y(2:length(id_srt))-y(1:length(id_srt)-1)));
         
         % build the schedule object - assigns times for tasks
-        tm(1)=0;
-        rS.TaskSchedule(1,:)=[id_srt(1) tm 0];
-        for i=2:length(id)
-            stageTime=dx(i-1)./get(rS,'stageSpeed.x');
-            % get the indexes for the previous and current tasks. 
-            [bla,indx]=getTasks(rS,id_srt(i),2); %#ok
-            [bla,prev_indx]=getTasks(rS,id_srt(i-1),2); %#ok
-            
-            %update the expected time for Task to start. 
-            tm(i)=tm(i-1)+get(rS.TaskBuffer(indx),'runTime')+stageTime;
-            
-            % update the minimal delay time after previous task. 
-            dep=get(rS.TaskBuffer(indx),'dependencies');
-            if isempty(dep), dep=zeros(1,2); end
-            rS.TaskSchedule(i,:)=[id_srt(i) tm(i) dep(1,2)];
-        end
+        rS.TaskSchedule(1,:)=id_srt;
+%         for i=2:length(id)
+%             stageTime=dx(i-1)./get(rS,'stageSpeed.x');
+%             % get the indexes for the previous and current tasks. 
+%             [bla,indx]=getTasks(rS,id_srt(i),2); %#ok
+%             [bla,prev_indx]=getTasks(rS,id_srt(i-1),2); %#ok
+%             
+%             %update the expected time for Task to start. 
+% %             tm(i)=tm(i-1)+get(rS.TaskBuffer(indx),'runTime')+stageTime;
+% %             
+% %             % update the minimal delay time after previous task. 
+% %             dep=get(rS.TaskBuffer(indx),'dependencies');
+% %             if isempty(dep), dep=zeros(1,2); end
+%             rS.TaskSchedule(i,:)=[id_srt(i) tm(i) dep(1,2)];
+%         end
         
 end
