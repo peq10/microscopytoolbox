@@ -36,7 +36,7 @@ for i=1:length(varargin)
         case 'dimensionorder'
             varargout{i}=md.Image.DimensionOrder;
         case 'dimensionsize'
-            varargout{i}=str2arr(md.Image.DimenionSizes);
+            varargout{i}=str2arr(md.Image.DimensionSize);
         case 'qdata'
           varargout{i}=md.Image.Qdata;
         case 'planenum'
@@ -54,15 +54,18 @@ for i=1:length(varargin)
         case 'exposuretime'
             varargout{i}=str2arr(md.Image.PlaneData.ExposureTime);
         case 'displaymode'
-            varargout{i}=md.Image.DisplayOptions.DisplayMode;
+            varargout{i}=md.DisplayOptions.DisplayMode;
         case 'displaylevels'
-            varargout{i}=str2arr(md.Image.DisplayOptions.Levels);
+            varargout{i}=str2arr(md.DisplayOptions.Levels);
         case 'displaychannels'
-            varargout{i}=str2arr(md.Image.DisplayOptions.Channels);
+            varargout{i}=str2arr(md.DisplayOptions.Channels);
         case 'displayroi'
-            varargout{i}=str2arr(md.Image.DisplayOptions.ROI);
+            varargout{i}=str2arr(md.DisplayOptions.ROI);
         case 'xml'
-            varargout{i}=struct2xml(struct(md));
+            varargout{i}=['<III>' struct2xml(struct(md)) '</III>'];
+        case 'channelnames'
+            channelnames={md.Image.ChannelInfo(:).ChannelName};
+            varargout{i}=channelnames;
         otherwise
             error('attribute %s is not part of MetaData properties interface',varargin{i});
     end

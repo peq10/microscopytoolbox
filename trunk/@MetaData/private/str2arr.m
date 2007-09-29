@@ -12,7 +12,20 @@ function arr = str2arr( str )
 % 
 % see also arr2str for the reciprocal tranformation
 
-if length(str) < 3
+%% do a few checks
+% if empty, return empty
+if isempty(str) 
+    arr=[];
+    return
+end
+
+% if no { - I interpert as single scalar return str2double(str)
+if isempty(strfind(str,'{'))
+    arr=str2double(str);
+    return
+end
+
+if strcmp(str,'{}')
     arr=[];
     return
 end

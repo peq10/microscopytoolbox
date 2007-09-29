@@ -26,6 +26,8 @@ for i=1:2:length(varargin)
             Tsk.UserData=varargin{i+1};
         case MetaDataAttributes %deligates the attributes to the MetaData class
             Tsk.MetaData=set(Tsk.MetaData,varargin{i},varargin{i+1});
+        case 'id'
+            Tsk.id=varargin{i+1};
         otherwise
             warning('Throopi:Task:UpdateTimes','Cannot set property %s',varargin{i});
     end

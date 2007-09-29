@@ -7,7 +7,7 @@ function showImg(md,img,hFig)
 clf
 
 % variables used for icons
-plyicon=[]; pauseicon=[]; zmicon=[]; dsticon=[]; panicon=[];;
+plyicon=[]; pauseicon=[]; zmicon=[]; dsticon=[]; panicon=[];
 defIcons;
 
 % start with first t and z
@@ -38,17 +38,19 @@ chnlstrct=chnlstrct(ix);
 pos_chnl=[{'none'}; {chnlstrct.Content}'];
 
 %ROI - defaults to whole image
-roi=get('md','displayroi');
-if isempty(roi), roi=[0.5 size(img,2)+0.5 0.5 size(img,2)+0.5]; end
+roi=get(md,'displayroi');
+if isempty(roi), roi=[0.5 size(img,2)+0.5 0.5 size(img,1)+0.5]; end
 
 % Mode - defaults to Gray
-initdspmode=get(md,'siplaymode');
+initdspmode=get(md,'displaymode');
 if isempty(initdspmode), initdspmode='Gray'; end
 
 
 %% set up figures etc.
-if ~exist('hFig','var')
+if ~exist('hFig','var') 
     hFig=figure;
+elseif ~sum(ismember(hFig,get(0,'children')))
+    figure(hFig)
 end
 
 if ~exist('img','var') || isempty(img)
@@ -148,7 +150,8 @@ hBtnGray = uicontrol('Style','Radio','String','Gray','units','normalized','pos',
 hBtnRGB= uicontrol('Style','Radio','String','RGB','units','normalized','pos',[0 0.33 1 0.33],'parent',hBtnGrp,'HandleVisibility','off');
 hBtnComp = uicontrol('Style','Radio','String','Comp','units','normalized','pos',[0 0 1 0.33],'parent',hBtnGrp,'HandleVisibility','off');
 set(hBtnGrp,'SelectionChangeFcn',@updateImage);
-set(hBtnGrp,'Visible','on','Selection',findobj(hBtnGrp,'string',initdspmode));
+
+set(hBtnGrp,'Visible','on','SelectedObject',findobj(hFig,'string',initdspmode));
 
 %% Save and zoom and pixel info panel
 
@@ -352,7 +355,7 @@ updateImage;
         end
     end
 
-    function saveDisplaySettings(hObject,events);
+    function saveDisplaySettings(hObject,events) %#ok<INUSD>
         %TODO
         filename=get(md,'filename');
         if isempty(filename) || ~exist(filename,'file')
@@ -373,7 +376,7 @@ updateImage;
         updateTiffMetaData(md,img);
     end
 
-    function ProjectPlaybackSettings(hObject,events);
+    function ProjectPlaybackSettings(hObject,events) %#ok<INUSD>
         %TODO
     end
 

@@ -63,7 +63,7 @@ for i=1:2:n
                 error('Exposure must be a double scalar!');
             end
             rS.mmc.setExposure(varargin{i+1});
-        case 'rootFolder'
+        case 'rootfolder'
             if ~ischar(varargin{i+1}) || ~exist(varargin{i+1},'dir')
                 error('rootFolder must be a string and a legit folder, please check');
             end

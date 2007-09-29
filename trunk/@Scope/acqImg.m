@@ -9,8 +9,11 @@ function img = acqImg(rS,Channel,Exposure)
 crnt_chnl=get(rS,'channel');
 
 % if no exposure settings, use current rS setting
-if ~exist('ExpDetails','var')
-    [Channel,Exposure]=get(rS,'channel','exposure');
+if ~exist('Channel','var')
+    Channel=get(rS,'channel');
+end
+if ~exist('Exposure','var')
+    Exposure=get(rS,'exposure');
 end
 
 n=length(Channel);
