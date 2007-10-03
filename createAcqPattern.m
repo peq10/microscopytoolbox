@@ -7,7 +7,7 @@ function Pos = createAcqPattern( pattern,varargin )
 %
 %    varargin will contain a pattern dependent set of varialbe: 
 %
-%   timelapse:  Pos = createAcqPattern('singleSpot',center,N)
+%   timelapse:  Pos = createAcqPattern('timelapse',center,N)
 %   grid:          Pos = createAcqPattern('grid',center,r,c,dist,z)
 %   circle:        Pos = createAcqPattern('circle',center,N)
 %   userdef:     Pos = createAcqPattern('userdef',X,Y,Z)

@@ -2,10 +2,7 @@ function showImg(md,img,hFig)
 %SHOWIMG opens a GUI that is useful in looking at 5D images and
 %
 
-
 %% Init all kind of things
-clf
-
 % variables used for icons
 plyicon=[]; pauseicon=[]; zmicon=[]; dsticon=[]; panicon=[];
 defIcons;
@@ -49,9 +46,9 @@ if isempty(initdspmode), initdspmode='Gray'; end
 %% set up figures etc.
 if ~exist('hFig','var') 
     hFig=figure;
-elseif ~sum(ismember(hFig,get(0,'children')))
-    figure(hFig)
 end
+figure(hFig)
+clf
 
 if ~exist('img','var') || isempty(img)
     img=readTiff(md);
@@ -77,7 +74,9 @@ end
 img=permute(img,dimordr);
 
 
-set(hFig,'Toolbar','none','Menubar','none','position',[100 100 800*size(img,2)/size(img,1) 800],'CloseRequestFcn',@closeFig);
+set(hFig,'Toolbar','none','Menubar','none','name',get(md,'filename'),...
+         'position',[100 100 800*size(img,2)/size(img,1) 800],...
+         'CloseRequestFcn',@closeFig);
 hAxes=axes('position',[0 0.1 1 0.9],'xtick',[],'ytick',[]);
 
 % those handles will be definded later, this "declares" them.
@@ -158,9 +157,9 @@ set(hBtnGrp,'Visible','on','SelectedObject',findobj(hFig,'string',initdspmode));
 hSaveZoomPnl=uipanel('position',[0.85 0 0.15 0.1]);
 
 % hPixelInfo is created in updateImage function
-hSaveBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Save','callback',@saveDisplaySettings,...
-                                                        'position',[0 0.41 0.5 0.38]);
-hShowCollBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Collections','callback','drawCollections(md)',...
+hSaveBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Save',...
+                                'callback',@saveDisplaySettings,'position',[0 0.41 0.5 0.38]);
+hShowCollBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Collections','callback',@drawCollections_callback,...
                                                           'position',[0.5 0.41 0.5 0.38],'fontsize',8);
                                                     
 hZoomBtn=uicontrol(hSaveZoomPnl,'style','togglebutton','units','normalized','cdata',zmicon,'callback',@ZoomImg,...
@@ -421,6 +420,10 @@ updateImage;
     function AddDistTool(hObject,events); %#ok I don't use input argument, but callback needs them
          if isempty(hImg), return, end %only works if image is defined
          imdistline(hAxes);
+    end
+
+    function drawCollections_callback(hObject,events) %#ok<INUSD>
+        drawCollections(md)
     end
 
         

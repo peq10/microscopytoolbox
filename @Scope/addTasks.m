@@ -6,5 +6,5 @@ function addTasks(rSin,Tsks)
 global rS;
 rS=rSin;
 
-rS.TaskBuffer=[rS.TaskBuffer; Tsks']; 
+rS.TaskBuffer=[rS.TaskBuffer; Tsks(:)]; 
 updateTaskSchedule(rS);

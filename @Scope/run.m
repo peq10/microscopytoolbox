@@ -1,9 +1,14 @@
-function  run( rS )
+function  run( rSin )
 %RUN all tasks in TaskSchedule
 
+global rS;
+rS=rSin;
+
 while ~isempty(rS.TaskSchedule)
-    [bla,indx]=getTasks(rS,'next');
-    do(rS.TaskBuffer(indx));
+    [Tsk,indx]=getTasks(rS,'next');
+    do(Tsk);
     % remove the Task from the schedule
-    rS.TaskSchedule=rS.TaskSchedule(2:end);
+    indxtokeep=1:length(rS.TaskSchedule);
+    indxtokeep=setdiff(indxtokeep,indx);
+    rS.TaskSchedule=rS.TaskSchedule(indxtokeep);
 end

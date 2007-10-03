@@ -19,21 +19,13 @@ global rS;
                                           'Binning');
 %% goto XYZ
 set(rS,'xy',[X Y],'z',Z);
-% figure(1)
-% plot(X,Y,'or');
+figure(1)
+plot(X,Y,'or');
 %% autofocus
 autofocus(rS);
 
 %% update Tsk object so the value I write to disk are actual not theoretical
-FcsScr.QdataType='FocusScore';
-FcsScr.Value=get(rS,'focusscore');
-FcsScr.QdataDescription='';
-
-Tsk=set(Tsk,'planetime',now,...
-            'stagex',get(rS,'x'),...
-            'stagey',get(rS,'y'),...
-            'stagez',get(rS,'z'),...
-            'qdata',FcsScr);
+Tsk=set(Tsk,'planetime',now,'stagex',get(rS,'x'),'stagey',get(rS,'y'),'stagez',get(rS,'z'));
 
 %% snap images
 img=acqImg(rS,Channels,Exposure);
@@ -43,4 +35,4 @@ writeTiff(Tsk,img,get(rS,'rootfolder'));
 set(rS,'lastImage',img); 
 
 %% show image
-% showImg(Tsk,img(:,:,1),2)
+showImg(Tsk,img(:,:,1),2)

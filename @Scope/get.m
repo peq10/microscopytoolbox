@@ -7,6 +7,26 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'focalplanegridsize'
+            varargout=[varargout; {rS.FocalPlaneGridSize}];
+        case 'focalplane'
+            try
+                x=rS.FocusPoints(:,1);
+                y=rS.FocusPoints(:,2);
+                z=rS.FocusPoints(:,3);
+                n=rS.FocalPlaneGridSize;
+                [X,Y]=meshgrid(linspace(min(x),max(x),n),linspace(min(y),max(y),n));
+                Z=gridfit(x,y,z,X(1,:),Y(:,1));
+                varargout=[varargout; {cat(3,X,Y,Z)}];
+            catch %if cannot interpolate a grid
+                varargout=[varargout; {[]}];
+            end
+        case 'focuspointshistory'
+            varargout=[varargout; {rS.FocusPointsHistory}];
+        case 'focuspointsproximity'
+            varargout=[varargout; {rS.FocusPointsProximity}];
+        case 'focuspoints'
+            varargout=[varargout; {rS.FocusPoints}];
         case 'x'
             varargout=[varargout; {rS.mmc.getXPosition(rS.XYstageName)}];
         case 'y'
@@ -34,7 +54,7 @@ for i=1:length(varargin)
         case 'schedulingmethod'
             varargout=[varargout; {rS.schedulingMethod}];
         case 'stagebusy'
-            varargout=[varargout; rS.mmc.deviceBusy(rS.XYstageName)];
+            varargout=[varargout; (rS.mmc.deviceBusy(rS.XYstageName) | rS.mmc.deviceBusy(rS.XYstageName))];
         case 'focusscore'
             % this is "hack" will need to change with autofocus device
             % it contains ASI specifics that should go away...

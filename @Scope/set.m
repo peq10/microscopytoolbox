@@ -5,23 +5,18 @@ function set(rSin, varargin)
 global rS;
 rS=rSin;
 
-n=length(varargin);
-allowed_properties={...
-    'x','y','z','xy','xz','yz','xyz','channel','exposure','whiteshutter','flourshutter','rootFolder'}; %#ok<NASGU>
-
-% If 'set' is called without input argument beside rS, 
-% return list of legal properties
-if n==0, 
-    for i=1:length(allowed_properties)
-        disp(allowed_properties{i});
-    end
-    return
-end
+n=length(varargin); 
 
 if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
+        case 'focalplanegridsize'
+            rS.FocalPlaneGridSize=varargin{i+1};
+        case 'focuspointsproximity'
+            rS.FocusPointHistory=varargin{i+1};
+        case 'focuspointhistory'
+            rS.FocusPointHistory=varargin{i+1};
         case 'x'
             x=varargin{i+1};
             y=rS.mmc.getYPosition(rS.XYstageName);
