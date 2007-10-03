@@ -59,6 +59,9 @@ Tsk.focusTime=0;
 % executed
 Tsk.executed=false;
 
+% behavior if a timed task and is called after the time it should have happened
+Tsk.LateBehavior='do'; % legel value: 'do' 'drop'
+
 % UserData - if not exist add empty
 if exist('UserData','var')
     Tsk.UserData=UserData;

@@ -7,7 +7,7 @@ switch dv
         fprintf('waiting for stage');
         while get(rS,'stageBusy')
             fprintf('.')
-            pause(0.05)
+            pause(0.1)
         end
         fprintf('done\n');
     otherwise

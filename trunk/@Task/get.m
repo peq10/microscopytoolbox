@@ -27,6 +27,8 @@ varargout=cell(length(varargin),1);
 
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'latebehavior'
+            varargout{i}=Tsk.LateBehavior;
         case 'id'
             varargout{i}=Tsk.id;
         case 'fcn'
@@ -35,7 +37,11 @@ for i=1:length(varargin)
             % Check to see if any of the values in md planetime is non NaN. 
             % if it is this means that at least a single plane is time
             % dependent which makes the whole thing time dependent.
-             varargout{i}=max(~isnan(get(Tsk.MetaData,'planetime')));
+            tm=get(Tsk.MetaData,'planetime');
+            if isempty(tm)
+                error('Task has no planetime information - check how you defined it...');
+            end
+             varargout{i}=max(~isnan(tm));
         case 'runtime'
             varargout{i}=Tsk.acqTime+Tsk.focusTime;
         case 'userdata'

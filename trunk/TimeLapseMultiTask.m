@@ -10,7 +10,8 @@
 
 %% Init Scope
 % the scope configuration file that will be passed to MicroManager
-% keep rS
+try keep rS, catch disp('rS does not exist, creating one'); end 
+tic
 delete(get(0,'Children')) % a more aggressive form of close (doesn't ask for confirmation)
 ScopeConfigFileName='ScopeWithStageFocusThroughMMserial.cfg';
 
@@ -21,15 +22,16 @@ if ~strcmp(class(rS),'Scope')
 end
 set(rS,'rootfolder','D:\GiardiaDataBuffer\');
 disp('Scope initialized');
-
+set(rS,'schedulingmethod','greedy');
+toc
 %% User input
+tic
 % Data for all channels
 Channels={'White'};
 Contents={'Phase'};
-Exposure=[5]; %#ok<NBRAK>
-Binning=[1]; %#ok<NBRAK>
-PlateName='Test1';
-WellName='Test2';
+Exposure=[4]; %#ok<NBRAK>
+Binning=[2]; %#ok<NBRAK>
+PlateName='FirstOvernightTimelapse';
 
 % other important data
 BaseFileName='Img';
@@ -38,12 +40,12 @@ BaseFileName='Img';
 r=3;
 c=3;
 WellCenter=[0 0];
-DistanceBetweenImages=100;
+DistanceBetweenImages=1000;
+T=0:60:7200;
 
 %% create an array of Tasks
 % Transform user input into variables useful to define a Task
 Coll(1).CollName=PlateName; Coll(1).CollType='Plate'; 
-Coll(2).CollName=WellName; Coll(2).CollType='Well'; 
 Rel.sub=2; Rel.dom=1;
 
 for i=1:length(Channels)
@@ -53,36 +55,41 @@ end
 %%%% Define a 'generic' Task for this well based on user data 
 
 % start with default values for all fields
-GenericTsk=Task([],'acq_simple');
+GenericTsk=Task([],'acq_simple_withFocalPlaneGuessing');
 
 %now change Collections and their relations
-GenericTsk=set(GenericTsk,'collections',Coll,...
-                          'Relations',Rel,...
+GenericTsk=set(GenericTsk,'Relations',Rel,...
                           'channels',chnls,...
                           'exposuretime',Exposure,...
-                          'binning',Binning,...
-                          'planetime',nan(length(Channels),1));
+                          'binning',Binning);
 
 %%%% Create the grid and replicate GenericTsk with few alterations
-
 Pos=createAcqPattern('grid',WellCenter,r,c,DistanceBetweenImages,zeros(r*c,1));
 
-for i=1:length(Pos)
-    id=getNewTaskIDs(rS);
-    Tsk(i)=set(GenericTsk,'stagex',repmat(Pos(i).X,1,length(Channels)),...
-                          'stagey',repmat(Pos(i).Y,1,length(Channels)),...
-                          'stagez',zeros(length(Channels),1),...
-                          'id',id,...
-                          'filename',[BaseFileName '_' num2str(id)]);
+for j=1:length(Pos)
+    for i=1:length(T)
+        id=getNewTaskIDs(rS);
+        Coll(2).CollName=['Site_' num2str(j)]; Coll(2).CollType='Well'; 
+        Tsk((j-1)*length(T)+i)=set(GenericTsk,'collections',Coll,...
+                                              'stagex',Pos(j).X,...
+                                              'stagey',Pos(j).Y,...
+                                              'stagez',Pos(j).Z,...
+                                              'planetime',T(i)/24/3600+now,'id',id,...
+                                              'filename',[BaseFileName '_' num2str(id)]);
+    end
+    j
 end
 
+disp('Finished creating Tasks');
+toc
 %% add Tasks to rS 
+tic
 removeTasks(rS,'all');
 addTasks(rS,Tsk);
 plotPlannedSchedule(rS,1)
 figure(1)
 hold on
-
+toc
 %% do all Tasks
 run(rS)
 

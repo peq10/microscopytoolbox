@@ -38,7 +38,16 @@ rS.lastImage=0;
 
 % the task buffer
 rS.TaskBuffer=[];
+
 rS.TaskSchedule=[]; 
+rS.TimedTasksSchedule=[];
+
+% Focus points - This is a list of points where rS know it had good focus
+% existing points are needed for rS to be able to guess another point
+rS.FocusPoints=[]; %[X Y Z T]
+rS.FocusPointHistory=60; %Number of seconds that are used in the updateFocalPlaneGrid 
+rS.FocusPointProximity=100; %the distance of points for which the history is relevant
+rS.FocalPlaneGridSize=25;
 
 % a flag to note whether scope is currently executing tasks
 rS.isRunning=false;
@@ -66,12 +75,6 @@ rS.pxlsz=0.065;
 
 rS.focusParams=[]; %will be updated in first call for getFocusParams
 
-%% add folder to the path
-addpath TaskFcns
-
-% additional toolboxes
-addpath(['ThirdParty' filesep 'xmltree'])
-
 %% create the object from struct
 rS=class(rS,'Scope');
 % set(rS,'channel','white');
@@ -79,4 +82,6 @@ rS=class(rS,'Scope');
 % Init the channel property by closing and opening the tran light
 set(rS,'channel','close')
 set(rS,'channel','white')
+
+
 

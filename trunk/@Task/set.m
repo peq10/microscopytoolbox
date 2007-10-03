@@ -11,6 +11,11 @@ MetaDataAttributes=textread(['@Task' filesep 'MetaDataAttributes'], '%s');
 %% Set the calues
 for i=1:2:length(varargin)
     switch lower(varargin{i})
+        case 'latebehavior'
+            if sum(ismember(varargin{i+1},{'do','drop'}))==0
+                error('Can only set LateBehavior to DO or DROP !!');
+            end
+            Tsk.LateBehavior=varargin{i+1};
         case 'acqtime'
             Tsk.acqTime=varargin{i+1};
         case 'stagemovetime'

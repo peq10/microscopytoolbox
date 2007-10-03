@@ -1,54 +1,69 @@
 % This script is an example of how to run Throopi the Roboscope. 
-% Performed setps
-% 1. Initialize the scope. 
-% 2. get some acuisition details 
-% 3. create and add tasks base on step 2. 
-% 4. run Throopi. 
+% It will acquire a time lapse movie in single location (single task) 
+%
+% The followig code is divided into cells, they: 
+% 1. Initialize the scope
+% 2. get user data
+% 3. create a single Task with multiple timepoints of Tasks (Tsk) (two step, first define whats the same for all tasks and then
+% 4. add Tsk to rS 
+% 5. run
 
 %% Init Scope
-
 % the scope configuration file that will be passed to MicroManager
-ScopeConfigFileName='Scope_noStage.cfg';
+keep rS
+delete(get(0,'Children')) % a more aggressive form of close (doesn't ask for confirmation)
+ScopeConfigFileName='ScopeWithStageFocusThroughMMserial.cfg';
 
 % call the constractor of the Scope 
-global rS; % name of the scope variable (rS=roboScope)
-rS=Scope(ScopeConfigFileName);
+global rS; % name of the scope (rS=roboScope)
+if ~strcmp(class(rS),'Scope')
+    rS=Scope(ScopeConfigFileName);
+end
+set(rS,'rootfolder','D:\GiardiaDataBuffer\');
+disp('Scope initialized');
 
+%% User input
+% Data for all channels
+Channels={'White'};
+Contents={'Phase'};
+Exposure=[5]; %#ok<NBRAK>
+Binning=[1]; %#ok<NBRAK>
+ExperimentName='Tst2';
 
-%%  Create the structures needed for acquisitions
+% other important data
+BaseFileName='Stk';
 
-% Misc data - names, objective etc. 
-MiscData.ProjectName='InitialTest';
-MiscData.DatasetName='Tst1';
-MiscData.Experimenter='Roy Wollman';
-MiscData.Experiment='testing throopi the roboscope';
-MiscData.ImageName='Img'; 
+% Stage position
+x=0; y=0; z=0; 
 
-Pos=createAcqPattern('grid',[0 0],10,10,1000,zeros(100,1)); %Pattern, Where to image, Number of images
+% Time
+T=0:5:30;
 
-T=linspace(0,19*3,100);
+%% create the time lapse Task
+% Transform user input into variables useful to define a Task
+Coll(1).CollName=PlateName; Coll(1).CollType='Plate'; 
+Coll(2).CollName=WellName; Coll(2).CollType='Well'; 
+Rel.sub=2; Rel.dom=1;
 
-% Details of all channels.
-ExposureDetails=[];
-ExposureDetails(1).channel='White';
-ExposureDetails(1).exposure=10;
-ExposureDetails(1).channel='Cy3';
-ExposureDetails(1).exposure=300;
+for i=1:length(Channels)
+    chnls(i)=struct('Number',1,'ChannelName',Channels{i}, 'Content',Contents{i});
+end
 
-% ExposureDetails(2).channel='DAPI';
-% ExposureDetails(2).exposure=500;
+%%%% Define a 'generic' Task for this well based on user data 
 
+% start with default values for all fields
+Tsk=Task([],'acq_simple');
 
-%% Create a series of dependent tasks
-Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,'acq_simple');
-
-% add to rS (this will automatically update the Task schedule). 
-addTasks(rS,Tsks); 
-
-
-%% startacquisition
-run(rS); 
-
-
-
-
+%now change Collections and their relations
+Tsk=set(Tsk,'collections',Coll,...
+                          'Relations',Rel,...
+                          'channels',chnls,...
+                          'exposuretime',Exposure,...
+                          'binning',Binning,...
+                          'stagex',repmat(Pos(i).X,1,length(Channels)),...
+                          'stagey',repmat(Pos(i).Y,1,length(Channels)),...
+                          'stagez',zeros(length(Channels),1),...
+                          'id',id,...
+                          'filename',[BaseFileName '_' num2str(id)]);
+                      
+                      

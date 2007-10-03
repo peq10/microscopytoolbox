@@ -12,5 +12,5 @@ if length(Tsks)>1
     ids=[ids{:}]';
 end
 
-[oldTsks,idx]=getTasks(rS,ids,2);
+[oldTsks,idx]=getTasks(rS,ids,3);
 rS.TaskBuffer(idx)=Tsks;
