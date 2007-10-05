@@ -20,18 +20,24 @@ global rS; % name of the scope (rS=roboScope)
 if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
-set(rS,'rootfolder','D:\GiardiaDataBuffer\');
+
+% a list of things that are specific for this script: 
+set(rS,'rootfolder','D:\S2data\',...
+       'schedulingmethod','greedy',...
+       'focusrange',50,...
+       'focusspeed',2);
+
 disp('Scope initialized');
-set(rS,'schedulingmethod','greedy');
+
 toc
 %% User input
 tic
 % Data for all channels
 Channels={'White'};
 Contents={'Phase'};
-Exposure=[4]; %#ok<NBRAK>
+Exposure=[6]; %#ok<NBRAK>
 Binning=[2]; %#ok<NBRAK>
-PlateName='FirstOvernightTimelapse';
+ExperimentName='OverNightTimeLapse-Oct4till5';
 
 % other important data
 BaseFileName='Img';
@@ -41,12 +47,11 @@ r=3;
 c=3;
 WellCenter=[0 0];
 DistanceBetweenImages=1000;
-T=0:60:7200;
+T=0:300:36000;
 
 %% create an array of Tasks
 % Transform user input into variables useful to define a Task
-Coll(1).CollName=PlateName; Coll(1).CollType='Plate'; 
-Rel.sub=2; Rel.dom=1;
+Coll(1).CollName=ExperimentName; Coll(1).CollType='Petri'; 
 
 for i=1:length(Channels)
     chnls(i)=struct('Number',1,'ChannelName',Channels{i}, 'Content',Contents{i});
@@ -58,14 +63,13 @@ end
 GenericTsk=Task([],'acq_simple_withFocalPlaneGuessing');
 
 %now change Collections and their relations
-GenericTsk=set(GenericTsk,'Relations',Rel,...
-                          'channels',chnls,...
+GenericTsk=set(GenericTsk,'channels',chnls,...
                           'exposuretime',Exposure,...
                           'binning',Binning);
 
 %%%% Create the grid and replicate GenericTsk with few alterations
 Pos=createAcqPattern('grid',WellCenter,r,c,DistanceBetweenImages,zeros(r*c,1));
-
+fprintf('\n000');
 for j=1:length(Pos)
     for i=1:length(T)
         id=getNewTaskIDs(rS);
@@ -77,7 +81,7 @@ for j=1:length(Pos)
                                               'planetime',T(i)/24/3600+now,'id',id,...
                                               'filename',[BaseFileName '_' num2str(id)]);
     end
-    j
+    fprintf('\b\b\b%03d',j);
 end
 
 disp('Finished creating Tasks');
@@ -87,8 +91,6 @@ tic
 removeTasks(rS,'all');
 addTasks(rS,Tsk);
 plotPlannedSchedule(rS,1)
-figure(1)
-hold on
 toc
 %% do all Tasks
 run(rS)
