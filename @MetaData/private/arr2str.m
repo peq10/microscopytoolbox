@@ -8,7 +8,7 @@ end
 
 % deal with scalars
 if numel(arr)==1
-    str=num2str(arr); 
+    str=sprintf('%.8f',arr); 
     return
 end
 
@@ -19,9 +19,9 @@ for i=1:dz
     for j=1:r
         for k=1:c
             if k>1
-                sub_str=sprintf('%s,%f',sub_str,arr(j,k,i));
+                sub_str=sprintf('%s,%.8f',sub_str,arr(j,k,i));
             else
-                sub_str=sprintf('{%f',arr(j,k,i));
+                sub_str=sprintf('{%.8f',arr(j,k,i));
             end
         end
         sub_str=[sub_str '}'];

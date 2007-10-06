@@ -80,10 +80,10 @@ for i=1:2:length(varargin)
             end
             md.Image.DimensionOrder=varargin{i+1};
         case 'dimensionsize'
-            if ~ischar(varargin{i+1}) || numel(varargin{i+1}) > 3
+            if ~isnumeric(varargin{i+1}) || numel(varargin{i+1}) > 3
                 error('Image DimensionSize must be numeric with numel <=3');
             end
-            md.Image.PlaneData.DimensionSize=num2str(varargin{i+1});
+            md.Image.DimensionSize=arr2str(varargin{i+1});
         case 'imgheight'
             if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
                 error('ImgHeight must be numeris and <= 3D')
@@ -125,10 +125,20 @@ for i=1:2:length(varargin)
             end
             md.Image.PlaneData.Binning=arr2str(varargin{i+1});
         case 'qdata'
-            if sum(ismember(fieldnames(varargin{i+1}),{'QdataType'; 'Value'; 'QdataDescription'}))~=3
-                error('Wrong fields for Qdata struct')
+            if ~isstruct(varargin{i+1}), 
+                error('Qdata must be a struct');
             end
-            varargin{i+1}=orderfields(varargin{i+1},{   'QdataType'; 'Value'; 'QdataDescription'});
+            if ~isequal(fieldnames(varargin{i+1}),{'QdataType';'Value';'QdataDescription'})
+                % test it only a matter of order
+                varargin{i+1}=orderfields(varargin{i+1},{'QdataType'; 'Value'; 'QdataDescription'});
+                % if still not equal, throw an error
+                if ~isequal(fieldnames(varargin{i+1}),{'QdataType';'Value';'QdataDescription'})
+                    error('Wrong fields for Qdata struct')
+                end
+            end
+            for j=1:length(varargin{i+1})
+                varargin{i+1}(j).Value=arr2str(varargin{i+1}(j).Value);
+            end
             md.Image.Qdata=varargin{i+1};
         case 'displaymode'
             if ~ischar(varargin{i+1}) || ~sum(ismember(varargin{i+1},{'Gray','RGB','Comp'}))

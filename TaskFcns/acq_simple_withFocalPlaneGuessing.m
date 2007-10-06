@@ -1,4 +1,4 @@
-function acq_simple(Tsk) 
+function acq_simple_withFocalPlaneGuessing(Tsk) 
 %SIMPLEACQ callback function to be used by by AcqSeq objects
 %   
 % Outline: 
@@ -20,7 +20,7 @@ Z=guessFocalPlane(rS,X,Y);
                                       
                                       
 %% goto XYZ
-set(rS,'xy',[X Y],'z',Z);
+set(rS,'xy',[X Y],'z',Z,'binning',Binning);
 % figure(1)
 % plot(X,Y,'or');
 %% autofocus
@@ -31,11 +31,17 @@ FcsScr.QdataType='FocusScore';
 FcsScr.Value=get(rS,'focusscore');
 FcsScr.QdataDescription='';
 
+Zguess.QdataType='FocalPlaneGuess';
+Zguess.Value=Z;
+Zguess.QdataDescription='';
+
+qdata=[FcsScr Zguess];
+
 Tsk=set(Tsk,'planetime',now,...
             'stagex',get(rS,'x'),...
             'stagey',get(rS,'y'),...
             'stagez',get(rS,'z'),...
-            'qdata',FcsScr);
+            'qdata',qdata);
 
 %% snap images
 img=acqImg(rS,Channels,Exposure);
@@ -43,6 +49,9 @@ img=acqImg(rS,Channels,Exposure);
 %% Write image to disk
 writeTiff(Tsk,img,get(rS,'rootfolder')); 
 set(rS,'lastImage',img); 
+
+%% set Task to executed and update rS
+replaceTasks(rS,set(Tsk,'executed',true));
 
 %% show image
 % showImg(Tsk,img(:,:,1),2)

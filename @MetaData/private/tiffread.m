@@ -1,4 +1,4 @@
-function [stack, img_read] = tiffread2(filename, img_first, img_last)
+function [stack, img_read] = tiffread(filename, img_first, img_last)
 % tiffread, version 2.4
 %
 % [stack, nbImages] = tiffread;
@@ -45,8 +45,8 @@ function [stack, img_read] = tiffread2(filename, img_first, img_last)
 % Cell Biology and Biophysics, EMBL; Meyerhofstrasse 1; 69117 Heidelberg; Germany
 % http://www.embl.org
 % http://www.cytosim.org
-
-
+%
+%
 
 
 %Optimization: join adjacent TIF strips: this results in faster reads
@@ -84,7 +84,7 @@ TIF.SamplesPerPixel  = 1;
 TIF.BOS              = 'l';          %byte order string
 
 if  isempty(findstr(filename,'.'))
-    filename = [filename,'.tif'];
+    filename = [filename,'.tiff'];
 end
 
 TIF.file = fopen(filename,'r','l');
@@ -211,7 +211,7 @@ while (ifd_pos ~= 0)
             case 33631       %metamorph stack data: gain/background?
                 TIF.MM_private2    = entry.val;
             otherwise
-                fprintf(1,'ignored TIFF entry with tag %i (cnt %i)\n', TIF.entry_tag, entry.cnt);
+%                 fprintf(1,'ignored TIFF entry with tag %i (cnt %i)\n', TIF.entry_tag, entry.cnt);
         end
         % move to next IFD entry in the file
         fseek(TIF.file, file_pos+12,-1);

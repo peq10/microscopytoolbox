@@ -6,5 +6,14 @@ function addTasks(rSin,Tsks)
 global rS;
 rS=rSin;
 
+%% add ids to Tsks
+for i=1:length(Tsks)
+    Tsks(i)=set(Tsks(i),'id',getNewTaskIDs(rS));
+end
+
+
+%% add Tasks
 rS.TaskBuffer=[rS.TaskBuffer; Tsks(:)]; 
+
+%% update schedule nased on current methods
 updateTaskSchedule(rS);

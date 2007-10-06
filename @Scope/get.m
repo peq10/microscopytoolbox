@@ -16,7 +16,7 @@ for i=1:length(varargin)
                 z=rS.FocusPoints(:,3);
                 n=rS.FocalPlaneGridSize;
                 [X,Y]=meshgrid(linspace(min(x),max(x),n),linspace(min(y),max(y),n));
-                Z=gridfit(x,y,z,X(1,:),Y(:,1));
+                Z=gridfit(x,y,z,X(1,:),Y(:,1), 'smooth',10,'extend','always');
                 varargout=[varargout; {cat(3,X,Y,Z)}];
             catch %if cannot interpolate a grid
                 varargout=[varargout; {[]}];

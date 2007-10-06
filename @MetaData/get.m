@@ -3,12 +3,30 @@ function varargout=get(md,varargin)
 % Only works on a single object not array, if you want to get for an array,
 % use a loop...
 
-if numel(md)~=1
-    error('get can only work on a single  MetaData object')
+%% check to see if md is an array, if so run foreach element seperatly.
+% this chunk is a big ugly, could flip the loop and avoid the second loop,
+% but who cares...
+if length(md)>1
+    varargout={};
+    s=cell(length(md),length(varargin));
+    for i=1:length(md)
+        for j=1:length(varargin)
+            s{i,j}=get(md(i),varargin{j});
+        end
+    end
+    for j=1:length(varargin)
+        varargout=[varargout {s(:,j)}];
+    end
+    return
 end
+
+%% From here down is the call for a single MetaData object
+
 varargout=cell(size(varargin));
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'metadata'
+            varargout{i}=md;
         case 'collections'
             varargout{i}=md.CollectionData.Collection;
         case 'relations'
@@ -38,7 +56,10 @@ for i=1:length(varargin)
         case 'dimensionsize'
             varargout{i}=str2arr(md.Image.DimensionSize);
         case 'qdata'
-          varargout{i}=md.Image.Qdata;
+            for j=1:length(md.Image.Qdata)
+                md.Image.Qdata(j).Value=str2arr(md.Image.Qdata(j).Value);
+            end
+            varargout{i}=md.Image.Qdata;
         case 'planenum'
             varargout{i}=md.Image.PlaneData.PlaneNum;
         case 'binning'
