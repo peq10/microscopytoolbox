@@ -10,10 +10,6 @@ import mmcorej.*;
 rS.mmc=CMMCore;
 rS.mmc.loadSystemConfiguration(config_file);
 
-%% Close both shutters
-% rS.mmc.setStateLabel('WhiteLight','0')
-% rS.mmc.setStateLabel('Fluorescence','0')
-
 %% This is the stage/autofocus hacks
 rS.XYstageName='XY-Stage';
 rS.ZstageName='Z-Stage';
@@ -36,11 +32,10 @@ rS.schedulingMethod='Ants_TSP';
 % image as well...
 rS.lastImage=0;
 
-% the task buffer
+% the task buffer and schedule (the schedule carry the task id in the right order)
 rS.TaskBuffer=[];
-
 rS.TaskSchedule=[]; 
-rS.TimedTasksSchedule=[];
+
 
 % Focus points - This is a list of points where rS know it had good focus
 % existing points are needed for rS to be able to guess another point
@@ -52,6 +47,8 @@ rS.FocalPlaneGridSize=25;
 % a flag to note whether scope is currently executing tasks
 rS.isRunning=false;
 
+% the handle for the statusbar
+rS.statusBarHandle=[];
 %Current Objective - TODO: get objective name from mmc config file. 
 % if value was not supplied, ask the user
 % if ~exist('ObjectiveLbl','var')
@@ -83,5 +80,7 @@ rS=class(rS,'Scope');
 set(rS,'channel','close')
 set(rS,'channel','white')
 
+%% add path
+addpath TaskFcns
 
 

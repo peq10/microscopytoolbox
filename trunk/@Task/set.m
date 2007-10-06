@@ -6,7 +6,10 @@ if numel(Tsk)~=1
 end
 
 %% load the list of MetaDataAttributes from file
-MetaDataAttributes=textread(['@Task' filesep 'MetaDataAttributes'], '%s');
+persistent MetaDataAttributes;
+if isempty(MetaDataAttributes)
+    MetaDataAttributes=textread(['@Task' filesep 'MetaDataAttributes'], '%s');
+end
 
 %% Set the calues
 for i=1:2:length(varargin)

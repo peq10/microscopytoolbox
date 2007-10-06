@@ -1,0 +1,55 @@
+function updateFocalPlaneGrid(rSin,x,y,z)
+
+% this trick make sure rS is updated 
+% notice that rSin MUST be the same global rS object. 
+global rS;
+rS=rSin;
+
+% Check to see if this is the first call for updateFocalPLaneGrid (e.g. if Z is empty)
+if isempty(rS.FocalPlaneGridZ)
+    [rS.FocalPlaneGridX,rS.FocalPlaneGridY]=meshgrid(x+(-0.5:+0.5),y+(-0.5:+0.5));
+    rS.FocalPlaneGridZ=z*ones(2,2);
+    return
+end
+
+% get the x,y as vecotrs
+currx=rS.FocalPlaneGridX(1,:);
+curry=rS.FocalPlaneGridY(:,1)';
+
+% regrid (add point in vector if needed) at currnet x
+if isempty(find(currx==x,1))
+    idx=find(currx>x,1,'first');
+    if isempty(idx) % x is bigger than all calues in currx - just add it last
+        currx=[currx x];
+    else
+        ind=idx:length(currx);
+        currx(ind+1)=currx(ind);
+        currx(idx)=x;
+    end
+end
+
+% same at y
+if isempty(find(curry==y,1))
+    idx=find(curry>y,1,'first');
+    if isempty(idx) % x is bigger than all calues in currx - just add it last
+        curry=[curry y];
+    else
+        ind=idx:length(curry);
+        curry(ind+1)=curry(ind);
+        curry(idx)=y;
+    end
+end
+
+% interpolate to the new grid new grid (with old data) is X,Y,Z
+[X,Y]=meshgrid(currx,curry);
+Z=interp2(rS.FocalPlaneGridX,rS.FocalPlaneGridY,rS.FocalPlaneGridZ,X,Y,'spline',0);
+
+% update with new z value 
+currx=X(1,:);
+curry=Y(:,1);
+Z(currx==x,curry==y)=z;
+
+newX=linspace(min(currx),max(currx),rS.focalPlaneGridSize);
+newY=linspace(min(curry),max(curry),rS.focalPlaneGridSize);
+[rS.FocalPlaneGridX,rS.FocalPlaneGridY]=meshgrid(newX,newY);
+rS.FocalPlaneGridZ=interp2(X,Y,Z,rS.FocalPlaneGridX,rS.FocalPlaneGridY);

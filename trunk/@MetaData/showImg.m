@@ -1,6 +1,17 @@
 function showImg(md,img,hFig)
-%SHOWIMG opens a GUI that is useful in looking at 5D images and
+%SHOWIMG opens a GUI that is useful in looking at 5D images 
 %
+% Possible calls: 
+% showImg(md,img) - show img with md metadata
+%
+% showImg(md,pth) this will read the image based on the md filename and pth
+% 
+% showImg(...,hFig) - hFig is the figure number to show image in
+
+%% if img is char - that it is actually the path variable
+if ischar(img)
+    img=readTiff(md,img);
+end
 
 %% Init all kind of things
 % variables used for icons
@@ -10,6 +21,11 @@ defIcons;
 % start with first t and z
 t=1;
 z=1;
+PlaybackSettings.ZT='T';
+PlaybackSettings.FPS=5;
+PlaybackSettings.Loop='Yes';
+PlaybackSettings.ShowTimer='Yes';
+
 
 rgbg=zeros([size(img(:,:,1)) 4]);
 allchnls={'Red','Green','Blue','Gray'}; % a list of all channels                                   
@@ -86,8 +102,8 @@ hImg=[];
 % Z slider
 hZTpnl=uipanel('position',[0 0 0.45 0.1 ]);
 
-hProjectPlaybackSettings=uicontrol(hZTpnl,'style','pushbutton','string','Settings','units','normalized','position',[0.01  0.48 0.18 0.5],...
-                                                               'callback',@ProjectPlaybackSettings);
+hPlaybackSettings=uicontrol(hZTpnl,'style','pushbutton','string','Settings','units','normalized','position',[0.01  0.48 0.18 0.5],...
+                                                               'callback',@PlaybackSettings);
 hPlayback=uicontrol(hZTpnl,'style','togglebutton','cdata',pauseicon,'units','normalized','position',[0.05  0 0.1 0.5],...
                                                                'callback',@Playback);                                                           
 
@@ -100,7 +116,7 @@ hZsliderLabel=uicontrol(hZTpnl,'style','text','string','Z','units','normalized',
 
 % T slider
 hTslider=uicontrol(hZTpnl,'style','slider','units','normalized','position',[0.2 0.5 0.65 0.3],...
-                                   'callback',@tSlider_callback,'min',0.999,'max',size(img,4),'value',1,'SliderStep',[1/size(img,4) 1/size(img,4)]);
+                                   'callback',@tSlider_callback,'min',0.999,'max',size(img,5),'value',1,'SliderStep',[1/size(img,5) 1/size(img,5)]);
 hTsliderBox=uicontrol(hZTpnl,'style','edit','units','normalized','position',[0.85 0.5 0.15 0.3],...
                                         'callback',@tSliderBox_callback,'string','1');
 hTsliderLabel=uicontrol(hZTpnl,'style','text','string','T','units','normalized','position',[0.95  0.55 0.05 0.3],'fontweight','bold');
@@ -375,8 +391,33 @@ updateImage;
         updateTiffMetaData(md,img);
     end
 
-    function ProjectPlaybackSettings(hObject,events) %#ok<INUSD>
-        %TODO
+    function PlaybackSettings(hObject,events) %#ok<INUSD>
+        pos=get(hFig,'position');
+        hQuestioneer=figure;
+        set(hQuestioneer,'position',[pos(1)+100,pos(2)+100,200,200],...
+                         'Toolbar','none','Menubar','none','name','Playback Setting');
+        
+        % Set up all the uicontrols for the playback settigns
+        % ZT
+        hZTlabel=uicontrol('Style','text','string','Dimension','fontsize',16,'units','normalized','Position',[0 0.8 .4 .2])
+        hBtnGrp_ZT = uibuttongroup('parent',hQuestioneer,'visible','off','Position',[0.4 0.8 .6 .2]);
+        hBtnT = uicontrol('Style','Radio','String','T','units','normalized','pos',[0 0.5 1 0.33],'parent',hBtnGrp_ZT,'HandleVisibility','off');
+        hBtnZ= uicontrol('Style','Radio','String','Z','units','normalized','pos',[0 0.5 1 0.33],'parent',hBtnGrp_ZT,'HandleVisibility','off');
+        set(hBtnGrp_ZT,'Visible','on','SelectedObject',findobj(hQuestioneer,'string',PlaybackSettings.ZT));
+
+        %Loop
+        hLooplabel=uicontrol('Style','text','string','Loop','fontsize',16,'units','normalized','Position',[0 0.6 .4 .2])
+        hBtnGrp_Loop = uibuttongroup('parent',hQuestioneer,'visible','off','Position',[0.4 0.8 .6 .2]);
+        hBtnT = uicontrol('Style','Radio','String','Yes','units','normalized','pos',[0 0.5 1 0.33],'parent',hBtnGrp_Loop,'HandleVisibility','off');
+        hBtnZ= uicontrol('Style','Radio','String','No','units','normalized','pos',[0 0.5 1 0.33],'parent',hBtnGrp_Loop,'HandleVisibility','off');
+        set(hBtnGrp_Loop,'Visible','on','SelectedObject',findobj(hQuestioneer,'string',PlaybackSettings.Loop));
+             
+        % FPS
+        hFPSlabel=uicontrol('Style','text','string','Loop','fontsize',16,'units','normalized','Position',[0 0.6 .4 .2])             
+                     
+        uiwait(hQuestioneer);
+        
+        
     end
 
     function Playback(hObject,events); %#ok I don't need events

@@ -20,13 +20,17 @@ if length(Tsk)>1
 end
 
 %% load the list of MetaDataAttributes from file
-MetaDataAttributes=textread(['@Task' filesep 'MetaDataAttributes'], '%s');
-
+persistent MetaDataAttributes;
+if isempty(MetaDataAttributes)
+    MetaDataAttributes=textread(['@Task' filesep 'MetaDataAttributes'], '%s');
+end
 %% get whatever is asked for a single Tsk ...
 varargout=cell(length(varargin),1);
 
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'metadata'
+            varargout{i}=Tsk.MetaData;
         case 'latebehavior'
             varargout{i}=Tsk.LateBehavior;
         case 'id'
@@ -44,6 +48,7 @@ for i=1:length(varargin)
              varargout{i}=max(~isnan(tm));
         case 'runtime'
             varargout{i}=Tsk.acqTime+Tsk.focusTime;
+            %TODO: make sure that get(Task,'runtime') is informative 
         case 'userdata'
             varargout{i}=Tsk.UserData;
         case 'executed'

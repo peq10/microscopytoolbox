@@ -2,6 +2,8 @@ function do(Tsk)
 % DO the task
 %     basically runs the fcn with the Tsk as input
 
+global rS;
+
 if isempty(Tsk)
     error('cannot do an empty task - what do you think I am?');
 end
@@ -26,14 +28,10 @@ else
             return
         end
         wait_time=tm-now;
-        if wait_time>0
-            h=waitbar(1-(tm-now)/wait_time,sprintf('Waiting for acquisition of %i',get(Tsk,'id')));
-        end
         while now < tm, 
-            waitbar(1-(tm-now)/wait_time,h) 
-            pause(0.01)
+            updateStatusBar( rS,1-(tm-now)/wait_time )
+            pause(0.1)
         end 
-         if wait_time>0, delete(h); end
     end
     Tsk.fcn(Tsk); % call the function handle
     Tsk.executed=1;

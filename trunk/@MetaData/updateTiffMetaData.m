@@ -1,8 +1,18 @@
-function updateTiffMetaData( md )
+function updateTiffMetaData( md,pth )
 %UPDATETIFFMETADATA replaces the metadata in a Tiff file
 
-%THE ONLY WAY I COULD FIND TO UPDATE A METADATA TIFF IF TO REWRITE THE
-%IMAGE... MUST BE A BETTER WAY, BUT UNTIL THAN, USE THIS FUNCTION
-%SELDOMLY...
+str=get(md,'xml');
+filename=fullfile(pth,[get(md,'filename') '.tiff']);
+
+success=true;
+cmd=sprintf('tiffset -s ImageDescription "%s" %s',str,filename);
+[failed,result] = system(cmd);
+
+if failed
+    error('Problem setting up tiff tag - output was: %s',result);
+end
+
+
+
 
 
