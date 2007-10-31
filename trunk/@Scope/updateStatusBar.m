@@ -3,7 +3,7 @@ function updateStatusBar( rSin,percentWaitToNextTask )
 % percentWaitToNextTask is for the lower bar - upper bar is calculated on the fly
 % to clear statusbar, call with percentWaitToNextTask=[]; 
 
-if isempty(percentWaitToNextTask)
+if ~exist('percentWaitToNextTask','var') || isempty(percentWaitToNextTask)
     delete(statusbar2);
     return
 end
@@ -20,7 +20,7 @@ end
 h=rS.statusBarHandle;
 
 exec=get(rS.TaskBuffer,'executed'); 
-exec=double([exec{:}]);
+if iscell(exec), exec=double([exec{:}]); end
 
 h=statusbar2(sum(exec)/length(exec),percentWaitToNextTask,h);
 statusbar2(h,'Time to next task');

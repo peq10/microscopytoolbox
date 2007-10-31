@@ -24,10 +24,13 @@ end
 %% First check that Collection data and filename and the 
 
 mdstruct=struct(mdarray);
+for i=1:length(mdstruct),
+    str{i}=struct2xml(mdstruct(i).CollectionData);
+end
 
 cnt=ones(1,3);
 for i=2:length(mdstruct)
-    cnt(1)=cnt(1)+double(isequal(mdstruct(1).CollectionData,mdstruct(i).CollectionData));
+    cnt(1)=cnt(1)+double(strcmp(str{1},str{i}));
     cnt(2)=cnt(2)+double(strcmp(mdstruct(1).Image.ImageFileName,mdstruct(i).Image.ImageFileName));
     cnt(3)=cnt(3)+double(isempty(setxor({mdstruct(1).Image.Qdata(:).QdataType},...
                                         {mdstruct(i).Image.Qdata(:).QdataType})));

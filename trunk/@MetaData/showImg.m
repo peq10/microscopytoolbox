@@ -27,6 +27,7 @@ PlaybackSettingsData.FPS=5;
 PlaybackSettingsData.Loop='Yes';
 PlaybackSettingsData.ShowTimer='Yes';
 
+
 rgbg=zeros([size(img(:,:,1)) 4]);
 allchnls={'Red','Green','Blue','Gray'}; % a list of all channels                                   
 

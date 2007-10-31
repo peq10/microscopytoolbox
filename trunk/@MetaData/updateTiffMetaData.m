@@ -26,16 +26,3 @@ if failed
 end
 
 
-
-
-
-=======
-if failed
-    error('Problem setting up tiff tag - output was: %s',result);
-end
-
-
-
-
-
->>>>>>> .r52

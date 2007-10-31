@@ -7,7 +7,11 @@ function rS = Scope(config_file)
 
 %% Here we initialize the MMC core part of rS
 import mmcorej.*;
-rS.mmc=CMMCore;
+rS.gui=MMStudioPlugin;
+rS.gui.run('')
+uiwait(msgbox('Click me - I''m beutiful'))
+rS.mmc=rS.gui.getMMCoreInstance;
+% rS.mmc=CMMCore;
 rS.mmc.loadSystemConfiguration(config_file);
 
 %% This is the stage/autofocus hacks
