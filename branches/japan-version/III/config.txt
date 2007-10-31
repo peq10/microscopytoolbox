@@ -1,0 +1,5 @@
+BufferFolder=imgbuff
+TargetFolder=imgtar
+DBname=i4a
+dbusername=rwollman
+verbose=1
