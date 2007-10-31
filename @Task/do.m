@@ -13,22 +13,20 @@ end
 
 disp(['Im about to perform Task with id: ' num2str(get(Tsk,'id'))]);
 
-
-
 % check to see if task was already executed?
 if Tsk.executed
     warning('Throopi:Task:singleExecution','This task was already executed, please create a new Task'); 
 else
     %check if its a timed task
-    tm=get(Tsk,'planetime');
-    if ~isnan(tm)
+    if get(Tsk,'timedependent');
+        tm=get(Tsk,'planetime');
         if tm > now && strcmp(get(Tsk,'LateBehavior'),'drop')
             fprintf('Task (with id %i) was droped from queue since we are late....\n',get(Tsk,'id'));
             Tsk.executed=-1;
             return
         end
         wait_time=tm-now;
-        while now < tm, 
+        while now < tm 
             updateStatusBar( rS,1-(tm-now)/wait_time )
             pause(0.1)
         end 

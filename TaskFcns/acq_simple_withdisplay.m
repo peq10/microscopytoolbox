@@ -31,7 +31,7 @@ Tsk=set(Tsk,'planetime',now,'stagex',get(rS,'x'),'stagey',get(rS,'y'),'stagez',g
 img=acqImg(rS,Channels,Exposure);
 
 %% Write image to disk
-writeTiff(Tsk,img,get(rS,'rootfolder')); 
+% writeTiff(Tsk,img,get(rS,'rootfolder')); 
 set(rS,'lastImage',img); 
 
 %% show image

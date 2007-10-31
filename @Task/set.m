@@ -14,6 +14,21 @@ end
 %% Set the calues
 for i=1:2:length(varargin)
     switch lower(varargin{i})
+        case 'timedependent'
+            Tsk.timedep=logical(varargin{i+1});
+        case 'tskfcn'
+            switch class(varargin{i+1})
+                case 'char'
+                    varargin{i+1}=str2func(varargin{i+1});
+                case 'function_handle'
+                    % check to make sure its only one
+                    if numel(varargin{i+1})~=1
+                        error('You must supply only a single function handle');
+                    end
+                otherwise
+                    error('Function handle must be supplied either as a string or a function handle!');
+            end
+            Tsk.fcn=varargin{i+1};
         case 'latebehavior'
             if sum(ismember(varargin{i+1},{'do','drop'}))==0
                 error('Can only set LateBehavior to DO or DROP !!');
@@ -36,6 +51,8 @@ for i=1:2:length(varargin)
             Tsk.MetaData=set(Tsk.MetaData,varargin{i},varargin{i+1});
         case 'id'
             Tsk.id=varargin{i+1};
+        case 'zshift'
+            Tsk.Zshift=varargin{i+1}';
         otherwise
             warning('Throopi:Task:UpdateTimes','Cannot set property %s',varargin{i});
     end

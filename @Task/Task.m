@@ -56,8 +56,14 @@ Tsk.acqTime=0;
 Tsk.focusTime=0;
 %TODO: calculate or do something with those
 
+% z-shift where to image - can have either scalar or array with number of
+% channels
+Tsk.Zshift=0;
+
 % executed
 Tsk.executed=false;
+
+Tsk.timedep=false;
 
 % behavior if a timed task and is called after the time it should have happened
 Tsk.LateBehavior='do'; % legel value: 'do' 'drop'

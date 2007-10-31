@@ -21,11 +21,11 @@ defIcons;
 % start with first t and z
 t=1;
 z=1;
-PlaybackSettings.ZT='T';
-PlaybackSettings.FPS=5;
-PlaybackSettings.Loop='Yes';
-PlaybackSettings.ShowTimer='Yes';
 
+PlaybackSettingsData.ZT='T';
+PlaybackSettingsData.FPS=5;
+PlaybackSettingsData.Loop='Yes';
+PlaybackSettingsData.ShowTimer='Yes';
 
 rgbg=zeros([size(img(:,:,1)) 4]);
 allchnls={'Red','Green','Blue','Gray'}; % a list of all channels                                   
@@ -253,10 +253,10 @@ updateImage;
         end
         
         axis(hAxes);
-        hImg=imshow(rgbg(:,:,toshow));
+        hImg=imagesc(rgbg(:,:,toshow));
         hPixelInfo=impixelinfoval(hSaveZoomPnl,hImg);
         set(hPixelInfo,'units','normalized','position',[0 0.8 1 0.2]);
-        set(hAxes,'xlim',roi(1:2),'ylim',roi(3:4));
+        set(hAxes,'xlim',roi(1:2),'ylim',roi(3:4),'xtick',[],'ytick',[]);
     end
 
     function changeChannel(hObject,events) %#ok I don't need events
@@ -301,7 +301,9 @@ updateImage;
                 lvl_ix=4;
         end
         axes(hAxes);
-        hImg=imshow(img(:,:,chnl_ix),rgbg_levels(lvl_ix,:));
+        hImg=imagesc(img(:,:,chnl_ix));
+        colormap gray
+        set(hAxes,'xtick',[],'ytick',[],'clim',rgbg_levels(lvl_ix,:));
         uiwait(imcontrast(hImg));
         rgbg_levels(lvl_ix,:)=get(hAxes,'Clim');
         % the chanel that I care about is:
@@ -403,14 +405,14 @@ updateImage;
         hBtnGrp_ZT = uibuttongroup('parent',hQuestioneer,'visible','off','Position',[0.4 0.8 .6 .2]);
         hBtnT = uicontrol('Style','Radio','String','T','units','normalized','pos',[0 0.5 1 0.33],'parent',hBtnGrp_ZT,'HandleVisibility','off');
         hBtnZ= uicontrol('Style','Radio','String','Z','units','normalized','pos',[0 0.5 1 0.33],'parent',hBtnGrp_ZT,'HandleVisibility','off');
-        set(hBtnGrp_ZT,'Visible','on','SelectedObject',findobj(hQuestioneer,'string',PlaybackSettings.ZT));
+        set(hBtnGrp_ZT,'Visible','on','SelectedObject',findobj(hQuestioneer,'string',PlaybackSettingsData.ZT));
 
         %Loop
         hLooplabel=uicontrol('Style','text','string','Loop','fontsize',16,'units','normalized','Position',[0 0.6 .4 .2])
         hBtnGrp_Loop = uibuttongroup('parent',hQuestioneer,'visible','off','Position',[0.4 0.8 .6 .2]);
         hBtnT = uicontrol('Style','Radio','String','Yes','units','normalized','pos',[0 0.5 1 0.33],'parent',hBtnGrp_Loop,'HandleVisibility','off');
         hBtnZ= uicontrol('Style','Radio','String','No','units','normalized','pos',[0 0.5 1 0.33],'parent',hBtnGrp_Loop,'HandleVisibility','off');
-        set(hBtnGrp_Loop,'Visible','on','SelectedObject',findobj(hQuestioneer,'string',PlaybackSettings.Loop));
+        set(hBtnGrp_Loop,'Visible','on','SelectedObject',findobj(hQuestioneer,'string',PlaybackSettingsData.Loop));
              
         % FPS
         hFPSlabel=uicontrol('Style','text','string','Loop','fontsize',16,'units','normalized','Position',[0 0.6 .4 .2])             
@@ -418,6 +420,7 @@ updateImage;
         uiwait(hQuestioneer);
         
         
+
     end
 
     function Playback(hObject,events); %#ok I don't need events

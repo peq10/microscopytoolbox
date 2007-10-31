@@ -7,6 +7,8 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'roi'
+            varargout=[varargout; {rS.mmc.getROI}];
         case 'focalplanegridsize'
             varargout=[varargout; {rS.FocalPlaneGridSize}];
         case 'focalplane'
@@ -54,7 +56,7 @@ for i=1:length(varargin)
         case 'schedulingmethod'
             varargout=[varargout; {rS.schedulingMethod}];
         case 'stagebusy'
-            varargout=[varargout; (rS.mmc.deviceBusy(rS.XYstageName) | rS.mmc.deviceBusy(rS.XYstageName))];
+            varargout=[varargout; {rS.mmc.deviceBusy(rS.XYstageName) | rS.mmc.deviceBusy(rS.XYstageName)}];
         case 'focusscore'
             % this is "hack" will need to change with autofocus device
             % it contains ASI specifics that should go away...
@@ -62,7 +64,7 @@ for i=1:length(varargin)
             rS.mmc.setSerialPortCommand(rS.COM,cmdstr,char(13))
             str=char(rS.mmc.getSerialPortAnswer(rS.COM,char(13)));
             str=regexprep(str,':A','');
-            varargout=[varargout; str2double(str)];
+            varargout=[varargout; {str2double(str)}];
         case {'focusrange',...
               'focusspeed',...
               'focussearchdirection',...
@@ -96,6 +98,8 @@ for i=1:length(varargin)
             varargout=[varargout; {str2double(rS.mmc.getProperty('DigitalCamera','Binning'))}];
         case 'autoshutter'
             varargout=[varargout; {rS.getAutoShutter}];
+        case 'progressbarhandle'
+            varargout=[varargout; {rS.statusBarHandle}];
         otherwise
             warning('Throopi:Property:get:Scope',['property: ' varargin{i} ' does not exist in Scope class']) 
     end

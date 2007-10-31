@@ -5,16 +5,36 @@ function acq_goto(Tsk)
 global rS;
 
 %% get the crnt acq details 
-[X,Y]=get(Tsk,'X','Y');
+[X,Y]=get(Tsk,'stageX','stageY');
 
 %% goto XY
 set(rS,'xy',[X Y]);
 waitFor(rS,'stage');
 
-%% update the x,y in the metadata of rS
-md=get(Tsk,'metadata');
-md=set(md,'stage.x',get(rS,'x'),'stage.y',get(rS,'y'));
-Tsk=set(Tsk,'executed',true,'MetaData',md);
+%% update status figures
+figure(1)
+tb=getTasks(rS,'executed');
+if ~isempty(tb)
+    t=get(tb,'planetime');
+    if iscell(t)
+        t=[t{:}]';
+    end
+    [bla,ix]=max(t);
+    [x,y]=get(tb(ix),'stagex','stagey');
+    X=[x; X];
+    Y=[y; Y];
+end
+plot(X,Y,'-or');
 
-replaceTasks(rS,Tsk);
+%% update the x,y in the metadata of rS
+Tsk=set(Tsk,'stagex',get(rS,'x'),...
+            'stagey',get(rS,'y'),...
+            'planetime',now);
+
+%% set Task to executed and update rS
+replaceTasks(rS,set(Tsk,'executed',true));
+
+%% update Task Status
+figure(4)
+plotTaskStatus(rS)
 
