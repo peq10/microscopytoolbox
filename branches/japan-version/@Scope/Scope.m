@@ -7,7 +7,13 @@ function rS = Scope(config_file)
 
 %% Here we initialize the MMC core part of rS
 import mmcorej.*;
-rS.mmc=CMMCore;
+
+%% create MicroManager with a GUI
+mmGUI=MMStudioPlugin;
+mmGUI.run('')
+mmc=mmGUI.getMMCoreInstance;
+uiwait(msgdlg('Press me when MM has been initialized'))
+rS.mmc=mmc;
 rS.mmc.loadSystemConfiguration(config_file);
 
 %% This is the stage/autofocus hacks
