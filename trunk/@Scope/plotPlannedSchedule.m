@@ -6,10 +6,6 @@ if ~exist('fig','var')
     fig=figure;
 end
 
-if strcmp(get(rS,'schedulingmethod'),'greedy')
-    return
-end
-
 figure(fig);
 clf
 hold on

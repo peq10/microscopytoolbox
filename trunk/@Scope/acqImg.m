@@ -18,7 +18,6 @@ end
 
 n=length(Channel);
 img=zeros(h,w,n); % notice the traspose element in the loop
-
 for i=1:n
     % set autoshutter only for whitelight
     autoshutter=1;

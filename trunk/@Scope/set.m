@@ -11,6 +11,8 @@ if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
+        case 'roi'
+            rS.mmc.setROI(varargin{i+1});
         case 'focalplanegridsize'
             rS.FocalPlaneGridSize=varargin{i+1};
         case 'focuspointsproximity'
@@ -43,7 +45,7 @@ for i=1:2:n
              % check that config is char
             if ~ischar(varargin{i+1}), error('Channel state must be char!'); end
             % Capitalize channel first letter
-            varargin{i+1}=regexprep(varargin{i+1}, '(^.)', '${upper($1)}');
+            varargin{i+1}(1)=upper(varargin{i+1}(1));
             % check that config state is "legal"
             if ~(rS.mmc.isConfigDefined('Channel',varargin{i+1}))
                 error([varargin{i+1} ' is not a legitimate Channel configuration, check config file']);
@@ -79,6 +81,10 @@ for i=1:2:n
             rS.mmc.setProperty('DigitalCamera','Binning',num2str(varargin{i+1}));
         case 'autoshutter'
             rS.mmc.setAutoShutter(logical(varargin{i+1}))
+        case 'statusbarposition'
+            if ~isempty(rS.statusBarHandle)
+                set(rS.statusBarHandle,'position',varargin{i+1});
+            end
         otherwise
             warning('Unrecognized attribute') %#ok
     end

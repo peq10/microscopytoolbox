@@ -26,7 +26,7 @@ rS.rootFolder='D:\GiardiaDataBuffer';
 rS.focusMethod='ASI';
 
 % default scheduling method
-rS.schedulingMethod='Ants_TSP'; 
+rS.schedulingMethod='greedy'; 
 
 % the last image captured, only saving that one (but could be a 3 channel
 % image as well...
@@ -80,7 +80,12 @@ rS=class(rS,'Scope');
 set(rS,'channel','close')
 set(rS,'channel','white')
 
-%% add path
+%% add path - "Plug-in" folders
 addpath TaskFcns
+addpath SchedulerFcns
+
+%% Other toolboxes
+addpath 
+
 
 

@@ -2,6 +2,8 @@ function varargout = get( Tsk,varargin )
 %GET Summary of this function goes here
 %   Detailed explanation goes here
 
+global rS;
+
 %% check to see if Tsk is an array, if so run foreach element seperatly.
 % this chunk is a big ugly, could flip the loop and avoid the second loop,
 % but who cares...
@@ -38,21 +40,23 @@ for i=1:length(varargin)
         case 'fcn'
             varargout{i}=Tsk.fcn;
         case 'timedependent'
-            % Check to see if any of the values in md planetime is non NaN. 
-            % if it is this means that at least a single plane is time
-            % dependent which makes the whole thing time dependent.
-            tm=get(Tsk.MetaData,'planetime');
-            if isempty(tm)
-                error('Task has no planetime information - check how you defined it...');
-            end
-             varargout{i}=max(~isnan(tm));
-        case 'runtime'
-            varargout{i}=Tsk.acqTime+Tsk.focusTime;
+            varargout{i}=Tsk.timedep;
+        case 'duration'
+            ExpTime=get(Tsk(1),'Exposuretime');
+            % duration has three components (all converted to days units): 
+            % 1. Exposure time + 100 ms per channel for overhead 
+            Tsk.acqTime=(sum(ExpTime)+length(ExpTime)*100)/1000/3600/24;
+            % 2. Focus time is based on stage 0.6 mm/sec max velocity
+            Tsk.focusTime=get(rS,'focusrange')/6/get(rS,'focusspeed')/24/3600;
+            % 3. 2 seconds overehad for movement (on average)
+            varargout{i}=Tsk.acqTime+Tsk.focusTime+2/3600/24;
             %TODO: make sure that get(Task,'runtime') is informative 
         case 'userdata'
             varargout{i}=Tsk.UserData;
         case 'executed'
             varargout{i}=Tsk.executed;
+        case 'zshift'
+            varargout{i}=Tsk.Zshift;
         case MetaDataAttributes %deligates the attributes to the MetaData class
             varargout{i}=get(Tsk.MetaData,varargin{i});
         otherwise
