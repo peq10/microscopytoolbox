@@ -1,50 +1,115 @@
 % This script is an example of how to run Throopi the Roboscope. 
+% It will acruiq a grid of image (suitable for a single well)
 %
-% "Algorithm" outline
-% =========================
-% 1. Initialize the scope, slide and image database 
-% 2. get 
-%     3.1 Initialize a acqusition data secquence that contains the
-%           position, exposures etc for all the sites within this well.
-%     3.2 Initialize an acquisition sequence based on the AcqData object
-%           from 3.1
-%     3.3 starts and waits for the dequence to end. 
-% 
+% The followig code is divided into cells, they: 
+% 1. Initialize the scope
+% 2. get user data
+% 3. create an array of Tasks (Tsk) for this well (two step, first define whats the same for all tasks and then
+% 4. add Tsk to rS 
+% 5. run
 
 %% Init Scope
-
 % the scope configuration file that will be passed to MicroManager
-ScopeConfigFileName='ScopeWithStageFocusThroughMMserial.cfg';
+try
+    keep rS
+catch
+end
+delete(get(0,'Children')) % a more aggressive form of close (doesn't ask for confirmation)
+ScopeConfigFileName='MM_Roboscope.cfg';
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)
-rS=Scope(ScopeConfigFileName);
+if ~strcmp(class(rS),'Scope')
+    rS=Scope(ScopeConfigFileName);
+end
+initFocalPlane(rS);
+set(rS,'rootfolder','C:\TrainSet1');
+set(rS,'schedulingmethod','acotsp');
+set(rS,'PFS',1)
+warning('off','MATLAB:divideByZero');
+gotoOrigin(rS)
+disp('Scope initialized');
 
-%%  Create the structures needed for acquisitions
+%% User input
+% Data for all channels
+Channels={'FITC'};
+Contents={'GFP tubulin'};
+Exposure=100; %#ok<NBRAK>
+Binning=1; %#ok<NBRAK>
+PlateName='Test1';
+WellName='Test2';
 
-% not sure what will get here. 
-MiscData.ProjectName='InitialTest';
-MiscData.DatasetName='Tst1';
-MiscData.Objective='40x';
-MiscData.Experimenter='Roy Wollman';
-MiscData.Experiment='testing throopi the roboscope';
-MiscData.ImageName='img';
+% other important data
+BaseFileName='Img';
 
-r=5;
-c=5;
-Pos=createAcqPattern('grid',[0 0],r,c,100,zeros(r*c,1));
+Zshift=0;
 
-ExposureDetails(1).channel='White';
-ExposureDetails(1).exposure=1;
-ExposureDetails(2).channel='FITC';
-ExposureDetails(2).exposure=1000;
+% Grid data
+r=10;
+c=10;
+WellCenter=[0 0];
+DistanceBetweenImages=200; %in microns (I think...)
 
-%%
-T=zeros(r*c,1);
-Tsks = createTaskSeries(MiscData,Pos,T,ExposureDetails,'acq_simple');
+%% create an array of Tasks
+% Transform user input into variables useful to define a Task
+Coll(1).CollName=PlateName; Coll(1).CollType='Plate'; 
+Coll(2).CollName=WellName; Coll(2).CollType='Well'; 
+Rel.sub=2; Rel.dom=1;
+
+for i=1:length(Channels)
+    chnls(i)=struct('Number',1,'ChannelName',Channels{i}, 'Content',Contents{i});
+end
+
+%%%% Define a 'generic' Task for this well based on user data 
+
+% start with default values for all fields
+GenericTsk=Task([],'acq_simple');
+
+%now change Collections and their relations
+GenericTsk=set(GenericTsk,'collections',Coll,...
+                          'Relations',Rel,...
+                          'channels',chnls,...
+                          'exposuretime',Exposure,...
+                          'binning',Binning,...
+                          'planetime',nan(length(Channels),1),...
+                          'Zshift',Zshift);
+
+%%%% Create the grid and replicate GenericTsk with few alterations
+
+Pos=createAcqPattern('grid',WellCenter,r,c,DistanceBetweenImages,zeros(r*c,1));
+
+for i=1:length(Pos)
+    id=getNewTaskIDs(rS);
+    Tsk(i)=set(GenericTsk,'stagex',Pos(i).X,...
+                          'stagey',Pos(i).Y,...
+                          'stagez',Pos(i).Z,...
+                          'id',id,...
+                          'filename',[BaseFileName '_' num2str(id)]);
+end
+
+%% add Tasks to rS 
 removeTasks(rS,'all');
-addTasks(rS,Tsks);
+addTasks(rS,Tsk);
 
-%%
+%% set up status figures
+plotPlannedSchedule(rS,1)
+figure(1)
+set(1,'position',[10   666   350   309],...
+    'Toolbar','none','Menubar','none','name','Throopi''s route');
+hold on
+
+updateStatusBar(rS); % this should delete all old progress bars
+updateStatusBar(rS,0); % create a new one
+set(rS,'statusbarposition',[10 430 356 180]);
+
+figure(3)
+set(3,'position',[  376   195   894   627],...
+    'Toolbar','none','Menubar','none','name','Focal Plane');
+
+figure(4)
+set(4,'position',[368   867   372   109],...
+    'Toolbar','none','Menubar','none','name','Task Status');
+
+%% do all Tasks
 run(rS)
 

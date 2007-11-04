@@ -30,6 +30,7 @@ else
             updateStatusBar( rS,1-(tm-now)/wait_time )
             pause(0.1)
         end 
+        disp(sprintf('Task time %s',datestr(tm,0)))
     end
     Tsk.fcn(Tsk); % call the function handle
     Tsk.executed=1;

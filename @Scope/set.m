@@ -11,6 +11,10 @@ if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
+        case 'pfs'
+            if logical(get(rS,'pfs'))~=logical(varargin{i+1})
+               rS.mmc.enableContinuousFocus(varargin{i+1});
+            end
         case 'roi'
             rS.mmc.setROI(varargin{i+1});
         case 'focalplanegridsize'

@@ -8,36 +8,31 @@ global rS;
                                           'exposuretime',...
                                           'ChannelNames',...
                                           'Binning');
-Z=guessFocalPlane(rS,X,Y);
+% Z=guessFocalPlane(rS,X,Y);
 
 %% goto XYZ
-set(rS,'xy',[X Y],'z',Z,'binning',Binning);
+set(rS,'xy',[X Y],'binning',Binning);
 
+%% wait for perfect focus
+pause(0.5)
+cnt=0;
+while ~get(rS,'pfs')
+    cnt=cnt+1;
+    pause(0.5)
+    if cnt>10
+        error(' I lost focus totally - dont knopw why');
+    end
+end
 %% update status figures
 figure(1)
 plot(X,Y,'-or');
-figure(2)
-plotFocalPlaneGrid(rS);
-
-%% autofocus
-autofocus(rS,1);
-z=get(rS,'z');
-z=z+get(Tsk,'zshift');
-set(rS,'z',z);
-z=get(rS,'z');
-z=z+get(Tsk,'zshift');
-set(rS,'z',z);
 
 %% update Tsk object so the value I write to disk are actual not theoretical
-FcsScr.QdataType='FocusScore';
-FcsScr.Value=get(rS,'focusscore');
-FcsScr.QdataDescription='';
-
 Zguess.QdataType='FocalPlaneGuess';
-Zguess.Value=Z;
+Zguess.Value=0;
 Zguess.QdataDescription='';
 
-qdata=[FcsScr Zguess];
+qdata=[Zguess];
 
 Tsk=set(Tsk,'planetime',now,...
             'stagex',get(rS,'x'),...
