@@ -81,15 +81,15 @@ rS=class(rS,'Scope');
 % set(rS,'channel','white');
 
 % Init the channel property by closing and opening the tran light
-set(rS,'channel','close')
-set(rS,'channel','white')
+% set(rS,'channel','close')
+% set(rS,'channel','white')
 
 %% add path - "Plug-in" folders
 addpath TaskFcns
 addpath SchedulerFcns
 
 %% Other toolboxes
-addpath 
+% addpath 
 
 
 

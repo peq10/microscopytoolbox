@@ -7,6 +7,8 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'pfs'
+            varargout=[varargout; {rS.mmc.isContinuousFocusEnabled}];
         case 'roi'
             varargout=[varargout; {rS.mmc.getROI}];
         case 'focalplanegridsize'
