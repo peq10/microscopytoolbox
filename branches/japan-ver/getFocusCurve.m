@@ -3,6 +3,7 @@ function F=getFocusCurve(dZ)
 % gets a vector of relative Z values (dZ) and returns the focus
 % score at each location along the vecotr. 
 
+% add this in japan
 
 global rS;
 
