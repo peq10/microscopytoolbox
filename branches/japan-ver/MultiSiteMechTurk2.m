@@ -34,7 +34,7 @@ disp('Scope initialized');
 % Data for all channels
 Channels={'FITC'};
 Contents={'GFP tubulin'};
-Exposure=100; %#ok<NBRAK>
+Exposure=250; %#ok<NBRAK>
 Binning=1; %#ok<NBRAK>
 PlateName='Test1';
 WellName='Test2';
@@ -83,7 +83,6 @@ for i=1:length(Pos)
     Tsk(i)=set(GenericTsk,'stagex',Pos(i).X,...
                           'stagey',Pos(i).Y,...
                           'stagez',Pos(i).Z,...
-                          'id',id,...
                           'filename',[BaseFileName '_' num2str(id)]);
 end
 
@@ -103,6 +102,7 @@ updateStatusBar(rS,0); % create a new one
 set(rS,'statusbarposition',[10 430 356 180]);
 
 figure(3)
+subplot('position',[0 0 1 1])
 set(3,'position',[  376   195   894   627],...
     'Toolbar','none','Menubar','none','name','Focal Plane');
 
@@ -114,13 +114,13 @@ set(4,'position',[368   867   372   109],...
 run(rS)
 
 %% More user defenitions
-ExposureZstack=500;
+ExposureZstack=750;
 Zstk_N=7;
-Zstk_dz=1.5;
+Zstk_dz=0.5;
 
-ExposureTimeLapse=[500; 200];
+ExposureTimeLapse=[750; 300];
 TimeLapseZstak_N=3;
-TimeLapseZstak_dz=3;
+TimeLapseZstak_dz=1;
 
 T=[8 4 4 ones(1,82)*2]/60/24;
 %T=[1 1 1]/60/24;
@@ -171,7 +171,7 @@ GenericTsk_TimeLapse=set(GenericTsk_TimeLapse,'channels',chnls,...
 
 %% now get the XY positions and create the new tasks
 OldTsk=getTasks(rS,'all',0);
-[XY,OldIDs,Qdata]=get(OldTsk,'UserData','id','Qdata');
+[XY,FileNames,Qdata]=get(OldTsk,'UserData','filename','Qdata');
 
 %% Create new time lapse tasks
 ZTsks=[];
@@ -179,19 +179,17 @@ TimeLapseTsks=[];
 for i=1:length(OldTsk)
     xy=XY{i};
     if ~isempty(xy)
-        id=getNewTaskIDs(rS);
         ZTsks=[ZTsks; set(GenericTsk_Zstk,...
                           'stagex',xy(1),...
                           'stagey',xy(2),...
-                          'id',id,...
                           'Qdata',Qdata{i},...
-                          'filename',['Stk_' num2str(OldIDs{i})])];
+                          'filename',[FileNames{i} '_Stk'])];
         id=getNewTaskIDs(rS);
         TimeLapse=set(GenericTsk_TimeLapse,...
                           'stagex',xy(1),...
                           'stagey',xy(2),...
                           'Qdata',Qdata{i},...
-                          'filename',['5D_' num2str(OldIDs{i})]);
+                          'filename',[FileNames{i} '_5D']);
          TimeLapseTsks=[TimeLapseTsks; split(TimeLapse)]; 
        
     end

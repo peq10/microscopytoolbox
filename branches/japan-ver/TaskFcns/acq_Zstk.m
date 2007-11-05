@@ -15,6 +15,7 @@ global rS;
 set(rS,'xy',[X Y]);
 
 %% wait for perfect focus
+set(rS,'pfs',1)
 pause(0.5)
 cnt=0;
 while ~get(rS,'pfs')
@@ -66,9 +67,9 @@ plotTaskStatus(rS)
 
 %% shift cell centers if needed
 tileSize=256;
-Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2);
+Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2+1);
 Qdata.Value(:,1)=min(floor(Qdata.Value(:,1)),size(img,2)-tileSize/2);
-Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2);
+Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2+1);
 Qdata.Value(:,2)=min(floor(Qdata.Value(:,2)),size(img,1)-tileSize/2);
 
 %% Write image to disk
