@@ -23,7 +23,7 @@ if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
 initFocalPlane(rS);
-set(rS,'rootfolder','C:\DebugingMechTurk2');
+set(rS,'rootfolder','C:\DebugingMechTurk3');
 set(rS,'schedulingmethod','acotsp');
 set(rS,'PFS',1)
 warning('off','MATLAB:divideByZero');
@@ -171,7 +171,7 @@ GenericTsk_TimeLapse=set(GenericTsk_TimeLapse,'channels',chnls,...
 
 %% now get the XY positions and create the new tasks
 OldTsk=getTasks(rS,'all',0);
-[XY,OldIDs]=get(OldTsk,'UserData','id');
+[XY,OldIDs,Qdata]=get(OldTsk,'UserData','id','Qdata');
 
 %% Create new time lapse tasks
 ZTsks=[];
@@ -184,11 +184,13 @@ for i=1:length(OldTsk)
                           'stagex',xy(1),...
                           'stagey',xy(2),...
                           'id',id,...
+                          'Qdata',Qdata{i},...
                           'filename',['Stk_' num2str(OldIDs{i})])];
         id=getNewTaskIDs(rS);
         TimeLapse=set(GenericTsk_TimeLapse,...
                           'stagex',xy(1),...
                           'stagey',xy(2),...
+                          'Qdata',Qdata{i},...
                           'filename',['5D_' num2str(OldIDs{i})]);
          TimeLapseTsks=[TimeLapseTsks; split(TimeLapse)]; 
        
@@ -201,7 +203,6 @@ removeTasks(rS,'all');
 addTasks(rS,ZTsks);
 addTasks(rS,TimeLapseTsks);
 plotPlannedSchedule(rS,1)
-
 run(rS);
         
         

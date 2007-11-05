@@ -1,16 +1,23 @@
-function showImg(md,img,hFig)
+function showImg(md,pth,img,hFig)
 %SHOWIMG opens a GUI that is useful in looking at 5D images 
 %
-% Possible calls: 
-% showImg(md,img) - show img with md metadata
+% Calling arguments: 
+% showImg(md,img,pth) - show img with md metadata
+%                       if img is empty - will read it from disk
 %
-% showImg(md,pth) this will read the image based on the md filename and pth
-% 
 % showImg(...,hFig) - hFig is the figure number to show image in
 
-%% if img is char - that it is actually the path variable
-if ischar(img)
-    img=readTiff(md,img);
+%% set argin defaults
+if ~exist('pth','var') || isempty(pth)
+    pth='';
+end
+
+if ~exist('img','var') || isempty(img)
+    img=readTiff(md,pth);
+end
+
+if ~exist('hFig','var') 
+    hFig=figure;
 end
 
 %% Init all kind of things
@@ -61,9 +68,6 @@ if isempty(initdspmode), initdspmode='Gray'; end
 
 
 %% set up figures etc.
-if ~exist('hFig','var') 
-    hFig=figure;
-end
 figure(hFig)
 clf
 
@@ -375,7 +379,7 @@ updateImage;
 
     function saveDisplaySettings(hObject,events) %#ok<INUSD>
         %TODO
-        filename=get(md,'filename');
+        filename=fullfilename(pth,get(md,'filename'));
         if isempty(filename) || ~exist(filename,'file')
             button = questdlg('Image does not have a filename (probably was never saved) do you really want to save it?');
             if sum(ismember(button,{'No','Cancel'})), return, end
