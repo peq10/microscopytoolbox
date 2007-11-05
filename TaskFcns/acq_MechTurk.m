@@ -29,7 +29,8 @@ while ~get(rS,'pfs')
     cnt=cnt+1;
     pause(0.5)
     if cnt>10
-        error(' I lost focus totally - dont knopw why');
+        warning('I lost focus totally - dont know why - moving on');
+        return
     end
 end
 %% update status figures

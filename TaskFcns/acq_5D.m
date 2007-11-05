@@ -2,6 +2,8 @@ function acq_spindleHunt(Tsk)
 
 global rS;
 
+tileSize=256;
+
 %% get the crnt acq details 
 [X,Y,Exposure,Channels,Z,UserData,T,Qdata]=get(Tsk,'stageX',...
                                           'stageY',...
@@ -19,6 +21,7 @@ set(rS,'xy',[X Y]);
 
 %% wait for perfect focus
 pause(0.5)
+set(rS,'pfs',1)
 cnt=0;
 while ~get(rS,'pfs')
     set(rS,'pfs',1)
@@ -74,6 +77,11 @@ end
 
 imshow(cat(3,red,green,zeros(size(red))),'initialmagnification','fit')
 
+hold on
+for i=1:size(Qdata.Value,1)
+    annotation('rectangle',[Qdata.Value(i,1)-tileSize/2 Qdata.Value(i,2)-tileSize/2 tileSize tileSize])
+end
+
 %% set Task to executed and update rS
 replaceTasks(rS,set(Tsk,'executed',true));
 
@@ -82,17 +90,16 @@ figure(4)
 plotTaskStatus(rS)
 
 %% shift cell centers if needed
-tileSize=256;
-Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2);
+Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2+1);
 Qdata.Value(:,1)=min(floor(Qdata.Value(:,1)),size(img,2)-tileSize/2);
-Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2);
+Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2+1);
 Qdata.Value(:,2)=min(floor(Qdata.Value(:,2)),size(img,1)-tileSize/2);
 
 %% Write image to disk
 for i=1:size(Qdata.Value,1)
     % crop
-    indx=(Qdata.Value(:,1)-tileSize/2):(Qdata.Value(:,1)+tileSize/2);
-    indy=(Qdata.Value(:,2)-tileSize/2):(Qdata.Value(:,2)+tileSize/2);
+    indx=(Qdata.Value(i,1)-tileSize/2):(Qdata.Value(i,1)+tileSize/2);
+    indy=(Qdata.Value(i,2)-tileSize/2):(Qdata.Value(i,2)+tileSize/2);
     imgcrp=img(indy,indx,:,:,:);
     % create a new Task with new filename
     old_filename=get(Tsk,'filename');

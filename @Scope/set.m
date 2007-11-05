@@ -13,7 +13,11 @@ for i=1:2:n
     switch lower(varargin{i})
         case 'pfs'
             if logical(get(rS,'pfs'))~=logical(varargin{i+1})
-               rS.mmc.enableContinuousFocus(varargin{i+1});
+                try
+                    rS.mmc.enableContinuousFocus(varargin{i+1});
+                catch
+                    warning('Failed to chagne PFS'); %#ok<WNTAG>
+                end
             end
         case 'roi'
             rS.mmc.setROI(varargin{i+1});
