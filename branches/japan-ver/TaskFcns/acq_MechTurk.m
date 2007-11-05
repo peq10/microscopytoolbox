@@ -55,15 +55,15 @@ plotTaskStatus(rS)
 
 %% Ask if there are spindles here
 figure(3)
-[x,y,b]=ginput(1);
+[x,y]=ginput;
 Prophase.QdataType='Prophase position';
 Prophase.QdataDescription='';
-if b==3
+if ~isempty(x)
     [prophase(1),prophase(2)]=get(rS,'x','y');
     Tsk=set(Tsk,'UserData',prophase);
-    Prophase.Value=[x y];
+    Prophase.Value=[x y];% x y are the coordinate within the image
 else
-    Prophase.Value=[NaN NaN];
+    Prophase.Value=[];
 end
 qdata=Prophase;
 Tsk=set(Tsk,'qdata',qdata);

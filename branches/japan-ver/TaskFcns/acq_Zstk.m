@@ -2,14 +2,13 @@ function acq_Zstk(Tsk)
 
 global rS;
 
-
-
 %% get the crnt acq details 
-[X,Y,Exposure,Channels,Z]=get(Tsk,'stageX',...
+[X,Y,Exposure,Channels,Z,Qdata]=get(Tsk,'stageX',...
                                           'stageY',...
                                           'exposuretime',...
                                           'ChannelNames',...
-                                          'stageZ');
+                                          'stageZ',...
+                                          'Qdata');
 % Z=guessFocalPlane(rS,X,Y);
 
 %% goto XYZ
@@ -65,5 +64,21 @@ replaceTasks(rS,set(Tsk,'executed',true));
 figure(4)
 plotTaskStatus(rS)
 
+%% shift cell centers if needed
+tileSize=256;
+Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2);
+Qdata.Value(:,1)=min(floor(Qdata.Value(:,1)),size(img,2)-tileSize/2);
+Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2);
+Qdata.Value(:,2)=min(floor(Qdata.Value(:,2)),size(img,1)-tileSize/2);
+
 %% Write image to disk
-writeTiff(Tsk,img,get(rS,'rootfolder')); 
+for i=1:size(Qdata.Value,1)
+    % crop
+    indx=(Qdata.Value(:,1)-tileSize/2):(Qdata.Value(:,1)+tileSize/2);
+    indy=(Qdata.Value(:,2)-tileSize/2):(Qdata.Value(:,2)+tileSize/2);
+    imgcrp=img(indy,indx,:);
+    % create a new Task with new filename
+    old_filename=get(Tsk,'filename');
+    TskTmp=set(Tsk,'filename',[old_filename '_' num2str(i)]);
+    writeTiff(TskTmp,imgcrp,get(rS,'rootfolder'));
+end
