@@ -27,6 +27,24 @@ Zdim=find(ordr=='Z');
 
 if N ~= prod(dim), error('Number of planes in file is different that expected by attribute DimensionSize, please check'); end
 
+%% If no projection or timeslice - read all in fast way
+if isempty(varargin)
+    % Nedelec's version is faster that Matlab's (or should be, need to bench mark);
+    img=tiffread(filename);
+
+    %% trandform to 5D
+    [ii,jj,kk]=ind2sub(dim,1:N);
+
+    imgT=zeros(size(img(1).data,1),size(img(1).data,2),max(ii),max(jj),max(kk));
+    for i=1:N
+        imgT(:,:,ii(i),jj(i),kk(i))=mat2gray(img(i).data,[0 2^16]);
+    end
+
+    img=single(imgT);
+    return
+end
+
+
 %% get the additionl options
 planeTimes=1:dim(Tdim-2);
 projectZ=0;
@@ -67,14 +85,14 @@ img=single([]);
 for t=planeTimes
     % find the linear index to read
     if Tdim==3
-        [sb1,sb2,sb3]=ndgrid(dim,t,1:dim(2),1:dim(3));
-        planeIxs=sub2ind(sb1(:),sb2(:),sb3(:));
+        [sb1,sb2,sb3]=meshgrid(t,1:dim(2),1:dim(3));
+        planeIxs=sub2ind(dim,sb1(:),sb2(:),sb3(:));
     elseif Tdim==4
-        [sb1,sb2,sb3]=ndgrid(dim,1:dim(1),t,1:dim(3));
-        planeIxs=sub2ind(sb1(:),sb2(:),sb3(:));
+        [sb1,sb2,sb3]=meshgrid(1:dim(1),t,1:dim(3));
+        planeIxs=sub2ind(dim,sb1(:),sb2(:),sb3(:));
     elseif Tdim==5
-        [sb1,sb2,sb3]=ndgrid(dim,1:dim(1),1:dim(2),t);
-        planeIxs=sub2ind(sb1(:),sb2(:),sb3(:));
+        [sb1,sb2,sb3]=meshgrid(1:dim(1),1:dim(2),t);
+        planeIxs=sub2ind(dim,sb1(:),sb2(:),sb3(:));
     else
         error('dim order doesn:t make sense - check it out')
     end

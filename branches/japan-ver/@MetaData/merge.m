@@ -68,21 +68,20 @@ planetime=[planetime{:}];
 
 
 %% create the qdata - do a few cell .struct etc transformation 
-qnum=length(get(mdarray(1),'qdata'));
-qcell=get(mdarray,'qdata');
-qarr=reshape([qcell{:}]',qnum,length(mdarray))';
-for i=1:qnum
-    Value{i}=arr2str([qarr(:,i).Value]);
-end
-QdataType={qcell{1}.QdataType};
-QdataDescription={qcell{1}.QdataDescription};
-qdata=struct('QdataType',QdataType,'Value',Value,'QdataDescription',QdataDescription);
-
+% qnum=length(get(mdarray(1),'qdata'));
+% qcell=get(mdarray,'qdata');
+% qarr=reshape([qcell{:}]',qnum,length(mdarray))';
+% for i=1:qnum
+%     Value{i}=arr2str([qarr(:,i).Value]);
+% end
+% QdataType={qcell{1}.QdataType};
+% QdataDescription={qcell{1}.QdataDescription};
+% qdata=struct('QdataType',QdataType,'Value',Value,'QdataDescription',QdataDescription);
+% 
 %% create the md based on the last md in the array
 md=mdarray(end);
 
 md=set(md,'creationdate',datestr(now),...
           'dimensionsize',sz,...
-          'planetime',planetime,...
-          'qdata',qdata);
+          'planetime',planetime);
             

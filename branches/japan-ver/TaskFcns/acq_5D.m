@@ -1,4 +1,4 @@
-function acq_spindleHunt(Tsk) 
+function acq_5D(Tsk) 
 
 global rS;
 
@@ -28,7 +28,8 @@ while ~get(rS,'pfs')
     cnt=cnt+1;
     pause(0.5)
     if cnt>10
-        error(' I lost focus totally - dont knopw why');
+       warning('I lost focus totally - dont know why - moving on');
+       return
     end
 end
 
@@ -41,7 +42,7 @@ Zguess.QdataType='FocalPlaneGuess';
 Zguess.Value=0;
 Zguess.QdataDescription='';
 
-qdata=[Zguess];
+qdata=Zguess;
 
 Tsk=set(Tsk,'planetime',now,...
             'stagex',get(rS,'x'),...
@@ -56,10 +57,10 @@ current_Z=get(rS,'z');
 for i=1:length(Z)
     set(rS,'z',current_Z+Z(i));
     if UserData.ImgTubChannel(ix)
-        img(:,:,:,i)=acqImg(rS,Channels,Exposure);
+        img(:,:,:,i)=acqImg(rS,Channels,Exposure); %#ok<AGROW>
     else
         tmp=acqImg(rS,Channels(1),Exposure(1));
-        img(:,:,:,i)=cat(3,tmp,zeros(size(tmp)));
+        img(:,:,:,i)=cat(3,tmp,zeros(size(tmp))); %#ok<AGROW>
     end
 end
 set(rS,'z',current_Z)
@@ -67,6 +68,8 @@ set(rS,'PFS',1);
 
 %% show image in figure 3
 figure(3)
+subplot('position',[0 0 1 1])
+clf
 if UserData.ImgTubChannel(ix)
     red=imadjust(max(img(:,:,1,:),[],4));
     green=imadjust(max(img(:,:,2,:),[],4));
@@ -76,11 +79,26 @@ else
 end
 
 imshow(cat(3,red,green,zeros(size(red))),'initialmagnification','fit')
+%% add rectangles
+% shift cell centers if needed
+Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2+1);
+Qdata.Value(:,1)=min(floor(Qdata.Value(:,1)),size(img,2)-tileSize/2);
+Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2+1);
+Qdata.Value(:,2)=min(floor(Qdata.Value(:,2)),size(img,1)-tileSize/2);
 
 hold on
 for i=1:size(Qdata.Value,1)
-    annotation('rectangle',[Qdata.Value(i,1)-tileSize/2 Qdata.Value(i,2)-tileSize/2 tileSize tileSize])
+    
+    x=[Qdata.Value(i,1)-tileSize/2; Qdata.Value(i,1)+tileSize/2];
+    y=[Qdata.Value(i,2)-tileSize/2; Qdata.Value(i,2)+tileSize/2];
+    
+    plot([x(1); x(1)],y,'linewidth',3)
+    plot([x(2); x(2)],y,'linewidth',3)
+    plot(x,[y(1) y(1)],'linewidth',3)
+    plot(x,[y(2) y(2)],'linewidth',3)
+   
 end
+
 
 %% set Task to executed and update rS
 replaceTasks(rS,set(Tsk,'executed',true));
@@ -88,12 +106,6 @@ replaceTasks(rS,set(Tsk,'executed',true));
 %% update Task Status
 figure(4)
 plotTaskStatus(rS)
-
-%% shift cell centers if needed
-Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2+1);
-Qdata.Value(:,1)=min(floor(Qdata.Value(:,1)),size(img,2)-tileSize/2);
-Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2+1);
-Qdata.Value(:,2)=min(floor(Qdata.Value(:,2)),size(img,1)-tileSize/2);
 
 %% Write image to disk
 for i=1:size(Qdata.Value,1)

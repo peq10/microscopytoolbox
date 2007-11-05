@@ -16,8 +16,6 @@ global rS;
                                           'exposuretime',...
                                           'ChannelNames',...
                                           'Binning');
-% Z=guessFocalPlane(rS,X,Y);
-
 %% goto XYZ
 set(rS,'xy',[X Y],'binning',Binning);
 
@@ -33,6 +31,7 @@ while ~get(rS,'pfs')
         return
     end
 end
+
 %% update status figures
 figure(1)
 plot(X,Y,'-or');
@@ -61,6 +60,7 @@ Prophase.QdataType='Prophase position';
 Prophase.QdataDescription='';
 if ~isempty(x)
     [prophase(1),prophase(2)]=get(rS,'x','y');
+    prophase(3)=now;
     Tsk=set(Tsk,'UserData',prophase);
     Prophase.Value=[x y];% x y are the coordinate within the image
 else
