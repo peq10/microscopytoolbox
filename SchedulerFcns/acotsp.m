@@ -30,7 +30,7 @@ if msg==0
     tr=tr+1;
 else
     warning('Scheduling failed!!!!! no idea why... ')
-    keyboard
+%     keyboard
     tr=1:length(x);
 end
 

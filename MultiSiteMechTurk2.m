@@ -45,8 +45,8 @@ BaseFileName='Img';
 Zshift=0;
 
 % Grid data
-r=5;
-c=5;
+r=2;
+c=2;
 WellCenter=[0 0];
 DistanceBetweenImages=200; %in microns (I think...)
 
@@ -122,9 +122,9 @@ ExposureTimeLapse=[750; 300];
 TimeLapseZstak_N=3;
 TimeLapseZstak_dz=1;
 
-T=[8 4 4 ones(1,82)*2]/60/24;
+dT=[8 4 4 ones(1,82)*2]/60/24;
 %T=[1 1 1]/60/24;
-ImgTubChannel=ones(size(T));
+ImgTubChannel=ones(size(dT));
 ImgTubChannel(2:2:end)=0;
 
 %% define new GenericTaks
@@ -141,8 +141,8 @@ chnl=struct('Number',1,'ChannelName','TRITC', 'Content','Mis12 Cherry');
 %now change Collections and their relations
 GenericTsk_Zstk=set(GenericTsk_Zstk,'channels',chnl,...
                           'exposuretime',ExposureZstack,...
-                          'planetime',now,...
-                          'stagez',Z);
+                          'stagez',Z,...
+                          'dimensionsize',[length(chnl) length(Z) 1]);
 
 
 %% For time lapse
@@ -156,18 +156,12 @@ clear chnls
 chnls(1)=struct('Number',1,'ChannelName','TRITC', 'Content','Mis12 Cherry');
 chnls(2)=struct('Number',1,'ChannelName','FITC', 'Content','GFP tubulin');
 
-%now change Collections and their relations
-T=now+cumsum(T);
-UserData.T=T;
-UserData.ImgTubChannel=ImgTubChannel;
 
 GenericTsk_TimeLapse=set(GenericTsk_TimeLapse,'channels',chnls,...
                           'exposuretime',ExposureTimeLapse,...
-                          'planetime',T,...
                           'stagez',Z,...
                           'timedependent',true,...
-                          'UserData',UserData,...
-                          'dimensionsize',[length(chnls) length(Z) length(T)]);                     
+                          'dimensionsize',[length(chnls) length(Z) length(dT)]);                     
 
 %% now get the XY positions and create the new tasks
 OldTsk=getTasks(rS,'all',0);
@@ -182,13 +176,18 @@ for i=1:length(OldTsk)
         ZTsks=[ZTsks; set(GenericTsk_Zstk,...
                           'stagex',xy(1),...
                           'stagey',xy(2),...
+                          'planetime',min(now,xy(3)+(dT(1)-1)/1440),...
                           'Qdata',Qdata{i},...
                           'filename',[FileNames{i} '_Stk'])];
         id=getNewTaskIDs(rS);
+        UserData.T=xy(3)+cumsum(dT)/1440;
+        UserData.ImgTubChannel=ImgTubChannel;
         TimeLapse=set(GenericTsk_TimeLapse,...
                           'stagex',xy(1),...
                           'stagey',xy(2),...
+                          'planetime',xy(3)+cumsum(dT)/1440,...
                           'Qdata',Qdata{i},...
+                          'UserData',UserData,...
                           'filename',[FileNames{i} '_5D']);
          TimeLapseTsks=[TimeLapseTsks; split(TimeLapse)]; 
        
