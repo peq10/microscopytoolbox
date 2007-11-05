@@ -12,7 +12,16 @@ rS.gui.run('')
 uiwait(msgbox('Click me - I''m beutiful'))
 rS.mmc=rS.gui.getMMCoreInstance;
 % rS.mmc=CMMCore;
-rS.mmc.loadSystemConfiguration(config_file);
+
+%% try to load devices - if an error occurs unload and clean
+try
+    rS.mmc.loadSystemConfiguration(config_file);
+catch
+    rS.mmc.unloadAllDevices;
+    rS=[];
+    uiwait(msgbox('An error occured during device loading - please close MM, correct the hardware problema and try again'))
+    error('An error occured when loading devices - rS is not a functional Roboscope!');
+end
 
 %% This is the stage/autofocus hacks
 rS.XYstageName='XY-Stage';
