@@ -12,6 +12,12 @@ function [Tsks,indx] = getTasks( rS,idx,bysch )
 if ~exist('bysch','var')
     bysch=1;
 end
+
+if isempty(rS.TaskBuffer)
+    Tsks=[]; 
+    indx=[];
+    return
+end
     
 % transform char into indexes
 if ischar(idx)

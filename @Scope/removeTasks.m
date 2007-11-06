@@ -19,7 +19,7 @@ if ischar(idx)
             [bla,idx]=getTasks(rS,'timed',0); 
         case 'nontimed_nonexecuted'
             [bla,nontimed]=getTasks(rS,'nontimed',0); 
-            [bla,executed]=getTasks(rS,'nontimed',0); 
+            [bla,executed]=getTasks(rS,'executed',0); 
             nonexecuted=setdiff(1:length(rS.TaskBuffer),executed);
             idx=intersect(nonexecuted,nontimed);
         otherwise
