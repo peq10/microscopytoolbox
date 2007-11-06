@@ -81,9 +81,6 @@ for i=1:size(Qdata.Value,1)
    
 end
 
-%% set Task to executed and update rS
-replaceTasks(rS,set(Tsk,'executed',true));
-
 %% update Task Status
 figure(4)
 plotTaskStatus(rS)
@@ -99,3 +96,7 @@ for i=1:size(Qdata.Value,1)
     TskTmp=set(Tsk,'filename',[old_filename '_' num2str(i)]);
     writeTiff(TskTmp,imgcrp,get(rS,'rootfolder'));
 end
+
+%% set Task to executed and update rS
+replaceTasks(rS,set(Tsk,'executed',true));
+

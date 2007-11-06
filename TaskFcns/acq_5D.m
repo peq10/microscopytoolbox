@@ -56,11 +56,11 @@ Tsk=set(Tsk,'DimensionOrder','XYCZT');
 current_Z=get(rS,'z');
 for i=1:length(Z)
     set(rS,'z',current_Z+Z(i));
-    if UserData.ImgTubChannel(ix)
-        img(:,:,:,i)=acqImg(rS,Channels,Exposure); %#ok<AGROW>
-    else
+    if UserData.SkpTubChannel(ix)
         tmp=acqImg(rS,Channels(1),Exposure(1));
         img(:,:,:,i)=cat(3,tmp,zeros(size(tmp))); %#ok<AGROW>
+    else
+        img(:,:,:,i)=acqImg(rS,Channels,Exposure); %#ok<AGROW>
     end
 end
 set(rS,'z',current_Z)
@@ -70,12 +70,12 @@ set(rS,'PFS',1);
 figure(3)
 subplot('position',[0 0 1 1])
 clf
-if UserData.ImgTubChannel(ix)
-    red=imadjust(max(img(:,:,1,:),[],4));
-    green=imadjust(max(img(:,:,2,:),[],4));
-else
+if UserData.SkpTubChannel(ix)
     red=imadjust(max(img(:,:,1,:),[],4));
     green=zeros(size(red));
+else
+    red=imadjust(max(img(:,:,1,:),[],4));
+    green=imadjust(max(img(:,:,2,:),[],4));
 end
 
 imshow(cat(3,red,green,zeros(size(red))),'initialmagnification','fit')
@@ -100,9 +100,6 @@ for i=1:size(Qdata.Value,1)
 end
 
 
-%% set Task to executed and update rS
-replaceTasks(rS,set(Tsk,'executed',true));
-
 %% update Task Status
 figure(4)
 plotTaskStatus(rS)
@@ -118,3 +115,6 @@ for i=1:size(Qdata.Value,1)
     TskTmp=set(Tsk,'filename',[old_filename '_' num2str(i)]);
     writeTiff(TskTmp,imgcrp,get(rS,'rootfolder'));
 end
+
+%% set Task to executed and update rS
+replaceTasks(rS,set(Tsk,'executed',true));

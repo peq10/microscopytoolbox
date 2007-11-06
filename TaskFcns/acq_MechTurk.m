@@ -53,9 +53,25 @@ imshow(img(:,:,1),[],'initialmagnification','fit')
 figure(4)
 plotTaskStatus(rS)
 
+%% add a counter for number of tasks
+OldTsk=getTasks(rS,'all',0);
+cnt=0;
+for i=1:length(OldTsk)
+    if get(OldTsk(i),'executed') && ~isempty(get(OldTsk(i),'UserData'))
+        cnt=cnt+1; 
+    end
+end
+
+set(3,'name',['already clicked on: ' num2str(cnt) ' prophase cells']);
+
 %% Ask if there are spindles here
 figure(3)
-[x,y]=ginput;
+[x,y,b]=ginput;
+if sum(b==27)
+    removeTasks(rS,'nontimed_nonexecuted');
+    return
+end
+
 Prophase.QdataType='Prophase position';
 Prophase.QdataDescription='';
 if ~isempty(x)

@@ -12,10 +12,10 @@ else
     texec=sum(exec);
 end
 stts(:,1)=[length(Timed)-texec texec]';
-exec=get(NonTimed,'executed');
 if isempty(NonTimed)
     texec=0;
 else
+    exec=get(NonTimed,'executed');
     if iscell(exec)
         exec=[exec{:}];
     end
@@ -24,7 +24,8 @@ end
 stts(:,2)=[length(NonTimed)-texec texec]';
 
 barh(stts','stacked')
-set(gca,'yticklabel',{'Timed','Non-Timed'},'ylim',[0.5 2.5]);
+set(gca,'yticklabel',{['Timed   ' num2str(stts(2,1)) '/' num2str(stts(1,1))] ,...
+                      ['Non-Timed   ' num2str(stts(2,2)) '/' num2str(stts(1,2))]},'ylim',[0.5 2.5]);
 xlabel('Number of Tasks');
 colormap summer
 h=legend('TODO','Finished');

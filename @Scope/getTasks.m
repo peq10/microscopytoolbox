@@ -31,7 +31,6 @@ if ischar(idx)
             idx=1;
         case 'last'
             idx=size(rS.TaskSchedule,1);
-            
         case 'all' 
             if bysch==1
                 idx=1:size(rS.TaskSchedule,1);

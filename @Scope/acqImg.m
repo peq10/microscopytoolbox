@@ -29,7 +29,7 @@ for i=1:n
            'Exposure',Exposure(i));
     rS.mmc.snapImage;
     imgtmp=rS.mmc.getImage;
-    img(:,:,i)=reshape(double(imgtmp)./(2^bd),w,h)';
+    img(:,:,i)=reshape(single(imgtmp)./(2^bd),w,h)';
 end
 
 set(rS,'channel',crnt_chnl);

@@ -150,8 +150,8 @@ for i=1:2:length(varargin)
                 error('Display levels must be numeric 4 x 2 matrix')
             end
             md.Image.DisplayOptions.Levels=arr2str(varargin{i+1});
-        case 'dispalychannels'
-            if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1},1)~=4 
+        case 'displaychannels'
+            if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=4 
                 error(['Display channel must be numeric 4 element vector which references the:\n'...
                          'channel for the Red Green Blue and Gray disaply channels, set 0 for none']);
             end
@@ -164,7 +164,7 @@ for i=1:2:length(varargin)
             end
             md.Image.DisplayOptions.Channels=arr2str(varargin{i+1});
         case 'displayroi'
-            if ~isa(varargin{i+1},'numeric') || size(varargin{i+1},1)~=4 || size(varargin{i+1},2)~=2
+            if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=4 
                 error('Display levels must be numeric 4 element matrix')
             end
             md.Image.DisplayOptions.ROI=arr2str(varargin{i+1});
