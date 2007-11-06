@@ -14,7 +14,7 @@ try
     keep rS
 catch
 end
-clear functions
+
 delete(get(0,'Children')) % a more aggressive form of close (doesn't ask for confirmation)
 ScopeConfigFileName='MM_Roboscope.cfg';
 
@@ -24,7 +24,7 @@ if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
 initFocalPlane(rS);
-set(rS,'rootfolder','C:\RealData3');
+set(rS,'rootfolder','C:\RawData\RealData4');
 set(rS,'schedulingmethod','acotsp');
 set(rS,'PFS',1)
 warning('off','MATLAB:divideByZero');
@@ -117,13 +117,13 @@ run(rS)
 %% More user defenitions
 ExposureZstack=750;
 Zstk_N=15;
-Zstk_dz=0.8;
+Zstk_dz=0.75;
 
 ExposureTimeLapse=[500; 200];
 TimeLapseZstak_N=2;
 TimeLapseZstak_dz=1.5;
 
-dT=[10 4 4 ones(1,82)*2]/60/24;
+dT=[12 4 4 ones(1,82)*2]/60/24;
 
 SkpTubChannel=ones(size(dT));
 SkpTubChannel(1:end)=0; % currently don' skip anyone...

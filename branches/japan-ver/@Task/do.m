@@ -3,7 +3,7 @@ function do(Tsk)
 %     basically runs the fcn with the Tsk as input
 
 global rS;
-persistent err;
+persistent herr;
 
 if isempty(Tsk)
     error('cannot do an empty task - what do you think I am?');
@@ -40,15 +40,13 @@ else
     catch
         % ersolve the error
         UserData=get(Tsk,'UserData');
-        newerr=lasterr;
-        if ~strcmp(newerr,err)
-            UserData.ExecutionFailure=err;
-            Tsk=set(Tsk,'UserData',UserData);
-            replaceTasks(rS,Tsk);
-            warning(['TASK HAS FAILED WITH ERROR   ' err]);
-            msgbox(err)
-        end
-        err=newerr;
+        err=lasterr;
+        UserData.ExecutionFailure=err;
+        Tsk=set(Tsk,'UserData',UserData);
+        replaceTasks(rS,Tsk);
+        warning(['TASK HAS FAILED WITH ERROR   ' err]);
+        if ishandle(herr), delete(herr); end
+        herr=msgbox(err);
         %% try to revcover from MM errors by unloading and loading all
         %% devices
         if~isempty(findstr(err,'mmcorej'))

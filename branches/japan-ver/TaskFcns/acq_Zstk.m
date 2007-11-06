@@ -46,39 +46,47 @@ Tsk=set(Tsk,'planetime',now,...
             'stagey',get(rS,'y'),...
             'stagez',get(rS,'z'),...
             'qdata',qdata);
+
+%% get the crop rectangles        
+% shift cell centers if needed
+imgsz=[get(rS,'Height') get(rS,'Width')]./get(rS,'Binning');
+Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2+1);
+Qdata.Value(:,1)=min(floor(Qdata.Value(:,1)),imgsz(2)-tileSize/2);
+Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2+1);
+Qdata.Value(:,2)=min(floor(Qdata.Value(:,2)),imgsz(1)-tileSize/2);
         
 %% acquire stack
 set(rS,'PFS',0);
 Tsk=set(Tsk,'DimensionOrder','XYZCT');
 current_Z=get(rS,'z');
+imgcrp=cell(size(Qdata.Value,1));
+mdl=ceil(length(Z)/2);
 for i=1:length(Z)
     set(rS,'z',current_Z+Z(i));
-    img(:,:,i)=acqImg(rS,Channels,Exposure); %#ok<AGROW>
+    img=acqImg(rS,Channels,Exposure); %#ok<AGROW>
+    for j=1:size(Qdata.Value,1)
+        indx=(Qdata.Value(j,1)-tileSize/2):(Qdata.Value(j,1)+tileSize/2);
+        indy=(Qdata.Value(j,2)-tileSize/2):(Qdata.Value(j,2)+tileSize/2);
+        imgcrp{j}(:,:,i)=img(indy,indx);
+    end
+    if i==mdl, imgmdl=img; end
 end
 set(rS,'z',current_Z)
 set(rS,'PFS',1);
 %% show image in figure 3
 figure(3)
-imshow(max(img,[],3),[],'initialmagnification','fit')
+imshow(imgmdl,[],'initialmagnification','fit')
 
 %% add rectangles
-% shift cell centers if needed
-Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2+1);
-Qdata.Value(:,1)=min(floor(Qdata.Value(:,1)),size(img,2)-tileSize/2);
-Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2+1);
-Qdata.Value(:,2)=min(floor(Qdata.Value(:,2)),size(img,1)-tileSize/2);
-
 hold on
 for i=1:size(Qdata.Value,1)
-    
     x=[Qdata.Value(i,1)-tileSize/2; Qdata.Value(i,1)+tileSize/2];
     y=[Qdata.Value(i,2)-tileSize/2; Qdata.Value(i,2)+tileSize/2];
-    
+  
     plot([x(1); x(1)],y,'linewidth',3)
     plot([x(2); x(2)],y,'linewidth',3)
     plot(x,[y(1) y(1)],'linewidth',3)
     plot(x,[y(2) y(2)],'linewidth',3)
-   
 end
 
 %% update Task Status
@@ -87,14 +95,10 @@ plotTaskStatus(rS)
 
 %% Write image to disk
 for i=1:size(Qdata.Value,1)
-    % crop
-    indx=(Qdata.Value(:,1)-tileSize/2):(Qdata.Value(:,1)+tileSize/2);
-    indy=(Qdata.Value(:,2)-tileSize/2):(Qdata.Value(:,2)+tileSize/2);
-    imgcrp=img(indy,indx,:);
     % create a new Task with new filename
     old_filename=get(Tsk,'filename');
     TskTmp=set(Tsk,'filename',[old_filename '_' num2str(i)]);
-    writeTiff(TskTmp,imgcrp,get(rS,'rootfolder'));
+    writeTiff(TskTmp,imgcrp{i},get(rS,'rootfolder'));
 end
 
 %% set Task to executed and update rS

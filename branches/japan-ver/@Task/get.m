@@ -4,6 +4,11 @@ function varargout = get( Tsk,varargin )
 
 global rS;
 
+if isempty(Tsk)
+    varargout=cell(size(varargin));
+    return
+end
+
 %% check to see if Tsk is an array, if so run foreach element seperatly.
 % this chunk is a big ugly, could flip the loop and avoid the second loop,
 % but who cares...
