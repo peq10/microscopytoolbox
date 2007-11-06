@@ -45,12 +45,11 @@ for i=1:length(varargin)
             ExpTime=get(Tsk(1),'Exposuretime');
             % duration has three components (all converted to days units): 
             % 1. Exposure time + 100 ms per channel for overhead 
-            Tsk.acqTime=(sum(ExpTime)+length(ExpTime)*20)/1000/3600/24;
+            Tsk.acqTime=(sum(ExpTime)+length(ExpTime)*200)* length(get(Tsk,'stagez'))/1000/3600/24;
             % 2. Focus time is based on stage 0.6 mm/sec max velocity
-            Tsk.focusTime=0;
+            Tsk.focusTime=0.1/3600/24; %in days units!!!
             % 3. 1 seconds overehad for movement (on average)
             varargout{i}=Tsk.acqTime+Tsk.focusTime+1/3600/24;
-            %TODO: make sure that get(Task,'runtime') is informative 
         case 'userdata'
             varargout{i}=Tsk.UserData;
         case 'executed'

@@ -3,6 +3,7 @@ function do(Tsk)
 %     basically runs the fcn with the Tsk as input
 
 global rS;
+persistent err;
 
 if isempty(Tsk)
     error('cannot do an empty task - what do you think I am?');
@@ -32,8 +33,30 @@ else
         end 
         disp(sprintf('Task time %s',datestr(tm,0)))
     end
-    Tsk.fcn(Tsk); % call the function handle
-    Tsk.executed=1;
+    
+    % try to perform a task
+    try
+        Tsk.fcn(Tsk); % call the function handle
+    catch
+        % ersolve the error
+        UserData=get(Tsk,'UserData');
+        newerr=lasterr;
+        if ~strcmp(newerr,err)
+            UserData.ExecutionFailure=err;
+            Tsk=set(Tsk,'UserData',UserData);
+            replaceTasks(rS,Tsk);
+            warning(['TASK HAS FAILED WITH ERROR   ' err]);
+            msgbox(err)
+        end
+        err=newerr;
+        %% try to revcover from MM errors by unloading and loading all
+        %% devices
+        if~isempty(findstr(err,'mmcorej'))
+            unlaod(rS);
+            loadDevices(rS);
+        end
+        
+    end
 end
 
 disp('done');

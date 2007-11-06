@@ -34,13 +34,8 @@ if isempty(varargin)
 
     %% trandform to 5D
     [ii,jj,kk]=ind2sub(dim,1:N);
-
-    imgT=zeros(size(img(1).data,1),size(img(1).data,2),max(ii),max(jj),max(kk));
-    for i=1:N
-        imgT(:,:,ii(i),jj(i),kk(i))=mat2gray(img(i).data,[0 2^16]);
-    end
-
-    img=single(imgT);
+    sz=[size(img(1).data) max(ii),max(jj),max(kk)];
+    img=single(reshape([img.data],sz))./2^16;
     return
 end
 

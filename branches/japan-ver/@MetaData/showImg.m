@@ -29,6 +29,9 @@ defIcons;
 t=1;
 z=1;
 
+% timer handle
+hTimerText=[];
+
 PlaybackSettingsData.ZT='T';
 PlaybackSettingsData.FPS=5;
 PlaybackSettingsData.Loop='Yes';
@@ -105,7 +108,7 @@ hImg=[];
 
 %% Construct the uicontrols - sliders
 % Z slider
-hZTpnl=uipanel('position',[0 0 0.45 0.1 ]);
+hZTpnl=uipanel('position',[0 0 0.4 0.1 ]);
 
 hPlaybackSettings=uicontrol(hZTpnl,'style','pushbutton','string','Settings','units','normalized','position',[0.01  0.48 0.18 0.5],...
                                                                'callback',@PlaybackSettings);
@@ -129,7 +132,7 @@ hTsliderLabel=uicontrol(hZTpnl,'style','text','string','T','units','normalized',
                                               
 %% panel for all level buttons
 
-hLvl=uipanel('position',[0.45 0 0.4 0.1]);
+hLvl=uipanel('position',[0.4 0 0.4 0.1]);
 
 % red chanel controls
 hRchnlLabel=uicontrol(hLvl,'style','text','string','Red','units','normalized','position',[0.01 0.7 0.2 0.3],...
@@ -175,18 +178,22 @@ set(hBtnGrp,'Visible','on','SelectedObject',findobj(hFig,'string',initdspmode));
 
 %% Save and zoom and pixel info panel
 
-hSaveZoomPnl=uipanel('position',[0.85 0 0.15 0.1]);
+hSaveZoomPnl=uipanel('position',[0.8 0 0.2 0.1]);
 
 % hPixelInfo is created in updateImage function
 hSaveBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Save',...
-                                'callback',@saveDisplaySettings,'position',[0 0.41 0.5 0.38]);
+                                'callback',@saveDisplaySettings,'position',[0.01 0.41 0.3 0.38]);
 hShowCollBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Collections','callback',@drawCollections_callback,...
-                                                          'position',[0.5 0.41 0.5 0.38],'fontsize',8);
+                                                          'position',[0.33 0.41 0.3 0.38],'fontsize',8);
+                                                      
+hAddQdata=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Qdata','callback',@addQdata_callback,...
+                                                          'position',[0.66 0.41 0.3 0.38],'fontsize',8);
+                                                       
                                                     
 hZoomBtn=uicontrol(hSaveZoomPnl,'style','togglebutton','units','normalized','cdata',zmicon,'callback',@ZoomImg,...
                                                         'position',[0.01 0.01 0.3 0.3]);
 hPanBtn=uicontrol(hSaveZoomPnl,'style','togglebutton','units','normalized','cdata',panicon,'callback',@PanImg,...
-                                                        'position',[0.32 0.01 0.3 0.3]);
+                                                        'position',[0.33 0.01 0.3 0.3]);
 hDistToolBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','cdata',dsticon,'callback',@AddDistTool,...
                                                         'position',[0.66 0.01 0.3 0.3]);
 
@@ -262,6 +269,17 @@ updateImage;
         hPixelInfo=impixelinfoval(hSaveZoomPnl,hImg);
         set(hPixelInfo,'units','normalized','position',[0 0.8 1 0.2]);
         set(hAxes,'xlim',roi(1:2),'ylim',roi(3:4),'xtick',[],'ytick',[]);
+        
+        %% add timer
+%         delete(hTimerText);
+        TimeStamps=get(md,'planetime');
+        TimeStamps=(TimeStamps-min(TimeStamps))*1440;
+        tmpx=get(hAxes,'xlim');
+        tmpy=get(hAxes,'ylim');
+        
+        TimerPos=[(tmpx(2)-tmpx(1))*0.1+tmpx(1) (tmpy(2)-tmpy(1))*0.1+tmpy(1)];
+        text(TimerPos(1),TimerPos(2),sprintf('% 5.2f',TimeStamps(t)),'color','w','fontsize',20);
+        
     end
 
     function changeChannel(hObject,events) %#ok I don't need events
@@ -379,7 +397,7 @@ updateImage;
 
     function saveDisplaySettings(hObject,events) %#ok<INUSD>
         %TODO
-        filename=fullfilename(pth,get(md,'filename'));
+        filename=[fullfile(pth,get(md,'filename')) '.tiff'];
         if isempty(filename) || ~exist(filename,'file')
             button = questdlg('Image does not have a filename (probably was never saved) do you really want to save it?');
             if sum(ismember(button,{'No','Cancel'})), return, end
@@ -391,11 +409,11 @@ updateImage;
         for i=1:4, dspchnls(i)=get(hndls(i),'value')-1; end
         
         % add attributes to md
-        md=set(md,'diaplylevels',rgbglevels,...
+        md=set(md,'displaylevels',rgbg_levels,...
                           'displaychannels',dspchnls,...
                           'displaymode',get(get(hBtnGrp,'SelectedObject'),'String'),...
-                          'diaplyroi',roi);
-        updateTiffMetaData(md,img);
+                          'displayroi',roi);
+        updateTiffMetaData(md,pth);
     end
 
     function PlaybackSettings(hObject,events) %#ok<INUSD>
@@ -475,8 +493,29 @@ updateImage;
         drawCollections(md)
     end
 
-        
+    function addQdata_callback(hObject,events) %#ok<INUSD>
+        hGetQdataFig=figure;
+        set(hGetQdataFig,'Toolbar','none','Menubar','none','position',[400 400 300 100],'Name','Add Qdata');
+        uicontrol('Style','Text','units','normalized','position',[0.01 0.66 0.25 0.25],'string','Type');
+        hQdataType=uicontrol('style','Edit','units','normalized','position',[0.01 0.1 0.25 0.4]);
 
+        uicontrol('Style','Text','units','normalized','position',[0.33 0.66 0.25 0.25],'string','Value');
+        hQdataValue=uicontrol('style','Edit','units','normalized','position',[0.33 0.1 0.25 0.4]);
+
+        uicontrol('Style','pushbutton','units','normalized','position',[0.65 0.4 0.25 0.3],'string','Add','callback',@addQdataButton_callback);
+
+        function addQdataButton_callback(hObject,events) %#ok<INUSD>
+            Qdata.QdataType=get(hQdataType,'String');
+            Qdata.Value=str2double(get(hQdataValue,'String'));
+            Qdata.QdataDescription='';
+            set(hQdataType,'String','');
+            set(hQdataValue,'String','');
+            NewQdata=[get(md,'Qdata'); Qdata];
+            md=set(md,'Qdata',NewQdata);
+        end
+
+    end
+  
     function defIcons
         plyicon =[...
             8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8

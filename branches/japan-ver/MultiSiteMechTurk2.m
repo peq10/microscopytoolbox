@@ -14,6 +14,7 @@ try
     keep rS
 catch
 end
+clear functions
 delete(get(0,'Children')) % a more aggressive form of close (doesn't ask for confirmation)
 ScopeConfigFileName='MM_Roboscope.cfg';
 
@@ -23,7 +24,7 @@ if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
 initFocalPlane(rS);
-set(rS,'rootfolder','C:\DebugingMechTurk3');
+set(rS,'rootfolder','C:\RealData3');
 set(rS,'schedulingmethod','acotsp');
 set(rS,'PFS',1)
 warning('off','MATLAB:divideByZero');
@@ -34,7 +35,7 @@ disp('Scope initialized');
 % Data for all channels
 Channels={'FITC'};
 Contents={'GFP tubulin'};
-Exposure=250; %#ok<NBRAK>
+Exposure=100; %#ok<NBRAK>
 Binning=1; %#ok<NBRAK>
 PlateName='Test1';
 WellName='Test2';
@@ -45,8 +46,8 @@ BaseFileName='Img';
 Zshift=0;
 
 % Grid data
-r=2;
-c=2;
+r=10;
+c=10;
 WellCenter=[0 0];
 DistanceBetweenImages=200; %in microns (I think...)
 
@@ -107,7 +108,7 @@ set(3,'position',[  376   195   894   627],...
     'Toolbar','none','Menubar','none','name','Focal Plane');
 
 figure(4)
-set(4,'position',[368   867   372   109],...
+set(4,'position',[368   867   572   109],...
     'Toolbar','none','Menubar','none','name','Task Status');
 
 %% MechTurk part
@@ -115,17 +116,17 @@ run(rS)
 
 %% More user defenitions
 ExposureZstack=750;
-Zstk_N=7;
-Zstk_dz=0.5;
+Zstk_N=15;
+Zstk_dz=0.8;
 
-ExposureTimeLapse=[750; 300];
-TimeLapseZstak_N=3;
-TimeLapseZstak_dz=1;
+ExposureTimeLapse=[500; 200];
+TimeLapseZstak_N=2;
+TimeLapseZstak_dz=1.5;
 
-dT=[8 4 4 ones(1,82)*2]/60/24;
-%T=[1 1 1]/60/24;
-ImgTubChannel=ones(size(dT));
-ImgTubChannel(2:2:end)=0;
+dT=[10 4 4 ones(1,82)*2]/60/24;
+
+SkpTubChannel=ones(size(dT));
+SkpTubChannel(1:end)=0; % currently don' skip anyone...
 
 %% define new GenericTaks
 
@@ -142,6 +143,7 @@ chnl=struct('Number',1,'ChannelName','TRITC', 'Content','Mis12 Cherry');
 GenericTsk_Zstk=set(GenericTsk_Zstk,'channels',chnl,...
                           'exposuretime',ExposureZstack,...
                           'stagez',Z,...
+                          'timedependent',true,...
                           'dimensionsize',[length(chnl) length(Z) 1]);
 
 
@@ -176,16 +178,16 @@ for i=1:length(OldTsk)
         ZTsks=[ZTsks; set(GenericTsk_Zstk,...
                           'stagex',xy(1),...
                           'stagey',xy(2),...
-                          'planetime',min(now,xy(3)+(dT(1)-1)/1440),...
+                          'planetime',min(now,xy(3)+(dT(1)-1/1440)),...
                           'Qdata',Qdata{i},...
                           'filename',[FileNames{i} '_Stk'])];
         id=getNewTaskIDs(rS);
-        UserData.T=xy(3)+cumsum(dT)/1440;
-        UserData.ImgTubChannel=ImgTubChannel;
+        UserData.T=xy(3)+cumsum(dT);
+        UserData.SkpTubChannel=SkpTubChannel;
         TimeLapse=set(GenericTsk_TimeLapse,...
                           'stagex',xy(1),...
                           'stagey',xy(2),...
-                          'planetime',xy(3)+cumsum(dT)/1440,...
+                          'planetime',UserData.T,...
                           'Qdata',Qdata{i},...
                           'UserData',UserData,...
                           'filename',[FileNames{i} '_5D']);
@@ -201,5 +203,7 @@ addTasks(rS,ZTsks);
 addTasks(rS,TimeLapseTsks);
 plotPlannedSchedule(rS,1)
 run(rS);
+
+set(rS,'pfs',0);
         
         
