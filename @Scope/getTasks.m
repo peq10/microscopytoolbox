@@ -51,6 +51,13 @@ if ischar(idx)
                 exec=[exec{:}]';
                 idx=find(exec);
             end
+        case 'nonexecuted'
+            bysch=0;
+            exec=get(rS.TaskBuffer,'executed');
+            if iscell(exec)
+                exec=[exec{:}]';
+                idx=find(exec==0);
+            end
         otherwise
     end
 end

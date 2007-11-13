@@ -2,6 +2,11 @@ function [Nuc,smlbw]=nucDetect(sml,filterFlag)
 % find all nuclei within a sml image (which should be in the order of cell
 % size)
 
+%% parameters
+fCentCutoffs=[0.075 0.1];
+fCellCutoffs=[0.01 0.05];
+ordr=3;
+
 %% check if need to filter image
 if ~exist('filterFlag','var')
     filterFlag=0;

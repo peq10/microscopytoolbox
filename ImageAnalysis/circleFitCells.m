@@ -62,7 +62,7 @@ for j=1:length(ix)
 end
 
 %% after watershed discard of too big and circular
-
+clscnv=imresize(clscnv,size(bw))>0;
 [lbl,n]=bwlabel(clscnv);
 stt=regionprops(lbl,features);
 cnvarea=[stt.ConvexArea]';

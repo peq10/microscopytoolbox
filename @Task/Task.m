@@ -52,9 +52,7 @@ Tsk.id=getNewTaskIDs(rS);
 Tsk.fcn=fcn;
 
 % run time: acqTime and stageMoveTime and fucosTime
-Tsk.acqTime=0;
-Tsk.focusTime=0;
-%TODO: calculate or do something with those
+Tsk.acqTime=10/86400; %default value for a task duration is 10 sec
 
 % z-shift where to image - can have either scalar or array with number of
 % channels

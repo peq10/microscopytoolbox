@@ -11,7 +11,10 @@ while ~isempty(rS.TaskSchedule)
     updateStatusBar(rS,0)
     if ~isempty(Tsk)
         try
+            t0=now;
             Tsk=do(Tsk);
+            dur=now-t0;
+            set(Tsk,'duration',dur);
             replaceTasks(rS,set(Tsk,'executed',true));
         catch
             % ersolve the error
