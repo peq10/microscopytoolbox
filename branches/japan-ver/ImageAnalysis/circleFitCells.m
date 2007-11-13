@@ -74,6 +74,7 @@ ix=setdiff(1:n,ix);
 stt=stt(ix);
 
 %% Cluster circles togather
+crcle=zeros(length(stt),3);
 for j=1:length(stt),
     [center,radius] = minboundcircle(stt(j).ConvexHull(:,1),stt(j).ConvexHull(:,2));
     crcle(j,:)=[center radius];
@@ -85,8 +86,12 @@ if isempty(stt)
 end
 
 D=pdist(crcle(:,1:2));
-Z=linkage(D,'average');
-C=cluster(Z,'cutoff',MergeDistance,'criterion','distance');
+if length(D)<3
+    C=1:length(ix);
+else
+    Z=linkage(D,'average');
+    C=cluster(Z,'cutoff',MergeDistance,'criterion','distance');
+end
 
 lbl=zeros(size(bw));
 for j=1:length(ix);

@@ -22,6 +22,7 @@ set(rS,'rootfolder','C:\RawData\RealData19');
 set(rS,'schedulingmethod','greedy');
 set(rS,'PFS',1)
 warning('off','MATLAB:divideByZero');
+warning off
 gotoOrigin(rS)
 addpath ImageAnalysis
 disp('Scope initialized');
@@ -37,7 +38,7 @@ UserData.Scan.T=NaN;
 UserData.NEB.Channels=Green;
 UserData.NEB.Exposure=100;
 UserData.NEB.Zstack=0;
-UserData.NEB.T=cumsum(6*ones(1,10))/1440;
+UserData.NEB.T=cumsum(ones(1,10))/1440;
 
 UserData.Zstack.Channels=Red;
 UserData.Zstack.Exposure=1200;
@@ -47,7 +48,7 @@ UserData.Zstack.T=NaN;
 UserData.TimeLapse.Channels=[Red Green];
 UserData.TimeLapse.Exposure=[500; 200];
 UserData.TimeLapse.Zstack=[-1.5 1.5]; 
-UserData.TimeLapse.T=ones(1,60)*3;
+UserData.TimeLapse.T=cumsum(ones(1,60)*3)/1440;
 
 BaseFileName='Img';
 
@@ -62,12 +63,13 @@ DistanceBetweenImages=200; %in microns (I think...)
 %%%% Define a 'generic' Task for this well based on user data 
 
 % start with default values for all fields
-GenericTsk=Task([],'acq_lookForProphase');
+GenericTsk=Task([],'acq_lookForProphaseCells');
 
 %now change Collections and their relations
 GenericTsk=set(GenericTsk,'channels',UserData.Scan.Channels,...
                           'exposuretime',UserData.Scan.Exposure,...
-                          'planetime',UserData.Scan.T);
+                          'planetime',UserData.Scan.T,...
+                          'UserData',UserData,'timedependent',false);
 
 %%%% Create the grid and replicate GenericTsk with few alterations
 
@@ -78,7 +80,7 @@ for i=1:length(Pos)
     Tsk(i)=set(GenericTsk,'stagex',Pos(i).X,...
                           'stagey',Pos(i).Y,...
                           'stagez',Pos(i).Z,...
-                          'filename',[BaseFileName '_' num2str(id)]);
+                          'filename',[BaseFileName '_' num2str(id)]); %#ok<AGROW>
 end
 
 %% add Tasks to rS 
@@ -96,7 +98,7 @@ figure(2)
 set(2,'position',[  10    97   350   295],...
     'Toolbar','none','Menubar','none','name','Focal Plane');
 
-plotFocalPlaneGrid(rS);
+% plotFocalPlaneGrid(rS);
 
 updateStatusBar(rS); % this should delete all old progress bars
 updateStatusBar(rS,0); % create a new one
@@ -104,15 +106,15 @@ set(rS,'statusbarposition',[10 430 356 180]);
 
 figure(3)
 subplot('position',[0 0 1 1])
-set(3,'position',[  376   195   894   627],...
+set(3,'position',[  372   348   894   627],...
     'Toolbar','none','Menubar','none','name','Focal Plane');
 
 figure(4)
-set(4,'position',[368   867   572   109],...
+set(4,'position',[379    57   499   254],...
     'Toolbar','none','Menubar','none','name','Task Status');
 
 %% MechTurk part
-run(rS)
+runWithoutExceptionHandling(rS)
 set(rS,'pfs',0);
         
         

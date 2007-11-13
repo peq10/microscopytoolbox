@@ -93,7 +93,7 @@ end
 
 %% update Task Status
 figure(4)
-plotTaskStatus(rS)
+plotTaskStatusByType(rS)
 plotFocalPlaneGrid(rS,2);
 
 %% Write image to disk
