@@ -25,7 +25,7 @@ if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
 initFocalPlane(rS);
-set(rS,'rootfolder','C:\RawData\RealData12');
+set(rS,'rootfolder','C:\RawData\RealData19');
 set(rS,'schedulingmethod','acotsp');
 set(rS,'PFS',1)
 warning('off','MATLAB:divideByZero');
@@ -130,7 +130,7 @@ ExposureTimeLapse=[500; 200];
 TimeLapseZstak_N=2;
 TimeLapseZstak_dz=1.5;
 
-dT=[10 4 4 ones(1,82)*2]/60/24;
+dT=[8 4 4 ones(1,82)*2]/60/24;
 
 
 SkpTubChannel=ones(size(dT));
@@ -152,6 +152,7 @@ GenericTsk_Zstk=set(GenericTsk_Zstk,'channels',chnl,...
                           'exposuretime',ExposureZstack,...
                           'stagez',Z,...
                           'timedependent',true,...
+                          'planetime',now,...
                           'dimensionsize',[length(chnl) length(Z) 1]);
 
 
@@ -180,18 +181,17 @@ OldTsk=getTasks(rS,'all',0);
 %% Create new time lapse tasks
 ZTsks=[];
 TimeLapseTsks=[];
+UserData.T=now+cumsum(dT);
+UserData.SkpTubChannel=SkpTubChannel;
 for i=1:length(OldTsk)
     xy=XY{i};
     if ~isempty(xy)
         ZTsks=[ZTsks; set(GenericTsk_Zstk,...
                           'stagex',xy(1),...
                           'stagey',xy(2),...
-                          'planetime',min(now,xy(3)+(dT(1)-1/1440)),...
                           'Qdata',Qdata{i},...
                           'filename',[FileNames{i} '_Stk'])];
         id=getNewTaskIDs(rS);
-        UserData.T=xy(3)+cumsum(dT);
-        UserData.SkpTubChannel=SkpTubChannel;
         TimeLapse=set(GenericTsk_TimeLapse,...
                           'stagex',xy(1),...
                           'stagey',xy(2),...
@@ -215,11 +215,10 @@ end
                   
 
 %% add and run
-set(rS,'schedulingmethod','greedy');
+set(rS,'schedulingmethod','repeated_acotsp');
 removeTasks(rS,'all');
 % addTasks(rS,AllRoyTsk);
-addTasks(rS,ZTsks);
-addTasks(rS,TimeLapseTsks);
+addTasks(rS,[ZTsks; TimeLapseTsks]);
 plotPlannedSchedule(rS,1)
 
 % uiwait(msgbox('Change Objectives'));

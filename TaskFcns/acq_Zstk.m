@@ -1,4 +1,4 @@
-function acq_Zstk(Tsk) 
+function Tsk=acq_Zstk(Tsk) 
 
 global rS;
 
@@ -11,14 +11,15 @@ tileSize=256;
                                           'ChannelNames',...
                                           'stageZ',...
                                           'Qdata');
-% Z=guessFocalPlane(rS,X,Y);
-
+Zguess=guessFocalPlane(rS,X,Y);
 %% goto XYZ
-set(rS,'xy',[X Y]);
+% set(rS,'pfs',0)
+% set(rS,'xy-slow',[X Y],'Z',Zguess);
+set(rS,'xy-slow',[X Y])
+%pause(1.5)
 
 %% wait for perfect focus
 set(rS,'pfs',1)
-pause(0.5)
 cnt=0;
 while ~get(rS,'pfs')
     set(rS,'pfs',1)
@@ -30,16 +31,17 @@ while ~get(rS,'pfs')
     end
 end
 
+addFocusPoints(rS,get(rS,'x'),get(rS,'y'),get(rS,'z'),now); 
+
 %% update status figures
-figure(1)
-plot(X,Y,'-or');
+plotRoute(rS,1)
 
 %% update Tsk object so the value I write to disk are actual not theoretical
-Zguess.QdataType='FocalPlaneGuess';
-Zguess.Value=0;
-Zguess.QdataDescription='';
+ZguessQdata.QdataType='FocalPlaneGuess';
+ZguessQdata.Value=Zguess;
+ZguessQdata.QdataDescription='';
 
-qdata=Zguess;
+qdata=ZguessQdata;
 
 Tsk=set(Tsk,'planetime',now,...
             'stagex',get(rS,'x'),...
@@ -92,6 +94,7 @@ end
 %% update Task Status
 figure(4)
 plotTaskStatus(rS)
+plotFocalPlaneGrid(rS,2);
 
 %% Write image to disk
 for i=1:size(Qdata.Value,1)
@@ -100,7 +103,4 @@ for i=1:size(Qdata.Value,1)
     TskTmp=set(Tsk,'filename',[old_filename '_' num2str(i)]);
     writeTiff(TskTmp,imgcrp{i},get(rS,'rootfolder'));
 end
-
-%% set Task to executed and update rS
-replaceTasks(rS,set(Tsk,'executed',true));
 

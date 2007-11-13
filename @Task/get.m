@@ -21,7 +21,7 @@ if length(Tsk)>1
         end
     end
     for j=1:length(varargin)
-        varargout=[varargout {s(:,j)}];
+        varargout=[varargout {s(:,j)}]; %#ok<AGROW>
     end
     return
 end

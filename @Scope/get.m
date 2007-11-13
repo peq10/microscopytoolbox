@@ -7,6 +7,8 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'obj'
+            varargout=[varargout; {rS.mmc.getStateLabel('OBJ')}];
         case 'pfs'
             varargout=[varargout; {rS.mmc.isContinuousFocusEnabled}];
         case 'roi'
@@ -50,7 +52,7 @@ for i=1:length(varargin)
         case 'rootfolder'
             varargout=[varargout; {rS.rootFolder}];
         case 'pixelsize'
-            varargout=[varargout; {rS.pxlsz}];
+            varargout=[varargout; {rS.pxlsz.um(strcmp(rS.pxlsz.label,get(rS,'OBJ')))}];
         case 'objective'
             varargout=[varargout; {rS.mmc.getStateLabel('Objective')}];
         case 'focusmethod'

@@ -11,6 +11,11 @@ if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
+        case 'obj'
+            if ~strcmp(varargin{i+1},get(rS,'obj'))
+               rS.mmc.setStateLabel('OBJ',varargin{i+1});
+            end
+                
         case 'pfs'
             if logical(get(rS,'pfs'))~=logical(varargin{i+1})
                 try
@@ -39,6 +44,19 @@ for i=1:2:n
             x=varargin{i+1}(1);
             y=varargin{i+1}(2);
             rS.mmc.setXYPosition(rS.XYstageName,x,y);
+        case 'xy-slow'
+            x=varargin{i+1}(1);
+            y=varargin{i+1}(2);
+            [curr_x,curr_y]=get(rS,'x','y');
+            xint=linspace(curr_x,x,6);
+            yint=linspace(curr_y,y,6);
+            xint=xint(2:end);
+            yint=yint(2:end);
+            for j=1:5
+                set(rS,'xy',[xint(j) yint(j)])
+                pause(0.2);
+            end
+            
         case'z'
             rS.mmc.setPosition(rS.ZstageName,varargin{i+1})
         case {'stagespeed.x','stagespeed.y','stagespeed.z'}
