@@ -32,6 +32,6 @@ for i=1:n
     img(:,:,i)=reshape(single(imgtmp)./(2^bd),w,h)';
 end
 
-set(rS,'channel',crnt_chnl);
+% set(rS,'channel',crnt_chnl);
 
 

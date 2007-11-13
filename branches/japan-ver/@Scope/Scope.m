@@ -79,9 +79,11 @@ rS.statusBarHandle=[];
 % rS.mmc.setState('Objective',ObjectiveLbl);
 
 % load the pixel sizes from file
-% pxlsz=csvread('PixelSizeList.csv');
-% pxlsz=sortrows(pxlsz);
-rS.pxlsz=0.065;
+fid=fopen('PixelSizeList.csv');
+C=textscan(fid,'%s %f');
+fclose(fid);
+rS.pxlsz.label=C{1};
+rS.pxlsz.um=C{2};
 
 rS.focusParams=[]; %will be updated in first call for getFocusParams
 

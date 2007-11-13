@@ -4,9 +4,14 @@ function ordr = repeated_acotsp(x,y,t,id,x_current,y_current,tasks_duration,t_cu
 %% sort them all based on time & divinde into blocks
 xy=[x y];
 [xyunq,bla,ix]=unique(xy,'rows');
+% xyunqorg=xyunq;
+dup=ceil(20/size(xyunq,1));
+xyunq=repmat(xyunq,dup,1);
 tunq=unique(t); 
 tic
 blockOrdr=acotsp(xyunq(:,1),xyunq(:,2),nan(size(xyunq(:,1))),(1:size(xyunq,1))',x_current,y_current);
+blockOrdr=blockOrdr(1:dup:end);
+% xyunq=xyunqorg;
 %%
 xyunq=xyunq(blockOrdr,:);
 tic

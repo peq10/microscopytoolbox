@@ -1,4 +1,4 @@
-function acq_MechTurk(Tsk) 
+function Tsk=acq_MechTurk(Tsk) 
 
 global rS;
 
@@ -11,13 +11,14 @@ global rS;
 % end
 
 %% get the crnt acq details 
-[X,Y,Exposure,Channels,Binning]=get(Tsk,'stageX',...
+[X,Y,Exposure,Channels]=get(Tsk,'stageX',...
                                           'stageY',...
                                           'exposuretime',...
-                                          'ChannelNames',...
-                                          'Binning');
+                                          'ChannelNames');
+                                      
+Z=guessFocalPlane(rS,X,Y);
 %% goto XYZ
-set(rS,'xy',[X Y],'binning',Binning);
+set(rS,'xy',[X Y],'Z',Z);
 
 %% wait for perfect focus
 pause(0.5)
@@ -32,9 +33,10 @@ while ~get(rS,'pfs')
     end
 end
 
+addFocusPoints(rS,get(rS,'x'),get(rS,'y'),get(rS,'z'),now); 
+
 %% update status figures
-figure(1)
-plot(X,Y,'-or');
+plotRoute(rS,1)
 
 %% update Tsk object so the value I write to disk are actual not theoretical
 Tsk=set(Tsk,'planetime',now,...
@@ -52,6 +54,7 @@ imshow(img(:,:,1),[],'initialmagnification','fit')
 %% update Task Status
 figure(4)
 plotTaskStatus(rS)
+plotFocalPlaneGrid(rS,2);
 
 %% add a counter for number of tasks
 OldTsk=getTasks(rS,'all',0);
@@ -67,6 +70,8 @@ set(3,'name',['already clicked on: ' num2str(cnt) ' prophase cells']);
 %% Ask if there are spindles here
 figure(3)
 [x,y,b]=ginput;
+% x=650;Å@y=514;Å@b=1; % used for silly acquisition..
+
 if sum(b==27)
     removeTasks(rS,'nontimed_nonexecuted');
     return
@@ -86,6 +91,3 @@ qdata=Prophase;
 Tsk=set(Tsk,'qdata',qdata);
 
 writeTiff(Tsk,img,get(rS,'rootfolder')); 
-
-%% set Task to executed and update rS
-replaceTasks(rS,set(Tsk,'executed',true));
