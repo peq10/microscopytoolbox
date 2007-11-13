@@ -6,7 +6,7 @@ function PlausiblyProphase=funcClicker(img,fig)
 % fCellCutoffs=[0.01 0.05];
 % ordr=3;
 
-CentThresh=0.15;
+CentThresh=0.01;
 minCentSize=4;
 RadiusMultiply=1.5;
 
@@ -20,6 +20,8 @@ ff=fft2(img);
 fltCent=ifft2(fCent.*ff);
 fltCell=ifft2(fCell.*ff);
 
+msg='found';
+
 %% thresholg segmentation for cells and centrosomes
 bw=im2bw(fltCell,graythresh(fltCell));
 bw=imclearborder(bw);
@@ -32,6 +34,7 @@ xycent=reshape([centstt.Centroid]',2,length(centstt))';
 % check if found any centrosomes
 if isempty(xycent)
     PlausiblyProphase=[];
+    msg='no centrosomes found';
     return
 end
 
@@ -58,6 +61,7 @@ D=distance(xycent',CircleFit(:,1:2)');
 PlausiblyProphase=[xycent CircleFit(mi,:)];
 
 if isempty(PlausiblyProphase)
+    msg='centrosmes dont belong to any cell';
     return
 end
 
@@ -82,9 +86,17 @@ PlausiblyProphase=PlausiblyProphase(ismember(mi,find(nucNum==1)),:);
 [bla,ix]=unique(PlausiblyProphase(:,4:5),'rows'); %#ok
 PlausiblyProphase=PlausiblyProphase(ix,:);
 
+if isempty(ix)
+    msg='all cells  are multi nucleate';
+    return
+end
+
+disp(msg)
+
 %% plotting
 if exist('fig','var')
     figure(fig)
+    set(fig,'name',msg);
     hold on
     drawCircle(CircleFit)
     hold on
@@ -95,5 +107,7 @@ if exist('fig','var')
         end
     end
 end
+
+% ginput(1);
 
 

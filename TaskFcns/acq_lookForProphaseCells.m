@@ -44,10 +44,11 @@ img=acqImg(rS,Channels,Exposure);
 figure(3)
 imshow(img(:,:,1),[],'initialmagnification','fit')
 figure(4)
-plotTaskStatus(rS)
+plotTaskStatusByType(rS)
 plotFocalPlaneGrid(rS,2);
+plotPlannedSchedule(rS,1)
 plotRoute(rS,1)
-
+drawnow
 
 %% check for prophase cells
 PlausiblyProphase=funcClicker(img,3);
@@ -59,7 +60,8 @@ Tsk=set(Tsk,'qdata',qdata);
 
 %% if Plausible Prophase exist - start new tasks
 if ~isempty(PlausiblyProphase)
-    LookForNEBTsk=set(Tsk,'fcn','acq_lookForNEB','planetime',UserData.NEB.T);
+    LookForNEBTsk=set(Tsk,'tskfcn','acq_lookForNEB','planetime',now+UserData.NEB.T,...
+                          'timedependent',true,'filename',[get(Tsk,'filename') '_NEB']);
     addTasks(rS,split(LookForNEBTsk));
 end
 

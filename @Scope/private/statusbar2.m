@@ -156,7 +156,7 @@ elseif nargin == 3 & check(f) % update
     if any(t(2,:)) && (p2 >= 1 || cputime-t(2,2) > 0.5 || p2-t(2,4) >= 0.01)
          
         elp =  cputime-t(2,1);   % the elapsed time
-        
+        warning off
         yAvg = elp/(p2*100);    % the average time of one precent increment
         
         estm = yAvg*(1-p2)*100; % estimated time remaining  

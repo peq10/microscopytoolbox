@@ -44,7 +44,7 @@ img=acqImg(rS,Channels,Exposure);
 figure(3)
 imshow(img(:,:,1),[],'initialmagnification','fit')
 figure(4)
-plotTaskStatus(rS)
+plotTaskStatusByType(rS)
 plotFocalPlaneGrid(rS,2);
 plotRoute(rS,1)
 
@@ -64,11 +64,16 @@ Tsk=set(Tsk,'qdata',qdata);
 
 %% if NEB happened acquire a Z-stack and start a 5D timelapse
 if sum(NEB)
-    ZstkTsk=set(Tsk,'fcn','acq_Zstk_fully_automated','planetime',now+UserData.ZStack.T,...
+    % remove all future tasks with my filename
+    AllTsks=getTasks(rS,'all');
+    AllFileNames=get(AllTsks,'filename');
+    ix=find(strcmp(AllFileNames,get(Tsk,'filename')));
+    removeTasks(rS,ix);
+    ZstkTsk=set(Tsk,'tskfcn','acq_Zstk_fully_automated','planetime',now+UserData.ZStack.T,...
                               'channels',UserData.ZStack.Channels,'exposuretime',UserData.ZStack.Exposure,...
                               'Z',UserData.TimeLapse.Z,'filename',[get(Tsk,'filename') '_Stk']);
     do(ZstkTsk);
-    TimeLapseTsk=set(Tsk,'fcn','acq_5D_fully_automated','planetime',now+UserData.TimeLapse.T,...
+    TimeLapseTsk=set(Tsk,'tskfcn','acq_5D_fully_automated','planetime',now+UserData.TimeLapse.T,...
                                        'channels',UserData.TimeLapse.Channels,'exposuretime',UserData.TimeLapse.Exposure,...
                                        'Z',UserData.TimeLapse.Z,'filename',[get(Tsk,'filename') '_5D']);
     addTasks(rS,split(TimeLapseTsk));
