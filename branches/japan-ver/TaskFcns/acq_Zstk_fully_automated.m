@@ -42,6 +42,13 @@ Tsk=set(Tsk,'planetime',now,...
             'stagex',get(rS,'x'),...
             'stagey',get(rS,'y'),...
             'stagez',get(rS,'z'));
+
+imgsz=[get(rS,'Height') get(rS,'Width')]./get(rS,'Binning');
+Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2+1);
+Qdata.Value(:,1)=min(floor(Qdata.Value(:,1)),imgsz(2)-tileSize/2);
+Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2+1);
+Qdata.Value(:,2)=min(floor(Qdata.Value(:,2)),imgsz(1)-tileSize/2);
+
         
 %% acquire stack
 set(rS,'PFS',0);
@@ -55,9 +62,13 @@ for i=1:length(Z)
     for j=1:size(Qdata.Value,1)
         indx=(Qdata.Value(j,1)-tileSize/2):(Qdata.Value(j,1)+tileSize/2);
         indy=(Qdata.Value(j,2)-tileSize/2):(Qdata.Value(j,2)+tileSize/2);
+        indx=ceil(indx);
+        indy=ceil(indy);
         imgcrp{j}(:,:,i)=img(indy,indx);
     end
-    if i==mdl, imgmdl=img; end
+    if i==mdl
+        imgmdl=img;
+    end
 end
 set(rS,'z',current_Z)
 set(rS,'PFS',1);
@@ -66,16 +77,10 @@ set(rS,'PFS',1);
 figure(3)
 subplot('position',[0 0 1 1])
 clf
-red=imadjust(max(img(:,:,1,:),[],4));
-green=imadjust(max(img(:,:,2,:),[],4));
-imshow(cat(3,red,green,zeros(size(red))),'initialmagnification','fit')
+imshow(imgmdl,[],'initialmagnification','fit')
 
 %% add rectangles
 % shift cell centers if needed
-Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2+1);
-Qdata.Value(:,1)=min(floor(Qdata.Value(:,1)),size(img,2)-tileSize/2);
-Qdata.Value(:,2)=max(ceil(Qdata.Value(:,2)),tileSize/2+1);
-Qdata.Value(:,2)=min(floor(Qdata.Value(:,2)),size(img,1)-tileSize/2);
 
 hold on
 for i=1:size(Qdata.Value,1)

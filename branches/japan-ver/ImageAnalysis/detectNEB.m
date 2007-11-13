@@ -1,5 +1,16 @@
 function NEB=detectNEB(img,PlausiblyProphase)
 
+%% segment the image
+% fCent=bandpassfilter(size(img),fCentCutoffs(1),fCentCutoffs(2),ordr);
+% fCell=bandpassfilter(size(img),fCellCutoffs(1),fCellCutoffs(2),ordr);
+load BandPassFilters
+
+%% preprocessing / filtering
+ff=fft2(img);
+fltCell=ifft2(fCell.*ff);
+bw=im2bw(fltCell,graythresh(fltCell));
+bw=imclearborder(bw);
+
 %% create a new ROI based on old circle fits and find new cells in it
 tileSize=256;
 se=strel('disk',5);
@@ -7,7 +18,7 @@ nebTubIntRatio=0.95;
 
 NEB=zeros(length(PlausiblyProphase),1);
 
-oldCenters=unique(PlausiblyProphase(:,3:4),'rows');
+oldCenters=unique(PlausiblyProphase(:,1:2),'rows');
 
 roi=[oldCenters(:,1)-tileSize/2 oldCenters(:,2)-tileSize/2 oldCenters(:,1)+tileSize/2 oldCenters(:,2)+tileSize/2];
 roi=ceil(roi);
@@ -18,11 +29,11 @@ roi(:,4)=min(roi(:,4),size(img,1));
 CircleFit=circleFitCells(bw,roi);
 
 %% Assign new circle to old cells
-[oldCenters,ix]=unique(PlausiblyProphase(:,3:4),'rows');
+[oldCenters,ix]=unique(PlausiblyProphase(:,1:2),'rows');
 oldRadi=PlausiblyProphase(ix,5);
 D=distance(oldCenters',CircleFit(:,1:2)');
 
-[mn,mi]=min(D);
+[mn,mi]=min(D,[],2);
 mi(mn>oldRadi)=NaN;
 
 %% fit nucleus to all new cells 

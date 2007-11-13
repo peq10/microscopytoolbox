@@ -38,12 +38,12 @@ UserData.Scan.T=NaN;
 UserData.NEB.Channels=Green;
 UserData.NEB.Exposure=100;
 UserData.NEB.Zstack=0;
-UserData.NEB.T=cumsum(ones(1,10))/1440;
+UserData.NEB.T=[0 cumsum(ones(1,10))/1440];
 
 UserData.Zstack.Channels=Red;
 UserData.Zstack.Exposure=1200;
 UserData.Zstack.Zstack=-9.8:1.4:9.8; 
-UserData.Zstack.T=NaN;
+UserData.Zstack.T=0;
 
 UserData.TimeLapse.Channels=[Red Green];
 UserData.TimeLapse.Exposure=[500; 200];

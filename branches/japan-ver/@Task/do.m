@@ -11,7 +11,7 @@ if length(Tsk)~=1
     error('Can only do one task at a time...'); 
 end
 
-disp(['Task id: ' num2str(get(Tsk,'id')) ' function: ' func2str(get(Tsk,'fcn')) ' filename: ' get(Tsk,'filename') ' time: ' datestr(now,0)]);
+fprintf(['--------------------\nTask id: ' num2str(get(Tsk,'id')) '\nfunction: ' func2str(get(Tsk,'fcn')) '\nfilename: ' get(Tsk,'filename') '\ntime: ' datestr(now,0) '\n']);
 
 % check to see if task was already executed?
 if Tsk.executed

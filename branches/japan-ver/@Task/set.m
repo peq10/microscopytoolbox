@@ -14,6 +14,8 @@ end
 %% Set the calues
 for i=1:2:length(varargin)
     switch lower(varargin{i})
+        case 'duration'
+            Tsk.acqTime=varargin{i+1};
         case 'timedependent'
             Tsk.timedep=logical(varargin{i+1});
         case 'tskfcn'

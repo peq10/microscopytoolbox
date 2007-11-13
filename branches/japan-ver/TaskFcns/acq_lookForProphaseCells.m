@@ -51,7 +51,10 @@ plotRoute(rS,1)
 drawnow
 
 %% check for prophase cells
-PlausiblyProphase=funcClicker(img,3);
+[PlausiblyProphase,msg]=funcClicker(img,3);
+
+set(3,'name',msg);
+disp(msg);
 
 qdata.QdataType='Plausibly Prophase';
 qdata.QdataDescription='';

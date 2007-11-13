@@ -1,4 +1,4 @@
-function PlausiblyProphase=funcClicker(img,fig)
+function [PlausiblyProphase,msg]=funcClicker(img,fig)
 
 %% paramters
 % used to create the freq filters
@@ -6,7 +6,7 @@ function PlausiblyProphase=funcClicker(img,fig)
 % fCellCutoffs=[0.01 0.05];
 % ordr=3;
 
-CentThresh=0.01;
+CentThresh=0.05;
 minCentSize=4;
 RadiusMultiply=1.5;
 
@@ -58,7 +58,7 @@ xycent=xycent(ix,:); %#ok
 % now assign nearest neighbor of cirle to each centrosome
 D=distance(xycent',CircleFit(:,1:2)');
 [bla,mi]=min(D,[],2); %#ok
-PlausiblyProphase=[xycent CircleFit(mi,:)];
+PlausiblyProphase=[ CircleFit(mi,:) xycent];
 
 if isempty(PlausiblyProphase)
     msg='centrosmes dont belong to any cell';
@@ -83,7 +83,7 @@ end
 
 %%  keep only cells with single nucleus 
 PlausiblyProphase=PlausiblyProphase(ismember(mi,find(nucNum==1)),:);
-[bla,ix]=unique(PlausiblyProphase(:,4:5),'rows'); %#ok
+[bla,ix]=unique(PlausiblyProphase(:,1:2),'rows'); %#ok
 PlausiblyProphase=PlausiblyProphase(ix,:);
 
 if isempty(ix)
@@ -91,12 +91,9 @@ if isempty(ix)
     return
 end
 
-disp(msg)
-
 %% plotting
 if exist('fig','var')
     figure(fig)
-    set(fig,'name',msg);
     hold on
     drawCircle(CircleFit)
     hold on

@@ -42,19 +42,14 @@ for i=1:length(varargin)
             varargout{i}=Tsk.LateBehavior;
         case 'id'
             varargout{i}=Tsk.id;
+        case 'fcnstr'
+            varargout{i}=func2str(Tsk.fcn);
         case 'fcn'
             varargout{i}=Tsk.fcn;
         case 'timedependent'
             varargout{i}=Tsk.timedep;
         case 'duration'
-            ExpTime=get(Tsk(1),'Exposuretime');
-            % duration has three components (all converted to days units): 
-            % 1. Exposure time + 100 ms per channel for overhead 
-            Tsk.acqTime=(sum(ExpTime)+length(ExpTime)*200)* length(get(Tsk,'stagez'))/1000/3600/24;
-            % 2. Focus time is based on stage 0.6 mm/sec max velocity
-            Tsk.focusTime=0.1/3600/24; %in days units!!!
-            % 3. 1 seconds overehad for movement (on average)
-            varargout{i}=Tsk.acqTime+Tsk.focusTime+1/3600/24;
+            varargout{i}=Tsk.acqTime;
         case 'userdata'
             varargout{i}=Tsk.UserData;
         case 'executed'

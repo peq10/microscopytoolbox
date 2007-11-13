@@ -19,6 +19,11 @@ if isempty(str)
     return
 end
 
+if strcmp(str(1),'<')
+    arr=xml2struct(str);
+    return
+end
+
 % if no { - I interpert as single scalar return str2double(str)
 if isempty(strfind(str,'{'))
     arr=str2double(str);

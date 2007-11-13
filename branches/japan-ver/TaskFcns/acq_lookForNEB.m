@@ -54,13 +54,13 @@ qdata=get(Tsk,'qdata');
 PlausiblyProphase=qdata.Value;
 NEB=detectNEB(img,PlausiblyProphase);
 
-PlausiblyProphase.Time=now;
-PlausiblyProphase.NEB=NEB;
+% PlausiblyProphase.Time=now;
+% PlausiblyProphase.NEB=NEB;
 
-qdata.QdataType='Plausibly Prophase With NEB data';
-qdata.QdataDescription='';
-qdata.Value=PlausiblyProphase;
-Tsk=set(Tsk,'qdata',qdata);
+% qdata.QdataType='Plausibly Prophase With NEB data';
+% qdata.QdataDescription='';
+% qdata.Value=PlausiblyProphase;
+% Tsk=set(Tsk,'qdata',qdata);
 
 %% if NEB happened acquire a Z-stack and start a 5D timelapse
 if sum(NEB)
@@ -69,13 +69,13 @@ if sum(NEB)
     AllFileNames=get(AllTsks,'filename');
     ix=find(strcmp(AllFileNames,get(Tsk,'filename')));
     removeTasks(rS,ix);
-    ZstkTsk=set(Tsk,'tskfcn','acq_Zstk_fully_automated','planetime',now+UserData.ZStack.T,...
-                              'channels',UserData.ZStack.Channels,'exposuretime',UserData.ZStack.Exposure,...
-                              'Z',UserData.TimeLapse.Z,'filename',[get(Tsk,'filename') '_Stk']);
+    ZstkTsk=set(Tsk,'tskfcn','acq_Zstk_fully_automated','planetime',now+UserData.Zstack.T,...
+                              'channels',UserData.Zstack.Channels,'exposuretime',UserData.Zstack.Exposure,...
+                              'stageZ',UserData.Zstack.Zstack,'filename',[get(Tsk,'filename') '_Stk']);
     do(ZstkTsk);
     TimeLapseTsk=set(Tsk,'tskfcn','acq_5D_fully_automated','planetime',now+UserData.TimeLapse.T,...
                                        'channels',UserData.TimeLapse.Channels,'exposuretime',UserData.TimeLapse.Exposure,...
-                                       'Z',UserData.TimeLapse.Z,'filename',[get(Tsk,'filename') '_5D']);
+                                       'stageZ',UserData.TimeLapse.Zstack,'filename',[get(Tsk,'filename') '_5D']);
     addTasks(rS,split(TimeLapseTsk));
 end
 
