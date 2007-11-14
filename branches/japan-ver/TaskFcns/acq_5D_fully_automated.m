@@ -26,7 +26,7 @@ while ~get(rS,'pfs')
     cnt=cnt+1;
     pause(0.5)
     if cnt>10
-       warning('I lost focus totally - dont know why - moving on'); %#ok
+        fprintf('\nI lost focus totally - moving on\n'); %#ok
        return
     end
 end
@@ -35,7 +35,7 @@ addFocusPoints(rS,get(rS,'x'),get(rS,'y'),get(rS,'z'),now);
 
 %% update status figures
 plotRoute(rS,1)
-
+plotPastTaskDuration(rS,5)
 %% update Tsk object so the value I write to disk are actual not theoretical
 
 Tsk=set(Tsk,'planetime',now,...

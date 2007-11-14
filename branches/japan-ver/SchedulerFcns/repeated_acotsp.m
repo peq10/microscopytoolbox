@@ -5,7 +5,7 @@ function ordr = repeated_acotsp(x,y,t,id,x_current,y_current,tasks_duration,t_cu
 xy=[x y];
 [xyunq,bla,ix]=unique(xy,'rows');
 % xyunqorg=xyunq;
-dup=ceil(20/size(xyunq,1));
+dup=floor(20/size(xyunq,1))+1;
 xyunq=repmat(xyunq,dup,1);
 tunq=unique(t); 
 tic

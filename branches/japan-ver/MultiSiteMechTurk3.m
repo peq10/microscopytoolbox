@@ -25,7 +25,7 @@ if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
 initFocalPlane(rS);
-set(rS,'rootfolder','C:\RawData\RealData20');
+set(rS,'rootfolder','C:\RawData\RealData21');
 set(rS,'schedulingmethod','acotsp');
 set(rS,'PFS',1)
 warning('off','MATLAB:divideByZero');

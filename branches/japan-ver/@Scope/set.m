@@ -11,6 +11,8 @@ if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
+        case 'refreshschedule'
+            rS.refreshSchedule=varargin{i+1};
         case 'obj'
             if ~strcmp(varargin{i+1},get(rS,'obj'))
                rS.mmc.setStateLabel('OBJ',varargin{i+1});

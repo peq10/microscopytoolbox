@@ -7,6 +7,8 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'refreshschedule'
+            varargout=[varargout; {rS.refreshSchedule}];
         case 'obj'
             varargout=[varargout; {rS.mmc.getStateLabel('OBJ')}];
         case 'pfs'
@@ -17,9 +19,10 @@ for i=1:length(varargin)
             varargout=[varargout; {rS.FocalPlaneGridSize}];
         case 'focalplane'
             try
-                x=rS.FocusPoints(:,1);
-                y=rS.FocusPoints(:,2);
-                z=rS.FocusPoints(:,3);
+                fcspnts=get(rS,'focuspoints');
+                x=fcspnts(:,1);
+                y=fcspnts(:,2);
+                z=fcspnts(:,3);
                 n=rS.FocalPlaneGridSize;
                 [X,Y]=meshgrid(linspace(min(x),max(x),n),linspace(min(y),max(y),n));
                 Z=gridfit(x,y,z,X(1,:),Y(:,1), 'smooth',10,'extend','always');
@@ -32,6 +35,8 @@ for i=1:length(varargin)
         case 'focuspointsproximity'
             varargout=[varargout; {rS.FocusPointsProximity}];
         case 'focuspoints'
+            varargout=[varargout; {rS.FocusPoints(rS.FocusPoints(:,5)==1,:)}];
+        case 'allfocuspoints'
             varargout=[varargout; {rS.FocusPoints}];
         case 'x'
             varargout=[varargout; {rS.mmc.getXPosition(rS.XYstageName)}];

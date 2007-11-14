@@ -5,8 +5,14 @@ global rS;
 rS=rSin;
 
 herr=[];
-
+cnt=0;
 while ~isempty(rS.TaskSchedule)
+    cnt=cnt+1;
+    if cnt==get(rS,'refreshschedule');
+        fprintf('refreshing schedule\n')
+        updateTaskSchedule(rS);
+        cnt=0;
+    end
     Tsk=getTasks(rS,'next');
     updateStatusBar(rS,0)
     if ~isempty(Tsk)
@@ -14,8 +20,7 @@ while ~isempty(rS.TaskSchedule)
             t0=now;
             Tsk=do(Tsk);
             dur=now-t0;
-            set(Tsk,'duration',dur);
-            replaceTasks(rS,set(Tsk,'executed',true));
+            replaceTasks(rS,set(Tsk,'executed',true,'duration',dur));
         catch
             % ersolve the error
 %             UserData=get(Tsk,'UserData');

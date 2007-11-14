@@ -36,16 +36,11 @@ for i=1:2:length(varargin)
                 error('Can only set LateBehavior to DO or DROP !!');
             end
             Tsk.LateBehavior=varargin{i+1};
-        case 'acqtime'
-            Tsk.acqTime=varargin{i+1};
         case 'stagemovetime'
             Tsk.stageMoveTime=varargin{i+1};
         case 'focustime'
             Tsk.focusTime=varargin{i+1};
         case 'executed'
-            if ~islogical(varargin{i+1})
-                error('executed state must be logical (true/false)');
-            end
             Tsk.executed=varargin{i+1};
         case 'userdata'
             Tsk.UserData=varargin{i+1};
