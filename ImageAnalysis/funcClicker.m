@@ -6,13 +6,16 @@ function [PlausiblyProphase,msg]=funcClicker(img,fig)
 % fCellCutoffs=[0.01 0.05];
 % ordr=3;
 
-CentThresh=0.05;
+CentThresh=0.0125;
 minCentSize=4;
 RadiusMultiply=1.5;
+CentProxToCircleCenter=0.75;   
 
 %% construct the filters
 % fCent=bandpassfilter(size(img),fCentCutoffs(1),fCentCutoffs(2),ordr);
 % fCell=bandpassfilter(size(img),fCellCutoffs(1),fCellCutoffs(2),ordr);
+fCent=[];
+fCell=[];
 load BandPassFilters
 
 %% preprocessing / filtering
@@ -35,6 +38,8 @@ xycent=reshape([centstt.Centroid]',2,length(centstt))';
 if isempty(xycent)
     PlausiblyProphase=[];
     msg='no centrosomes found';
+    plotCurrnetStatus;
+    drawnow
     return
 end
 
@@ -48,22 +53,49 @@ roi(:,3)=min(roi(:,3),size(img,2));
 roi(:,4)=min(roi(:,4),size(img,1));
 CircleFit=circleFitCells(bw,roi);
 
+if isempty(CircleFit)
+    PlausiblyProphase=[];
+    msg='no Cells found';
+    plotCurrnetStatus('centrosomes');
+    drawnow
+    return
+end
+
 %% allocate centrosomes to circles
 
 % First get rid of all centrosomes that have multiple ownerships
 Dmult=distance(xycent(:,[1 2])',CircleFit(:,1:2)');
 ix=find((sum(Dmult<repmat(CircleFit(:,3)'*RadiusMultiply,size(Dmult,1),1),2)==1));
-xycent=xycent(ix,:); %#ok
 
-% now assign nearest neighbor of cirle to each centrosome
-D=distance(xycent',CircleFit(:,1:2)');
-[bla,mi]=min(D,[],2); %#ok
-PlausiblyProphase=[ CircleFit(mi,:) xycent];
-
-if isempty(PlausiblyProphase)
-    msg='centrosmes dont belong to any cell';
+if isempty(ix)
+    PlausiblyProphase=[];
+    msg='centrosmes ownership ambigues';
+    plotCurrnetStatus('centrosomes','circles');
+    drawnow
     return
 end
+
+% if ix is not empty - remove all the 
+xycent=xycent(ix,:); %#ok
+
+% now assign ownership to each centrome - given that it is close to the
+% center by a CentProxToCircleCenter factor
+D=distance(xycent',CircleFit(:,1:2)');
+[dst,mi]=min(D,[],2); 
+PlausiblyProphase=[CircleFit(mi,:) xycent];
+% keep only the ones that the closet centrosome is less that
+% CentProxToCircleCenter * Circle radius
+ix=find(dst<PlausiblyProphase(:,3)*CentProxToCircleCenter);
+PlausiblyProphase=PlausiblyProphase(ix,:);
+mi=mi(ix);
+if isempty(PlausiblyProphase)
+    msg='centrosmes to far from cell center';
+    plotCurrnetStatus('centrosomes','circles');
+    drawnow
+    return
+end
+
+plotCurrnetStatus('centrosomes','circles');
 
 %% Fit nucleus only to the Plausible cells
 Nuc=[];
@@ -88,23 +120,39 @@ PlausiblyProphase=PlausiblyProphase(ix,:);
 
 if isempty(ix)
     msg='all cells  are multi nucleate';
+    plotCurrnetStatus('centrosomes','circles','nuclei');
+    drawnow
     return
 end
 
-%% plotting
-if exist('fig','var')
-    figure(fig)
-    hold on
-    drawCircle(CircleFit)
-    hold on
-    plot(xycent(:,1),xycent(:,2),'.r')
-    for j=1:length(Nuc)
-        for k=1:length(Nuc{j})
-            plot(Nuc{j}{k}(:,1),Nuc{j}{k}(:,2),'g')
-        end
-    end
-end
+plotCurrnetStatus('centrosomes','circles','nuclei');
+drawnow
 
+%% plotting
+    function plotCurrnetStatus(varargin)
+        if exist('fig','var')
+            figure(fig)
+            hold on
+            if sum(strcmp(varargin,'circles'))
+                drawCircle(CircleFit)
+            end
+            hold on
+            if sum(strcmp(varargin,'centrosomes'))
+                plot(xycent(:,1),xycent(:,2),'.r')
+            end
+            if sum(strcmp(varargin,'nuclei'))
+                for jj=1:length(Nuc) 
+                    for kk=1:length(Nuc{jj}) 
+                        plot(Nuc{jj}{kk}(:,1),Nuc{jj}{kk}(:,2),'g')
+                    end
+                end
+            end
+        end
+        set(fig,'name',msg);
+    end % of nested function plot...
+
+%%
+end % main function 
 % ginput(1);
 
 

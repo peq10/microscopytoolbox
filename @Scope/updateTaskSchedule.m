@@ -8,27 +8,7 @@ global rS;
 rS=rSin;
 
 %% get info about tasks in buffer
-
-% estimate the median duration time for each task type
-ExecTsks=getTasks(rS,'executed');
-fncStrUnq={};
-if isempty(ExecTsks)
-    medianDuration=[];
-else
-    [fncStr,AllDuration]=get(ExecTsks,'fcnstr','duration');
-    if iscell(AllDuration)
-        AllDuration=[AllDuration{:}];
-    end
-    if ~iscell(fncStr)
-        fncStr={fncStr};
-
-    end
-    fncStrUnq=unique(fncStr);
-    medianDuration=zeros(length(fncStrUnq),1);
-    for i=1:length(fncStrUnq)
-        medianDuration(i)=median(AllDuration(ismember(fncStr,fncStrUnq{i})));
-    end
-end
+[durVector,fncStrUnq]=getPastTasksDuration(rS);
 
 NonExecTasks=getTasks(rS,'nonexecuted');
 % get the IDs,x,y of all non-executed tasks. 
@@ -45,8 +25,8 @@ fncStr=get(NonExecTasks,'fcnstr');
 duration=zeros(length(NonExecTasks),1);
 for i=1:length(NonExecTasks)
     ix=find(strcmp(fncStrUnq,fncStr{i})); %#ok<EFIND>
-    if ~isempty(ix) && ~isempty(medianDuration)
-        dur=medianDuration(ix);
+    if ~isempty(ix) && ~isempty(durVector{ix})
+        dur=median(durVector{ix});
     else
         dur=get(NonExecTasks(i),'duration');
     end

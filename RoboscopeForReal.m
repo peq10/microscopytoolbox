@@ -18,9 +18,8 @@ if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
 initFocalPlane(rS);
-set(rS,'rootfolder','C:\RawData\RealData19');
-set(rS,'schedulingmethod','greedy');
-set(rS,'PFS',1)
+set(rS,'rootfolder','C:\RawData\RoboData1');
+set(rS,'PFS',1,'refreshschedule',10);
 warning('off','MATLAB:divideByZero');
 warning off
 gotoOrigin(rS)
@@ -30,6 +29,8 @@ disp('Scope initialized');
 %% User input
 % Data for all channels
 
+DEBUG=1;
+
 UserData.Scan.Channels=Green;
 UserData.Scan.Exposure=100;
 UserData.Scan.Zstack=0;
@@ -38,7 +39,7 @@ UserData.Scan.T=NaN;
 UserData.NEB.Channels=Green;
 UserData.NEB.Exposure=100;
 UserData.NEB.Zstack=0;
-UserData.NEB.T=[0 cumsum(ones(1,10))/1440];
+UserData.NEB.T=cumsum(6*ones(1,10))/1440;
 
 UserData.Zstack.Channels=Red;
 UserData.Zstack.Exposure=1200;
@@ -50,11 +51,15 @@ UserData.TimeLapse.Exposure=[500; 200];
 UserData.TimeLapse.Zstack=[-1.5 1.5]; 
 UserData.TimeLapse.T=cumsum(ones(1,60)*3)/1440;
 
+if DEBUG
+    UserData.NEB.T=cumsum(0.5*ones(1,10))/1440;
+end
+
 BaseFileName='Img';
 
 % Grid data
-r=12;
-c=12;
+r=32;
+c=32;
 WellCenter=[0 0];
 DistanceBetweenImages=200; %in microns (I think...)
 
@@ -85,7 +90,9 @@ end
 
 %% add Tasks to rS 
 removeTasks(rS,'all');
+set(rS,'schedulingmethod','greedy');
 addTasks(rS,Tsk);
+
 
 %% set up status figures
 plotPlannedSchedule(rS,1)
@@ -95,14 +102,14 @@ set(1,'position',[10   666   350   309],...
 hold on
 
 figure(2)
-set(2,'position',[  10    97   350   295],...
+set(2,'position',[ 10   262   350   281],...
     'Toolbar','none','Menubar','none','name','Focal Plane');
 
 % plotFocalPlaneGrid(rS);
 
 updateStatusBar(rS); % this should delete all old progress bars
 updateStatusBar(rS,0); % create a new one
-set(rS,'statusbarposition',[10 430 356 180]);
+set(rS,'statusbarposition',[10 580 356 180]);
 
 figure(3)
 subplot('position',[0 0 1 1])
@@ -110,11 +117,19 @@ set(3,'position',[  372   348   894   627],...
     'Toolbar','none','Menubar','none','name','Focal Plane');
 
 figure(4)
-set(4,'position',[379    57   499   254],...
+set(4,'position',[ 10    52   364   169],...
+    'Toolbar','none','Menubar','none','name','Task Status');
+
+figure(5)
+set(5,'position',[399    70   483   181],...
     'Toolbar','none','Menubar','none','name','Task Status');
 
 %% MechTurk part
-runWithoutExceptionHandling(rS)
+
+for i=1:20
+    runWithoutExceptionHandling(rS)
+    addTasks(rS,Tsk);
+end
 set(rS,'pfs',0);
         
         

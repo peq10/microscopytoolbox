@@ -10,7 +10,7 @@ global rS;
                                           'UserData');
                                       
 %% goto XYZ
-set(rS,'xy',[X Y]); 
+set(rS,'xy-slow',[X Y]); 
 
 %% implement focalPointGuess
 % Zguess=guessFocalPlane(rS,X,Y);
@@ -24,7 +24,7 @@ while ~get(rS,'pfs')
     cnt=cnt+1;
     pause(0.5)
     if cnt>10
-        warning('I lost focus totally - dont know why - moving on'); %#ok
+        fprintf('\nI lost focus totally - moving on\n'); %#ok
         return
     end
 end
@@ -42,17 +42,18 @@ img=acqImg(rS,Channels,Exposure);
 
 %% update plots
 figure(3)
+subplot('position',[0 0 1 1])
 imshow(img(:,:,1),[],'initialmagnification','fit')
 figure(4)
 plotTaskStatusByType(rS)
 plotFocalPlaneGrid(rS,2);
 plotRoute(rS,1)
-
+plotPastTaskDuration(rS,5)
 
 %% check for NEB
 qdata=get(Tsk,'qdata');
 PlausiblyProphase=qdata.Value;
-NEB=detectNEB(img,PlausiblyProphase);
+NEB=detectNEB(img,PlausiblyProphase,3);
 
 % PlausiblyProphase.Time=now;
 % PlausiblyProphase.NEB=NEB;
@@ -65,10 +66,13 @@ NEB=detectNEB(img,PlausiblyProphase);
 %% if NEB happened acquire a Z-stack and start a 5D timelapse
 if sum(NEB)
     % remove all future tasks with my filename
-    AllTsks=getTasks(rS,'all');
-    AllFileNames=get(AllTsks,'filename');
+    AllNonExecTsks=getTasks(rS,'nonexecuted');
+    AllFileNames=get(AllNonExecTsks,'filename');
     ix=find(strcmp(AllFileNames,get(Tsk,'filename')));
-    removeTasks(rS,ix);
+    for i=1:length(ix)
+        AllNonExecTsks(ix(i))=set(AllNonExecTsks(ix(i)),'executed',2); %#ok<FNDSB>
+    end
+    replaceTasks(rS,AllNonExecTsks(ix));
     ZstkTsk=set(Tsk,'tskfcn','acq_Zstk_fully_automated','planetime',now+UserData.Zstack.T,...
                               'channels',UserData.Zstack.Channels,'exposuretime',UserData.Zstack.Exposure,...
                               'stageZ',UserData.Zstack.Zstack,'filename',[get(Tsk,'filename') '_Stk']);

@@ -26,7 +26,7 @@ while ~get(rS,'pfs')
     cnt=cnt+1;
     pause(0.5)
     if cnt>10
-       warning('I lost focus totally - dont know why - moving on'); %#ok
+        fprintf('\nI lost focus totally - moving on\n'); %#ok
        return
     end
 end
@@ -100,7 +100,7 @@ end
 figure(4)
 plotTaskStatusByType(rS)
 plotFocalPlaneGrid(rS,2);
-
+plotPastTaskDuration(rS,5);
 %% Write image to disk
 for i=1:size(Qdata.Value,1)
     % create a new Task with new filename

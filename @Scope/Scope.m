@@ -48,12 +48,12 @@ rS.lastImage=0;
 % the task buffer and schedule (the schedule carry the task id in the right order)
 rS.TaskBuffer=[];
 rS.TaskSchedule=[]; 
-
+rS.refreshSchedule=Inf;
 
 % Focus points - This is a list of points where rS know it had good focus
 % existing points are needed for rS to be able to guess another point
 rS.FocusPoints=[]; %[X Y Z T]
-rS.FocusPointHistory=60; %Number of seconds that are used in the updateFocalPlaneGrid 
+rS.FocusPointHistory=1/1440; %Number of days that are used in the updateFocalPlaneGrid 
 rS.FocusPointProximity=100; %the distance of points for which the history is relevant
 rS.FocalPlaneGridSize=25;
 
