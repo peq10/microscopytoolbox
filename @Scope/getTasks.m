@@ -84,7 +84,7 @@ switch bysch
         [both_ids,indx]=intersect(bfrids,ids);
     case 2
         %validate input
-        if isempty(rS.TimedTaskSchedule) || max(idx) > size(rS.TimeTaskSchedule,1)
+        if isempty(rS.TimedTaskSchedule) 
             error('Task requested is outside of current Timed schedule, please update schedule and try again');
         end
         % find the shared ids between buffer and schedule

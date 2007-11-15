@@ -6,6 +6,9 @@ catch
     clear
 end
 
+% call the memory monitor - you can enable logging there if u want to...
+mm;
+
 delete(get(0,'Children')) % a more aggressive form of close (doesn't ask for confirmation)
 ScopeConfigFileName='MM_Roboscope.cfg';
 
@@ -18,7 +21,7 @@ if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
 initFocalPlane(rS);
-set(rS,'rootfolder','C:\RawData\RoboData1');
+set(rS,'rootfolder','C:\RawData\RoboData3');
 set(rS,'PFS',1,'refreshschedule',10);
 warning('off','MATLAB:divideByZero');
 warning off
@@ -29,7 +32,7 @@ disp('Scope initialized');
 %% User input
 % Data for all channels
 
-DEBUG=1;
+DEBUG=false;
 
 UserData.Scan.Channels=Green;
 UserData.Scan.Exposure=100;
@@ -127,7 +130,7 @@ set(5,'position',[399    70   483   181],...
 %% MechTurk part
 
 for i=1:20
-    runWithoutExceptionHandling(rS)
+    run(rS)
     addTasks(rS,Tsk);
 end
 set(rS,'pfs',0);
