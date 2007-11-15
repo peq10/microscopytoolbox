@@ -16,26 +16,23 @@ while ~isempty(rS.TaskSchedule)
     Tsk=getTasks(rS,'next');
     updateStatusBar(rS,0)
     if ~isempty(Tsk)
-        try
-            t0=now;
-            Tsk=do(Tsk);
-            dur=now-t0;
-            replaceTasks(rS,set(Tsk,'executed',true,'duration',dur));
-        catch
-            % ersolve the error
-%             UserData=get(Tsk,'UserData');
-            err=lasterr;
-%             UserData.ExecutionFailure=err;
-%             Tsk=set(Tsk,'UserData',UserData);
-%             replaceTasks(rS,Tsk);
-            warning(['TASK HAS FAILED WITH ERROR   ' err]);
-            if ishandle(herr), delete(herr); end
-            herr=msgbox(err);
-            %% try to revcover from MM errors by unloading and loading all
-            %% devices, than give it another shot. 
-            if~isempty(findstr(err,'mmcorej'))
-                unload(rS);
-                loadDevices(rS);
+        if get(rS,'resolveErrors')
+            try
+                t0=now;
+                Tsk=do(Tsk);
+                dur=now-t0;
+                replaceTasks(rS,set(Tsk,'executed',true,'duration',dur));
+            catch
+                % try to resolve the error
+                err=lasterr;
+                disp(['TASK HAS FAILED WITH ERROR   ' err]);
+                if ishandle(herr), delete(herr); end
+                herr=msgbox(err);
+
+                %% calling sub-function to try and resolve the error
+                resolveError(err)
+
+                %% try to redo the last task
                 try
                     Tsk=do(Tsk);
                     replaceTasks(rS,set(Tsk,'executed',true));
@@ -43,7 +40,32 @@ while ~isempty(rS.TaskSchedule)
                     warning('Failed AGAIN - this isn''t my day');
                 end
             end
+        else
+            t0=now;
+            Tsk=do(Tsk);
+            dur=now-t0;
+            replaceTasks(rS,set(Tsk,'executed',true,'duration',dur));
         end
     end
     rS.TaskSchedule=rS.TaskSchedule(2:end);
+end
+
+function resolveError(err)
+% this subfunction 
+global rS;
+
+%% try to recover from MM errors by unloading and loading all
+% devices, than give it another shot.
+if~isempty(findstr(err,'mmcorej'))
+    unload(rS);
+    loadDevices(rS);
+end
+
+%% try to recover from memory error by unloading packing and reloading mmc
+if ~isempty(findstr(err,'memory'))
+    unload(rS);
+    rS.mmc=[];
+    pack;
+    rS.mmc=CMMCore;
+    rS.mmc.loadSystemConfiguration('MM_Roboscope.cfg');
 end

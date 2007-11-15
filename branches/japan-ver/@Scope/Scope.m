@@ -6,11 +6,18 @@ function rS = Scope(config_file)
 %   objective determine the pixel size
 
 %% Here we initialize the MMC core part of rS
+% if config file is empty - start witht he GUI otherwise
+% start using the cnfig file directly. 
+
 import mmcorej.*;
-rS.gui=MMStudioPlugin;
-rS.gui.run('')
-uiwait(msgbox('Click me - I''m beutiful'))
-rS.mmc=rS.gui.getMMCoreInstance;
+if nargin ==0 || isempty(config_file)
+    rS.gui=MMStudioPlugin;
+    rS.gui.run('')
+    uiwait(msgbox('Click me - I''m beutiful'))
+    rS.mmc=rS.gui.getMMCoreInstance;
+else
+    rS.mmc=CMMCore;
+end
 % rS.mmc=CMMCore;
 
 %% try to load devices - if an error occurs unload and clean
@@ -34,6 +41,9 @@ rS.taskID=0;
 
 %root folder
 rS.rootFolder='D:\GiardiaDataBuffer';
+
+% resolve error - default is yes
+rS.resolveErrors=true;
 
 % default focus method
 rS.focusMethod='ASI';

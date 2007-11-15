@@ -7,6 +7,8 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'resolveErrors'
+            varargout=[varargout; {rS.resolveErrors}];
         case 'refreshschedule'
             varargout=[varargout; {rS.refreshSchedule}];
         case 'obj'
