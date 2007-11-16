@@ -41,18 +41,19 @@ img=acqImg(rS,Channels,Exposure);
 
 %% show image in figure 3
 figure(3)
+clf
+subplot('position',[0 0 1 1])
 imshow(img(:,:,1),[],'initialmagnification','fit')
 
 %% update Task Status
 figure(4)
-plotTaskStatus(rS)
-plotFocalPlaneGrid(rS,2);
+plotTaskStatusByType(rS)
 
 %% add a counter for number of tasks
 OldTsk=getTasks(rS,'all',0);
 cnt=0;
 for i=1:length(OldTsk)
-    if get(OldTsk(i),'executed') && ~isempty(get(OldTsk(i),'UserData'))
+    if strcmp(get(OldTsk(i),'status'),'executed') && ~isempty(get(OldTsk(i),'UserData'))
         cnt=cnt+1; 
     end
 end
