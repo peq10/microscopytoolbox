@@ -4,6 +4,9 @@ function [Tsks,indx] = getTasks( rS,property,value )
 % in that case the returned Tasks are ones that have ALL the propery value
 % pairs.
 % 
+% Note: Value are only allowed to be scalars (either char of numeric)
+% others will be ignored
+%
 % to special cases are the 'all' and 'next', all returns them all, and next
 % return the next task from the scheduer
 %
@@ -43,12 +46,18 @@ if ~iscell(property)
 end
 
 % find indexes that are true for all property value pairs
-indx=1:length(rS.TaskBuffer);
+rtrns=true(length(rS.TaskBuffer),1);
 
 for i=1:length(property)
     v=get(rS.TaskBuffer,property{i});
-    indx=intersect(indx,find(ismember(v,value{i})));
+    if isa(value{i},'numeric')
+        v=[v{:}]';
+    end
+    rtrns=rtrns & ismember(v,value{i});
 end
+
+
+indx=find(rtrns);
 
 Tsks=rS.TaskBuffer(indx);
 

@@ -14,12 +14,12 @@ while ~isempty(rS.TaskSchedule)
         cnt=0;
     end
     Tsk=getTasks(rS,'next');
-    updateStatusBar(rS,0)
+%     updateStatusBar(rS,0)
     if ~isempty(Tsk)
         if get(rS,'resolveErrors')
             try
                 Tsk=do(Tsk);
-                replaceTasks(rS,set(Tsk,'executed',true));
+                replaceTasks(rS,set(Tsk,'status','executed'));
             catch
                 % try to resolve the error
                 err=lasterr;
@@ -40,7 +40,7 @@ while ~isempty(rS.TaskSchedule)
             end
         else
             Tsk=do(Tsk);
-            replaceTasks(rS,set(Tsk,'executed',true));
+            replaceTasks(rS,set(Tsk,'status','executed'));
         end
     end
     rS.TaskSchedule=rS.TaskSchedule(2:end);

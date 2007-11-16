@@ -20,18 +20,20 @@ if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
 initFocalPlane(rS);
-set(rS,'rootfolder','C:\RawData\RoboData5');
+removeTasks(rS,'all');
+set(rS,'rootfolder','C:\RawData\RoboData6');
 set(rS,'PFS',1,'refreshschedule',10);
 warning('off','MATLAB:divideByZero');
 warning off
 gotoOrigin(rS)
 addpath ImageAnalysis
 disp('Scope initialized');
+tic
 
 %% User input
 % Data for all channels
 
-DEBUG=false;
+DEBUG=true;
 
 UserData.Scan.Channels=Green;
 UserData.Scan.Exposure=100;
@@ -114,10 +116,6 @@ set(2,'position',[ 10   246   350   309],...
 
 plotFocalPlaneGrid(rS);
 
-updateStatusBar(rS); % this should delete all old progress bars
-updateStatusBar(rS,0); % create a new one
-set(rS,'statusbarposition',[380 246 356 180]);
-
 figure(3)
 subplot('position',[0 0 1 1])
 set(3,'position',[  380   348   894   627],...
@@ -136,6 +134,7 @@ mm;
 %% MechTurk part
 
 for i=1:20
+    toc
     run(rS)
     addTasks(rS,Tsk);
 end

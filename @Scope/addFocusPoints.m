@@ -15,8 +15,8 @@ end
 %  were taken more than rS.FocuPointHistory seconds ago)
 curr_xy=rS.FocusPoints(:,1:2)';
 D=distance(curr_xy,[x; y]);
-T=(t-rS.FocusPoints(:,4))*3600*24;
-ix=find((D>rS.FocusPointProximity)+(T<rS.FocusPointHistory)); 
+T=(t-rS.FocusPoints(:,4));
+ix=find((D>rS.FocusPointProximity).*(T<rS.FocusPointHistory)); 
 rS.FocusPoints(ix,5)=0; %#ok<FNDSB>
 
 % add current point

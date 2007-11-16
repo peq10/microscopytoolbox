@@ -75,8 +75,8 @@ set(rS,'PFS',1);
 
 %% show image in figure 3
 figure(3)
-subplot('position',[0 0 1 1])
 clf
+subplot('position',[0 0 1 1])
 imshow(imgmdl,[],'initialmagnification','fit')
 
 %% add rectangles

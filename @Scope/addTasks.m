@@ -8,7 +8,7 @@ rS=rSin;
 
 %% add ids to Tsks
 for i=1:length(Tsks)
-    Tsks(i)=set(Tsks(i),'id',getNewTaskIDs(rS));
+    Tsks(i)=set(Tsks(i),'id',getNewTaskIDs(rS),'status','inqueue');
 end
 
 

@@ -6,14 +6,15 @@ if ~exist('fig','var')
     fig=figure;
 end
 
+
+
 allsym='^<>vdh*h+o.sph';
 
 
 figure(fig)
-hold on
-
+cla
 tb=getTasks(rS,'status','executed');
-[X,Y,T,typ]=get(tb,'stagex','stagey','planetime','fncstr');
+[X,Y,T,typ]=get(tb,'stagex','stagey','planetime','fcnstr');
 if ~iscell(X)
     if ~isempty(X)
         hold on
@@ -32,9 +33,11 @@ xyunq=unique(xyt(:,1:2),'rows');
 
 for i=1:size(xyunq,1)
     ind=find((xyt(:,1)==xyunq(i,1)).*(xyt(:,2)==xyunq(i,2)));
-    xyt(ind,4)=length(ind)+3;
+    xyt(ind,4)=length(ind)+10;
     xyt(ind,5)=max(xyt(ind,3));
 end
+
+plotPlannedSchedule(rS,fig)
 hold on
 
 for i=1:length(unqFnc)
@@ -43,6 +46,7 @@ for i=1:length(unqFnc)
     scatter(xyt(ind,1),xyt(ind,2),xyt(ind,4),xyt(ind,5),sym,'filled');
 end
 
-legend(unqFnc)
-colorbar
+% legend([{'plan'}; unqFnc(:)],'location','southoutside')
+axis equal
+% colorbar
 

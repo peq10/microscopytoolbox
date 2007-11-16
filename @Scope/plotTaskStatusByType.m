@@ -5,20 +5,21 @@ Tsks=getTasks(rS,'all');
 
 unqStt=unique(status);
 
-[unq,bla,m]=unique(fncStr);
+[unqFnc,bla,m]=unique(fncStr);
 tbl=tabulate(m);
 
-stts=zeros(size(tbl,1),2);
+stts=zeros(length(unqStt),length(unqFnc));
 
 for i=1:size(tbl,1)
     for j=1:length(unqStt)
-        stts(i,j)=sum(strcmp(status,unqStt{j}));
+        stts(j,i)=sum(strcmp(status,unqStt{j}).*strcmp(fncStr,unqFnc{i}));
     end
 end
-    
+stts=[zeros(1,length(unqStt)); stts'];
+
 barh(stts,'stacked')
-set(gca,'yticklabel',unq,'ylim',[0.5 size(tbl,1)+0.5]);
+set(gca,'yticklabel',unqFnc,'ylim',[1.5 size(tbl,1)+1.5]);
 xlabel('Number of Tasks');
 colormap summer
-h=legend('TODO','Finished');
+h=legend(unqStt);
 set(h,'position',[0.05 0.05 0.2 0.2]);

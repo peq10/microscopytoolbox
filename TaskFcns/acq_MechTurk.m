@@ -62,10 +62,10 @@ set(3,'name',['already clicked on: ' num2str(cnt) ' prophase cells']);
 %% Ask if there are spindles here
 figure(3)
 [x,y,b]=ginput;
-% x=650;ï¿½@y=514;ï¿½@b=1; % used for silly acquisition..
+% x=650;?¿½@y=514;?¿½@b=1; % used for silly acquisition..
 
 if sum(b==27)
-    removeTasks(rS,{'timedependent','status'},{false,'nonexecuted'});
+    removeTasks(rS,{'timedependent','status'},{false,'inqueue'});
     return
 end
 
