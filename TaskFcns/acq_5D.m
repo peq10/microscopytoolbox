@@ -82,6 +82,8 @@ else
 end
 
 imshow(cat(3,red,green,zeros(size(red))),'initialmagnification','fit')
+
+
 %% add rectangles
 % shift cell centers if needed
 Qdata.Value(:,1)=max(ceil(Qdata.Value(:,1)),tileSize/2+1);
@@ -105,8 +107,7 @@ end
 
 %% update Task Status
 figure(4)
-plotTaskStatus(rS)
-plotFocalPlaneGrid(rS,2);
+plotTaskStatusByType(rS)
 
 %% Write image to disk
 for i=1:size(Qdata.Value,1)
