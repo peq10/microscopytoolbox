@@ -56,8 +56,8 @@ set(rS,'PFS',1);
 
 %% show image in figure 3
 figure(3)
-subplot('position',[0 0 1 1])
 clf
+subplot('position',[0 0 1 1])
 red=imadjust(max(img(:,:,1,:),[],4));
 green=imadjust(max(img(:,:,2,:),[],4));
 imshow(cat(3,red,green,zeros(size(red))),'initialmagnification','fit')

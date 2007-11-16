@@ -2,12 +2,11 @@ function [PlausiblyProphase,msg]=funcClicker(img,fig)
 
 %% paramters
 % used to create the freq filters
-% fCentCutoffs=[0.075 0.1];
-% fCellCutoffs=[0.01 0.05];
-% ordr=3;
+fCentCutoffs=[0.075 0.1];
+fCellCutoffs=[0.01 0.05];
+ordr=3;
 
-
-CentThresh=0.0125;
+CentThresh=0.02;
 
 minCentSize=4;
 RadiusMultiply=1.5;
@@ -15,11 +14,16 @@ CentProxToCircleCenter=0.75;
 
 
 %% construct the filters
-% fCent=bandpassfilter(size(img),fCentCutoffs(1),fCentCutoffs(2),ordr);
-% fCell=bandpassfilter(size(img),fCellCutoffs(1),fCellCutoffs(2),ordr);
-fCent=[];
-fCell=[];
-load BandPassFilters
+persistent fCent;
+if isempty(fCent)
+    fprintf('creating a fCent filter in funcClicker\n');
+    fCent=bandpassfilter(size(img),fCentCutoffs(1),fCentCutoffs(2),ordr);
+end
+persistent fCell;
+if isempty(fCell)
+    fprintf('creating a fCent filter in funcClicker\n');
+    fCell=bandpassfilter(size(img),fCellCutoffs(1),fCellCutoffs(2),ordr);
+end
 
 %% preprocessing / filtering
 ff=fft2(img);
@@ -88,12 +92,15 @@ xycent=xycent(ix,:); %#ok
 D=distance(xycent',CircleFit(:,1:2)');
 
 [dst,mi]=min(D,[],2); 
+
+% here we ahave a row per centrosome
 PlausiblyProphase=[CircleFit(mi,:) xycent];
+
 % keep only the ones that the closet centrosome is less that
 % CentProxToCircleCenter * Circle radius
 ix=find(dst<PlausiblyProphase(:,3)*CentProxToCircleCenter);
-PlausiblyProphase=PlausiblyProphase(ix,:);
-mi=mi(ix);
+PlausiblyProphase=PlausiblyProphase(ix,:); %#ok<FNDSB>
+
 
 if isempty(PlausiblyProphase)
     msg='centrosmes to far from cell center';
@@ -102,31 +109,30 @@ if isempty(PlausiblyProphase)
     return
 end
 
-plotCurrnetStatus('centrosomes','circles');
+% moving into a row per cell
+[bla,ix]=unique(PlausiblyProphase(:,1:2),'rows'); %#ok
+PlausiblyProphase=PlausiblyProphase(ix,:);
 
 %% Fit nucleus only to the Plausible cells
 Nuc=[];
-CellsToCheck=unique(mi);
-for j=1:length(CellsToCheck)
-    ix=CellsToCheck(j);
-    rect=[CircleFit(ix,1)-CircleFit(ix,3) CircleFit(ix,2)-CircleFit(ix,3) 2*ones(1,2)*CircleFit(ix,3)];
+for j=1:size(PlausiblyProphase,1)
+    rect=[PlausiblyProphase(j,1)-PlausiblyProphase(j,3) PlausiblyProphase(j,2)-PlausiblyProphase(j,3) 2*ones(1,2)*PlausiblyProphase(j,3)];
+    rect(1:2)=max(1,rect(1:2));
     sml=imcrop(fltCell,rect);
     Nuc{j}=nucDetect(sml);
     nucNum(j)=length(Nuc{j}); %#ok
     for k=1:length(Nuc{j})
         bnd=Nuc{j}{k};
-        Nuc{j}{k}(:,1)=bnd(:,2)+CircleFit(j,1)-CircleFit(j,3);
-        Nuc{j}{k}(:,2)=bnd(:,1)+CircleFit(j,2)-CircleFit(j,3);
+        Nuc{j}{k}(:,1)=bnd(:,2)+rect(1);
+        Nuc{j}{k}(:,2)=bnd(:,1)+rect(2);
     end
 end
 
 %%  keep only cells with single nucleus 
-PlausiblyProphase=PlausiblyProphase(ismember(mi,find(nucNum==1)),:);
-[bla,ix]=unique(PlausiblyProphase(:,1:2),'rows'); %#ok
-PlausiblyProphase=PlausiblyProphase(ix,:);
+PlausiblyProphase=PlausiblyProphase(nucNum==1,:);
 
-if isempty(ix)
-    msg='all cells  are multi nucleate';
+if isempty(PlausiblyProphase)
+    msg='Could not assign only a single nuclei';
     plotCurrnetStatus('centrosomes','circles','nuclei');
     drawnow
     return

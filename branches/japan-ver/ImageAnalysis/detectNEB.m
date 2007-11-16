@@ -1,11 +1,13 @@
 function NEB=detectNEB(img,PlausiblyProphase,fig)
 
-%% segment the image
-% fCent=bandpassfilter(size(img),fCentCutoffs(1),fCentCutoffs(2),ordr);
-% fCell=bandpassfilter(size(img),fCellCutoffs(1),fCellCutoffs(2),ordr);
-fCent=[]; %#ok<NASGU>
-fCell=[];
-load BandPassFilters
+%% create filter if needed
+fCellCutoffs=[0.01 0.05];
+ordr=3;
+persistent fCell;
+if isempty(fCell)
+    fprintf('creating a fCell filter in detectNEB\n');
+    fCell=bandpassfilter(size(img),fCellCutoffs(1),fCellCutoffs(2),ordr);
+end
 
 %% preprocessing / filtering
 ff=fft2(img);
@@ -18,9 +20,9 @@ tileSize=256;
 se=strel('disk',5);
 nebTubIntRatio=1000;%0.95;
 
-NEB=zeros(length(PlausiblyProphase),1);
+NEB=false(size(PlausiblyProphase,1),1);
 
-oldCenters=unique(PlausiblyProphase(:,1:2),'rows');
+oldCenters=PlausiblyProphase(:,1:2);
 
 roi=[oldCenters(:,1)-tileSize/2 oldCenters(:,2)-tileSize/2 oldCenters(:,1)+tileSize/2 oldCenters(:,2)+tileSize/2];
 roi=ceil(roi);
@@ -31,31 +33,35 @@ roi(:,4)=min(roi(:,4),size(img,1));
 CircleFit=circleFitCells(bw,roi);
 
 %% Assign new circle to old cells
-[oldCenters,ix]=unique(PlausiblyProphase(:,1:2),'rows');
-oldRadi=PlausiblyProphase(ix,5);
+oldRadi=PlausiblyProphase(:,3);
 D=distance(oldCenters',CircleFit(:,1:2)');
 
 [mn,mi]=min(D,[],2);
-mi(mn>oldRadi)=NaN;
+mi=mi(mn<oldRadi);
+CircleFit=CircleFit(mi,:);
 
 %% fit nucleus to all new cells 
 rect=[1 1 1 1]; %#ok<NASGU>
-for i=1:length(mi)
-    if ~isnan(mi(i))
-        ix=mi(i);
-        rect=[CircleFit(ix,1)-CircleFit(ix,3) CircleFit(ix,2)-CircleFit(ix,3) 2*ones(1,2)*CircleFit(ix,3)];
-        sml=imcrop(fltCell,rect);
-        [Nuc{i},bw]=nucDetect(sml); %#ok<AGROW>
-        
-        cyto=logical(imdilate(bw,se)-bw);
-        if isempty(Nuc{i}) || median(sml(bw))/median(sml(cyto)) > nebTubIntRatio
-            NEB(i)=1;
-        end
+Nuc=cell(size(CircleFit,1),1);
+for i=1:size(CircleFit,1)
+    rect=[CircleFit(i,1)-CircleFit(i,3) CircleFit(i,2)-CircleFit(i,3) 2*ones(1,2)*CircleFit(i,3)];
+    rect(1:2)=max(1,rect(1:2));
+    sml=imcrop(fltCell,rect);
+    [Nuc{i},bw]=nucDetect(sml); %#ok<AGROW>
+    cyto=logical(imdilate(bw,se)-bw);
+    if isempty(Nuc{i}) || median(sml(bw))/median(sml(cyto)) > nebTubIntRatio
+        NEB(i)=true;
+    end
+    for k=1:length(Nuc{i})
+        bnd=Nuc{i}{k};
+        Nuc{i}{k}(:,1)=bnd(:,2)+rect(1); %#ok<AGROW>
+        Nuc{i}{k}(:,2)=bnd(:,1)+rect(2); %#ok<AGROW>
     end
 end
 
 plotCurrnetStatus('circles','nuclei')
 
+%% nested function
     function plotCurrnetStatus(varargin)
         if exist('fig','var')
             figure(fig)
@@ -67,12 +73,14 @@ plotCurrnetStatus('circles','nuclei')
             if sum(strcmp(varargin,'nuclei'))
                 for jj=1:length(Nuc)
                     for kk=1:length(Nuc{jj})
-                        plot(Nuc{jj}{kk}(:,1)+rect(1),Nuc{jj}{kk}(:,2)+rect(2),'g')
+                        plot(Nuc{jj}{kk}(:,1),Nuc{jj}{kk}(:,2),'g')
                     end
                 end
             end
         end
+        set(fig,'name','looking for NEB')
     end % of nested function plot...
 
-end
+%%
+end % of main function
 

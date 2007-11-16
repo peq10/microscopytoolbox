@@ -34,7 +34,10 @@ else
     end
 
     % perform the task
+    t0=now;
     Tsk=Tsk.fcn(Tsk); % call the function handle
+    dur=now-t0;
+    Tsk=set(Tsk,'duration',dur);
 end
 
 disp('done');
