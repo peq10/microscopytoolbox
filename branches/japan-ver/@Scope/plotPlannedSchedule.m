@@ -9,7 +9,7 @@ end
 figure(fig);
 clf
 hold on
-TskNonExec=getTasks(rS,'nonexecuted');
+TskNonExec=getTasks(rS,'status','nonexecuted');
 [x,y,id]=get(TskNonExec,'stagex','stagey','id');
 if iscell(x)
    x=[x{:}]'; y=[y{:}]'; id=[id{:}]';

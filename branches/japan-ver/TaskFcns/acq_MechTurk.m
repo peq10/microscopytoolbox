@@ -2,14 +2,6 @@ function Tsk=acq_MechTurk(Tsk)
 
 global rS;
 
-% check if there are already 10 prophase cells
-% OldTsk=getTasks(rS,'executed');
-% XY=get(OldTsk,'UserData');
-% XY=[XY{:}]/2;
-% if length(XY>=10)
-%     return
-% end
-
 %% get the crnt acq details 
 [X,Y,Exposure,Channels]=get(Tsk,'stageX',...
                                           'stageY',...
@@ -28,7 +20,7 @@ while ~get(rS,'pfs')
     cnt=cnt+1;
     pause(0.5)
     if cnt>10
-        warning('I lost focus totally - dont know why - moving on');
+        warning('I lost focus totally - dont know why - moving on'); %#ok
         return
     end
 end
@@ -70,10 +62,10 @@ set(3,'name',['already clicked on: ' num2str(cnt) ' prophase cells']);
 %% Ask if there are spindles here
 figure(3)
 [x,y,b]=ginput;
-% x=650;Å@y=514;Å@b=1; % used for silly acquisition..
+% x=650;ÔøΩ@y=514;ÔøΩ@b=1; % used for silly acquisition..
 
 if sum(b==27)
-    removeTasks(rS,'nontimed_nonexecuted');
+    removeTasks(rS,{'timedependent','status'},{false,'nonexecuted'});
     return
 end
 

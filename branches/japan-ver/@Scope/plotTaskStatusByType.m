@@ -1,8 +1,9 @@
 function plotTaskStatusByType(rS)
 
 Tsks=getTasks(rS,'all');
-[fncStr,exec]=get(Tsks,'fcnstr','executed');
-exec=[exec{:}];
+[fncStr,status]=get(Tsks,'fcnstr','status');
+
+unqStt=unique(status);
 
 [unq,bla,m]=unique(fncStr);
 tbl=tabulate(m);
@@ -10,8 +11,9 @@ tbl=tabulate(m);
 stts=zeros(size(tbl,1),2);
 
 for i=1:size(tbl,1)
-    stts(i,2)=sum(exec(m==i));
-    stts(i,1)=sum(m==i)-stts(i,2);
+    for j=1:length(unqStt)
+        stts(i,j)=sum(strcmp(status,unqStt{j}));
+    end
 end
     
 barh(stts,'stacked')

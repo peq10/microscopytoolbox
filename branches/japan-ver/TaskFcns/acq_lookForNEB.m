@@ -66,11 +66,9 @@ NEB=detectNEB(img,PlausiblyProphase,3);
 %% if NEB happened acquire a Z-stack and start a 5D timelapse
 if sum(NEB)
     % remove all future tasks with my filename
-    AllNonExecTsks=getTasks(rS,'nonexecuted');
-    AllFileNames=get(AllNonExecTsks,'filename');
-    ix=find(strcmp(AllFileNames,get(Tsk,'filename')));
-    for i=1:length(ix)
-        AllNonExecTsks(ix(i))=set(AllNonExecTsks(ix(i)),'executed',2); %#ok<FNDSB>
+    AllNonExecTsks=getTasks(rS,{'status','filename'},{'nonexecuted',get(Tsk,'filename')});
+    for i=1:length(AllNonExecTsks)
+        AllNonExecTsks(i)=set(AllNonExecTsks(ix(i)),'status','skipped'); %#ok<FNDSB>
     end
     replaceTasks(rS,AllNonExecTsks(ix));
     ZstkTsk=set(Tsk,'tskfcn','acq_Zstk_fully_automated','planetime',now+UserData.Zstack.T,...

@@ -30,7 +30,7 @@ plotPlannedSchedule(rS,1)
 run(rS);
 
 %% get the real XYs
-Tsks2=getTasks(rS,'all',0); %get all tasks from buffer
+Tsks2=getTasks(rS,'all'); %get all tasks from buffer
 exe=get(Tsks2,'executed');
 exe=[exe{:}]';
 MDs=get(Tsks2,'MetaData');

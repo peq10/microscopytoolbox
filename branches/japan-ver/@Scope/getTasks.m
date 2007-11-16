@@ -1,105 +1,54 @@
-function [Tsks,indx] = getTasks( rS,idx,bysch )
-%GETTASKS from rS. idx numerical index of task by oder (1=first end=last).
-%   indx is the location of the task in the TaskBuffer
-%   idx  - can also get the char values: 'next','last','all'
-%   bysch  - [0/1/2] 0 - idx are indexes into the TaskBuffer
-%                    1 - idx are indexes into the TaskSchedule
-%                    2 - idx are ids of Tasks from the Buffer
+function [Tsks,indx] = getTasks( rS,property,value )
+%GETTASKS from rS that have specfic value for each property
+% if property is an cell array, than value must be a cell array as well and
+% in that case the returned Tasks are ones that have ALL the propery value
+% pairs.
 % 
+% to special cases are the 'all' and 'next', all returns them all, and next
+% return the next task from the scheduer
+%
+% examples:
+% [Tsk,id]=getTasks(rS,'status','executed')
+% [Tsk,id]=getTasks(rS,{'status','fncstr'},{'executed','acq_simple'})
 
-
-% fill in default values
-if ~exist('bysch','var')
-    bysch=1;
-end
-
+% check if its empty
 if isempty(rS.TaskBuffer)
     Tsks=[]; 
     indx=[];
     return
 end
-    
-% transform char into indexes
-if ischar(idx)
-    switch idx
-        case 'timed'
-            tm=get(rS.TaskBuffer,'timedependent');
-            tm=[tm{:}]';
-            idx=find(tm);
-            bysch=0;
-        case 'nontimed'
-            tm=get(rS.TaskBuffer,'timedependent');
-            tm=[tm{:}]';
-            idx=find(tm==0);
-            bysch=0;
-        case 'next'
-            bysch=1;
-            idx=1;
-        case 'last'
-            idx=size(rS.TaskSchedule,1);
-        case 'all' 
-            if bysch==1
-                idx=1:size(rS.TaskSchedule,1);
-            else
-                bysch=0;
-                idx=1:numel(rS.TaskBuffer);
-            end
-        case 'executed'
-            bysch=0;
-            exec=get(rS.TaskBuffer,'executed');
-            if iscell(exec)
-                exec=[exec{:}]';
-                idx=find(exec==1);
-            end
-        case 'nonexecuted'
-            bysch=0;
-            exec=get(rS.TaskBuffer,'executed');
-            if iscell(exec)
-                exec=[exec{:}]';
-                idx=find(exec==0);
-            end
-        case 'skipped'
-            bysch=0;
-            exec=get(rS.TaskBuffer,'executed');
-            if iscell(exec)
-                exec=[exec{:}]';
-                idx=find(exec==2);
-            end
-        otherwise
-    end
+
+% deal with special cases
+if ischar(property) && strcmp(property,'all')
+    Tsks=rS.TaskBuffer;
+    indx=1:length(rS.TaskBuffer);
+    return
 end
 
-switch bysch
-    case 0 % index are directly to TaskBuffer
-        indx=idx;
-    case 1 %index is for schedule
-        %validate input
-        if isempty(rS.TaskSchedule) || max(idx) > size(rS.TaskSchedule,1)
-            error('Task requested is outside of current schedule, please update schedule and try again');
-        end
-        % find the shared ids between buffer and schedule
-        ids=rS.TaskSchedule(idx);
-        bfrids=get(rS.TaskBuffer,'id');
-        if iscell(bfrids),  bfrids=[bfrids{:}]'; end
-        [both_ids,indx]=intersect(bfrids,ids);
-    case 2
-        %validate input
-        if isempty(rS.TimedTaskSchedule) 
-            error('Task requested is outside of current Timed schedule, please update schedule and try again');
-        end
-        % find the shared ids between buffer and schedule
-        ids=rS.TimedTaskSchedule(idx,1);
-        bfrids=get(rS.TaskBuffer,'id');
-        bfrids=[bfrids{:}]';
-        [both_ids,indx]=intersect(bfrids,ids);
-    case 3 %idx are actually ids not indexes
-        bfrids=get(rS.TaskBuffer,'id');
-        bfrids=[bfrids{:}]';
-        [both_ids,indx]=intersect(bfrids,idx);
-    otherwise 
-   
+if ischar(property) && strcmp(property,'next')
+    id=rS.TaskSchedule(1);
+    if isempty(id)
+        Tsks=[];
+        indx=[];
+        return
+    end
+    [Tsks,indx]=getTasks(rS,'id',id);
+    return
 end
-% check for ids and get them 
+
+% if only single property supplied - make it a cell
+if ~iscell(property) 
+    property={property};
+    value={value};
+end
+
+% find indexes that are true for all property value pairs
+indx=1:length(rS.TaskBuffer);
+
+for i=1:length(property)
+    v=get(rS.TaskBuffer,property{i});
+    indx=intersect(indx,find(ismember(v,value{i})));
+end
 
 Tsks=rS.TaskBuffer(indx);
 

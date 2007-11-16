@@ -21,7 +21,7 @@ while ~isempty(rS.TaskSchedule)
                 t0=now;
                 Tsk=do(Tsk);
                 dur=now-t0;
-                replaceTasks(rS,set(Tsk,'executed',true,'duration',dur));
+                replaceTasks(rS,set(Tsk,'statyus','executed','duration',dur));
             catch
                 % try to resolve the error
                 err=lasterr;
@@ -35,16 +35,16 @@ while ~isempty(rS.TaskSchedule)
                 %% try to redo the last task
                 try
                     Tsk=do(Tsk);
-                    replaceTasks(rS,set(Tsk,'executed',true));
+                    replaceTasks(rS,set(Tsk,'status','executed'));
                 catch
-                    warning('Failed AGAIN - this isn''t my day');
+                    warning('Failed AGAIN - this isn''t my day'); %#ok
                 end
             end
         else
             t0=now;
             Tsk=do(Tsk);
             dur=now-t0;
-            replaceTasks(rS,set(Tsk,'executed',true,'duration',dur));
+            replaceTasks(rS,set(Tsk,'status','executed',true,'duration',dur));
         end
     end
     rS.TaskSchedule=rS.TaskSchedule(2:end);

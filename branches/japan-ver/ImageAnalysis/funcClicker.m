@@ -6,10 +6,13 @@ function [PlausiblyProphase,msg]=funcClicker(img,fig)
 % fCellCutoffs=[0.01 0.05];
 % ordr=3;
 
+
 CentThresh=0.0125;
+
 minCentSize=4;
 RadiusMultiply=1.5;
 CentProxToCircleCenter=0.75;   
+
 
 %% construct the filters
 % fCent=bandpassfilter(size(img),fCentCutoffs(1),fCentCutoffs(2),ordr);
@@ -28,6 +31,8 @@ msg='found';
 %% thresholg segmentation for cells and centrosomes
 bw=im2bw(fltCell,graythresh(fltCell));
 bw=imclearborder(bw);
+
+% determine the threshold based on cell border
 Cent=im2bw(fltCent,CentThresh);
 Cent=bwareaopen(Cent,minCentSize);
 Cent(~bw)=0;
@@ -81,6 +86,7 @@ xycent=xycent(ix,:); %#ok
 % now assign ownership to each centrome - given that it is close to the
 % center by a CentProxToCircleCenter factor
 D=distance(xycent',CircleFit(:,1:2)');
+
 [dst,mi]=min(D,[],2); 
 PlausiblyProphase=[CircleFit(mi,:) xycent];
 % keep only the ones that the closet centrosome is less that
@@ -88,6 +94,7 @@ PlausiblyProphase=[CircleFit(mi,:) xycent];
 ix=find(dst<PlausiblyProphase(:,3)*CentProxToCircleCenter);
 PlausiblyProphase=PlausiblyProphase(ix,:);
 mi=mi(ix);
+
 if isempty(PlausiblyProphase)
     msg='centrosmes to far from cell center';
     plotCurrnetStatus('centrosomes','circles');
