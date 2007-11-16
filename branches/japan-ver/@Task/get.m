@@ -36,13 +36,15 @@ varargout=cell(length(varargin),1);
 
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'waittime'
+            varargout{i}=Tsk.waitTime;
         case 'metadata'
             varargout{i}=Tsk.MetaData;
         case 'latebehavior'
             varargout{i}=Tsk.LateBehavior;
         case 'id'
             varargout{i}=Tsk.id;
-        case 'fcnstr'
+        case {'fcnstr','fncstr'}
             varargout{i}=func2str(Tsk.fcn);
         case 'fcn'
             varargout{i}=Tsk.fcn;
@@ -52,8 +54,8 @@ for i=1:length(varargin)
             varargout{i}=Tsk.acqTime;
         case 'userdata'
             varargout{i}=Tsk.UserData;
-        case 'executed'
-            varargout{i}=Tsk.executed;
+        case 'status'
+            varargout{i}=Tsk.status;
         case 'zshift'
             varargout{i}=Tsk.Zshift;
         case MetaDataAttributes %deligates the attributes to the MetaData class

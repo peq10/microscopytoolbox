@@ -14,6 +14,8 @@ end
 %% Set the calues
 for i=1:2:length(varargin)
     switch lower(varargin{i})
+        case 'waittime'
+            Tsk.waitTime=varargin{i+1};
         case 'duration'
             Tsk.acqTime=varargin{i+1};
         case 'timedependent'
@@ -40,8 +42,8 @@ for i=1:2:length(varargin)
             Tsk.stageMoveTime=varargin{i+1};
         case 'focustime'
             Tsk.focusTime=varargin{i+1};
-        case 'executed'
-            Tsk.executed=varargin{i+1};
+        case 'status'
+            Tsk.status=varargin{i+1};
         case 'userdata'
             Tsk.UserData=varargin{i+1};
         case MetaDataAttributes %deligates the attributes to the MetaData class

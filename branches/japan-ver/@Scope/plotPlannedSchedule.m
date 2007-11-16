@@ -7,13 +7,14 @@ if ~exist('fig','var')
 end
 
 figure(fig);
-clf
-hold on
-TskNonExec=getTasks(rS,'status','nonexecuted');
+TskNonExec=getTasks(rS,'status','inqueue');
 [x,y,id]=get(TskNonExec,'stagex','stagey','id');
 if iscell(x)
    x=[x{:}]'; y=[y{:}]'; id=[id{:}]';
 end
+
+% the purpose of thie ismember is to sort them according to the right
+% order
 [bla,ind]=ismember(rS.TaskSchedule,id);
 ind=ind(ind>0);
 plot(x(ind),y(ind),'-')

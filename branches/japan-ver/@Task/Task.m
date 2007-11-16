@@ -60,7 +60,7 @@ Tsk.waitTime=0; % the time we waited for this Task to start
 Tsk.Zshift=0;
 
 % status
-Tsk.status='nonexecuted';
+Tsk.status='undef';
 Tsk.timedep=false;
 
 % behavior if a timed task and is called after the time it should have happened

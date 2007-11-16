@@ -64,7 +64,7 @@ rS.refreshSchedule=Inf;
 % existing points are needed for rS to be able to guess another point
 rS.FocusPoints=[]; %[X Y Z T]
 rS.FocusPointHistory=1/1440; %Number of days that are used in the updateFocalPlaneGrid 
-rS.FocusPointProximity=100; %the distance of points for which the history is relevant
+rS.FocusPointProximity=10; %the distance of points for which the history is relevant
 rS.FocalPlaneGridSize=25;
 
 % a flag to note whether scope is currently executing tasks

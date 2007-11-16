@@ -21,7 +21,7 @@ if isempty(fCent)
 end
 persistent fCell;
 if isempty(fCell)
-    fprintf('creating a fCent filter in funcClicker\n');
+    fprintf('creating a fCell filter in funcClicker\n');
     fCell=bandpassfilter(size(img),fCellCutoffs(1),fCellCutoffs(2),ordr);
 end
 
