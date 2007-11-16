@@ -6,7 +6,7 @@ if ~exist('fig','var')
     fig=figure;
 end
 
-tb=getTasks(rS,'executed');
+tb=getTasks(rS,'status','executed');
 [X,Y,T]=get(tb,'stagex','stagey','planetime');
 if iscell(X)
     xyt=sortrows([[X{:}]' [Y{:}]' ([T{:}]'-mean([T{:}]))*24*3600],3);

@@ -12,7 +12,7 @@ allsym='^<>vdh*h+o.sph';
 figure(fig)
 hold on
 
-tb=getTasks(rS,'executed');
+tb=getTasks(rS,'status','executed');
 [X,Y,T,typ]=get(tb,'stagex','stagey','planetime','fncstr');
 if ~iscell(X)
     if ~isempty(X)

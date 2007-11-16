@@ -53,14 +53,14 @@ Tsk.fcn=fcn;
 
 % run time: acqTime and stageMoveTime and fucosTime
 Tsk.acqTime=10/86400; %default value for a task duration is 10 sec
+Tsk.waitTime=0; % the time we waited for this Task to start
 
 % z-shift where to image - can have either scalar or array with number of
 % channels
 Tsk.Zshift=0;
 
-% executed
-Tsk.executed=false;
-
+% status
+Tsk.status='nonexecuted';
 Tsk.timedep=false;
 
 % behavior if a timed task and is called after the time it should have happened

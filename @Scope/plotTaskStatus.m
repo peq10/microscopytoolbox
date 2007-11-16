@@ -1,7 +1,7 @@
 function plotTaskStatus(rS)
 
-Timed=getTasks(rS,'timed');
-NonTimed=getTasks(rS,'nontimed');
+Timed=getTasks(rS,'timedependent',true);
+NonTimed=getTasks(rS,'timedependent',false);
 if isempty(Timed)
     texec=0;
 else

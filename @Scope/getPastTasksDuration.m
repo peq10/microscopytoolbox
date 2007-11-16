@@ -7,7 +7,7 @@ fncStrUnq={};
 durVector={};
 
 % get past tasks
-ExecTsks=getTasks(rS,'executed');
+ExecTsks=getTasks(rS,'status','executed');
 if isempty(ExecTsks)
     return
 end

@@ -85,10 +85,6 @@ for i=1:length(varargin)
           varargout=[varargout; {getFocusParams(rS,varargin{i})}];
         case 'currnettaskid'
             varargout=[varargout; {rS.taskID}];
-        case 'tasksfinished'
-            cnt=get(rS.TaskBuffer,'executed');
-            cnt=[cnt{:}];
-            varargout=[varargout; {sum(cnt)}];
         case 'isrunning'
             varargout=[varargout; {rS.isRunning}];
         case 'stagespeed.x'

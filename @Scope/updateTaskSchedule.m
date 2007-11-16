@@ -10,7 +10,7 @@ rS=rSin;
 %% get info about tasks in buffer
 [durVector,fncStrUnq]=getPastTasksDuration(rS);
 
-NonExecTasks=getTasks(rS,'nonexecuted');
+NonExecTasks=getTasks(rS,'status','nonexecuted');
 % get the IDs,x,y of all non-executed tasks. 
 x=get(NonExecTasks,'stageX');
 if iscell(x), x=[x{:}]'; end
