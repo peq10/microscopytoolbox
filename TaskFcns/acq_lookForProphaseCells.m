@@ -42,6 +42,7 @@ img=acqImg(rS,Channels,Exposure);
 
 %% update plots
 figure(3)
+clf
 subplot('position',[0 0 1 1])
 imshow(img(:,:,1),[],'initialmagnification','fit')
 figure(4)

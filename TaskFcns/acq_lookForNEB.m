@@ -42,6 +42,7 @@ img=acqImg(rS,Channels,Exposure);
 
 %% update plots
 figure(3)
+clf
 subplot('position',[0 0 1 1])
 imshow(img(:,:,1),[],'initialmagnification','fit')
 figure(4)
@@ -55,31 +56,46 @@ qdata=get(Tsk,'qdata');
 PlausiblyProphase=qdata.Value;
 NEB=detectNEB(img,PlausiblyProphase,3);
 
-% PlausiblyProphase.Time=now;
-% PlausiblyProphase.NEB=NEB;
+%% if NEB happened acquire a Z-stack and start a 5D timelapse
+% write tiff of current image
+writeTiff(Tsk,img,get(rS,'rootfolder')); 
 
-% qdata.QdataType='Plausibly Prophase With NEB data';
-% qdata.QdataDescription='';
-% qdata.Value=PlausiblyProphase;
-% Tsk=set(Tsk,'qdata',qdata);
+% if did not detect NEB - don:t change anything just cointinue
+if ~sum(NEB), return, end
+ 
+% split into Prometapahse (NEB happened)
+% and non prometaphase
+Prometaphase=PlausiblyProphase(NEB,:);
+qdataPropmetaphse=qdata;
+qdataPropmetaphse.Value=Prometaphase;
+PlausiblyProphase=PlausiblyProphase(~NEB,:);
+
+qdata.Value=PlausiblyProphase;
 
 %% if NEB happened acquire a Z-stack and start a 5D timelapse
 if sum(NEB)
     % remove all future tasks with my filename
-    AllNonExecTsks=getTasks(rS,{'status','filename'},{'nonexecuted',get(Tsk,'filename')});
+    NonExecTsks=getTasks(rS,{'status','filename'},{'nonexecuted',get(Tsk,'filename')});
     for i=1:length(AllNonExecTsks)
-        AllNonExecTsks(i)=set(AllNonExecTsks(ix(i)),'status','skipped'); %#ok<FNDSB>
+        if isempty(PlausiblyProphase)
+            NonExecTsks(i)=set(AllNonExecTsks(i),'status','skipped'); 
+        else
+            NonExecTsks(i)=set(AllNonExecTsks(i),'qdata',qdata); 
+        end
     end
-    replaceTasks(rS,AllNonExecTsks(ix));
-    ZstkTsk=set(Tsk,'tskfcn','acq_Zstk_fully_automated','planetime',now+UserData.Zstack.T,...
-                              'channels',UserData.Zstack.Channels,'exposuretime',UserData.Zstack.Exposure,...
-                              'stageZ',UserData.Zstack.Zstack,'filename',[get(Tsk,'filename') '_Stk']);
-    do(ZstkTsk);
-    TimeLapseTsk=set(Tsk,'tskfcn','acq_5D_fully_automated','planetime',now+UserData.TimeLapse.T,...
-                                       'channels',UserData.TimeLapse.Channels,'exposuretime',UserData.TimeLapse.Exposure,...
-                                       'stageZ',UserData.TimeLapse.Zstack,'filename',[get(Tsk,'filename') '_5D']);
-    addTasks(rS,split(TimeLapseTsk));
 end
+replaceTasks(rS,NonExecutedTsks);
 
-%%
-writeTiff(Tsk,img,get(rS,'rootfolder')); 
+%% create new Tasks
+
+ZstkTsk=set(Tsk,'tskfcn','acq_Zstk_fully_automated','planetime',now+UserData.Zstack.T,...
+    'channels',UserData.Zstack.Channels,'exposuretime',UserData.Zstack.Exposure,...
+    'stageZ',UserData.Zstack.Zstack,'filename',[get(Tsk,'filename') '_Stk'],...
+    'qdata',qdataPropmetaphse);
+do(ZstkTsk);
+TimeLapseTsk=set(Tsk,'tskfcn','acq_5D_fully_automated','planetime',now+UserData.TimeLapse.T,...
+    'channels',UserData.TimeLapse.Channels,'exposuretime',UserData.TimeLapse.Exposure,...
+    'stageZ',UserData.TimeLapse.Zstack,'filename',[get(Tsk,'filename') '_5D'],...
+    'qdata',qdataPropmetaphse);
+addTasks(rS,split(TimeLapseTsk));
+

@@ -5,9 +5,8 @@ try
 catch
     clear
 end
-
-% call the memory monitor - you can enable logging there if u want to...
-mm;
+% clear persistent variables
+clear functions
 
 delete(get(0,'Children')) % a more aggressive form of close (doesn't ask for confirmation)
 ScopeConfigFileName='MM_Roboscope.cfg';
@@ -21,7 +20,7 @@ if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
 initFocalPlane(rS);
-set(rS,'rootfolder','C:\RawData\RoboData3');
+set(rS,'rootfolder','C:\RawData\RoboData5');
 set(rS,'PFS',1,'refreshschedule',10);
 warning('off','MATLAB:divideByZero');
 warning off
@@ -56,6 +55,11 @@ UserData.TimeLapse.T=cumsum(ones(1,60)*3)/1440;
 
 if DEBUG
     UserData.NEB.T=cumsum(0.5*ones(1,10))/1440;
+    set(rS,'resolveErrors',false)
+    dbstop if error
+else
+    set(rS,'resolveErrors',true)
+    dbclear if error
 end
 
 BaseFileName='Img';
@@ -100,33 +104,35 @@ addTasks(rS,Tsk);
 %% set up status figures
 plotPlannedSchedule(rS,1)
 figure(1)
-set(1,'position',[10   666   350   309],...
+set(1,'position',[10   597   350   309],...
     'Toolbar','none','Menubar','none','name','Throopi''s route');
 hold on
 
 figure(2)
-set(2,'position',[ 10   262   350   281],...
+set(2,'position',[ 10   246   350   309],...
     'Toolbar','none','Menubar','none','name','Focal Plane');
 
-% plotFocalPlaneGrid(rS);
+plotFocalPlaneGrid(rS);
 
 updateStatusBar(rS); % this should delete all old progress bars
 updateStatusBar(rS,0); % create a new one
-set(rS,'statusbarposition',[10 580 356 180]);
+set(rS,'statusbarposition',[380 246 356 180]);
 
 figure(3)
 subplot('position',[0 0 1 1])
-set(3,'position',[  372   348   894   627],...
+set(3,'position',[  380   348   894   627],...
     'Toolbar','none','Menubar','none','name','Focal Plane');
 
 figure(4)
-set(4,'position',[ 10    52   364   169],...
+set(4,'position',[ 10    40   364   169],...
     'Toolbar','none','Menubar','none','name','Task Status');
 
 figure(5)
-set(5,'position',[399    70   483   181],...
+set(5,'position',[ 380    40   483   173],...
     'Toolbar','none','Menubar','none','name','Task Status');
 
+% call the memory monitor - you can enable logging there if u want to...
+mm;
 %% MechTurk part
 
 for i=1:20

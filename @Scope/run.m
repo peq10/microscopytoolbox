@@ -18,10 +18,8 @@ while ~isempty(rS.TaskSchedule)
     if ~isempty(Tsk)
         if get(rS,'resolveErrors')
             try
-                t0=now;
                 Tsk=do(Tsk);
-                dur=now-t0;
-                replaceTasks(rS,set(Tsk,'statyus','executed','duration',dur));
+                replaceTasks(rS,set(Tsk,'executed',true));
             catch
                 % try to resolve the error
                 err=lasterr;
@@ -41,10 +39,8 @@ while ~isempty(rS.TaskSchedule)
                 end
             end
         else
-            t0=now;
             Tsk=do(Tsk);
-            dur=now-t0;
-            replaceTasks(rS,set(Tsk,'status','executed',true,'duration',dur));
+            replaceTasks(rS,set(Tsk,'executed',true));
         end
     end
     rS.TaskSchedule=rS.TaskSchedule(2:end);
@@ -65,7 +61,8 @@ end
 if ~isempty(findstr(err,'memory'))
     unload(rS);
     rS.mmc=[];
-    pack;
+    pack('packfile.mat');
+    import mmcorej.*;
     rS.mmc=CMMCore;
     rS.mmc.loadSystemConfiguration('MM_Roboscope.cfg');
 end
