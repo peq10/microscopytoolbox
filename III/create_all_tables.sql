@@ -58,7 +58,7 @@ CREATE TABLE coll_qdata (
         id serial PRIMARY KEY, 
 	type varchar references coll_qdata_types(name) NOT NULL,
 	coll varchar references collections(filename) NOT NULL,
-	value numeric[] NOT NULL,
+	value numeric[],
 	label text
 );
 
@@ -172,13 +172,6 @@ CREATE TABLE job_types (
         -- part I 'static data'
 	id serial primary key, 
 	executable varchar NOT NULL, 
-	based_on_table varchar references job_type_based_on_table (name) NOT NULL, 
-                                      -- the name of the table type that is used for this job 
-                                      -- e.g. images, collections, img_qdata, coll_qdata 
-	update_file boolean NOT NULL DEFAULT 'false', -- if ture it means that it changed some metadata in the file, 
-	argv text[], -- here are all the additional parameter that are passed to the job
-                       -- This should be an Nx2 matrix of text where the first colum is property name second is property value.
-	argc integer,  -- number of arguments, e.g. N in last row. 
 	-- part II - conditions to create a new job
 	run_on_query text NOT NULL, -- this field hold the sql query that defines on whom this job_type should be performed.
                                     -- a trigger on insert will turn it also into a view for ease of use. 
@@ -213,7 +206,6 @@ CREATE TABLE jobs (
 	started timestamp,
 	finished timestamp, 
 	status varchar references job_status (status) DEFAULT 'queue' NOT NULL, 
-	in_id serial, 
 	errormsg text,
 	filename varchar NOT NULL -- this could reference either collections, images filename. This would be the input to inputqryfcn 
 	                          -- in the job_type table

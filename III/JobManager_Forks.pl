@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 #
-# This import managers will move the files from the acquisition folder
-# into their final location and while doing so will update the DB and create 
-# collection files as needed. 
+# This job managers will query the database to identify new jobs 
+# it would then launch them as necessary and updates the DB when
+# jobs are finished. 
 
 use strict;
 use Switch;
@@ -19,10 +19,11 @@ III->connectToDB();
 
 while (1) {
 
+# Launching new jobs
 while ($job->III::Jobs->new()) {
 
     # create input file
-	$job->createInputFile();
+	$tmpfilename = $job->createInputFile();
 		
 	# start another job and use its pid as a key to store the job hash
 	$CurrentJobs->{Parallel::Jobs::start_job(%$nextJob->{"system(%$nextJob->{'executable'}"},$tmpfilename)} =  $job;
@@ -33,7 +34,6 @@ while ($job->III::Jobs->new()) {
 while (! undef ($pid,$event,$data)=Parallel::Jobs::watch_jobs()) {
 	switch ($event) {
 		case 'EXIT' {
-		    $CurrentJobs->{$pid}->parseOutputFile();
 		    $CurrentJobs->{$pid}->updateDB('Success');
 		    $run_num--; 
 		    }

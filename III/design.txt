@@ -1,0 +1,103 @@
+Some thought about III system
+===============================
+
+III - the meaning of the name
+-----------------------------
+Image Informatics Infrastructure also known as I^3 or I-cube or eye-cube. 
+
+What III is good for?
+---------------------
+III system is designed to provide all the infrastructure for large image analysis
+projects. Basically, it provides a mechanism to deal with large datasets (~10^6 images) and data crunching time of 10^3 (or more) CPU hours. 
+
+What III is not good for?
+-------------------------
+Web based access to images, multi-user datacenters, providing infrastructure for imaging facilities and so on. Most of the later functionality is provided by projects like OME and such and altough it is potentially possible to do some of the things III is ment for using those projects, it seems easier to write it from scratch. By losing all the web functionality, the system becomes much easier to install maintain etc.
+
+How does it do that?
+--------------------
+Basically by providing a few classes and scripts that uses them. The user of the III system is a programer administrator who will extend or customize the III system to his own need and hardware set up. The basic idea is that we need to have some comman ground between everything (database, image ananlysis modules, etc). The common ground is provided by the two classes: MetaData and CollectionData. Those classes are implemented in both perl and matlab (with almost the same interface, few changes exist and are documented in the class descriptions). 
+
+Beside the two basic classes, III provides a job scheduling mechanism, some data redundency (between the FS and the DB) and small other things. III can be tailored and extended to specific installations, it provides mechanism to run analysis on single server, a PVM cluster, using SGE queue and (someday) even to run on Amazon EC2.
+
+Restrictions
+-------------------------------------
+The system will need to have PostgreSQL installed, a few perl modules and have a file system that is accessible to all the analysis nodes. 
+
+Typical usage of III
+--------------------
+User needs to: 
+1. Create xml files that would categorize the different types of collection that would e part of this project (plates, wells, genes, ...) and put them in the FS. 
+2. Transfer images (with the proper xml in the tiff header) to the FS. The images can come from any source as long as they aare the write format. 
+3. Define the analysis jobs in following three steps (see below) but basically if the analysis works directly on images than its a very simple step. 
+
+Thats it. 
+
+What is happening under the hood?
+---------------------------------
+There are two demaon-like process that are running in the background, FS2DB and the JobManager: 
+
+FS2DB.pl - constantly looking for new or modified files and sync them to the DB, 
+JobManager_X.pl - a mechanism to start and manage jobs. There are several types of job managers depending on where the analysis will take plave and what mechanism there is to control the analysis slaves (PVM, SGE, EC2, just a single node...)
+
+
+How to write analysis modules / job types?
+------------------------------------------
+Perhaps the main restriction of III is that all analysis modules must either modify the metadata in some existing files or create new images / collection files using the specified MetaData / CollectionData formats. 
+This means that for matlab based image analysis, all jobs will need to use the MetaData and CollectionData classes. But that's exactly why they exist... 
+
+Defining a new job is requires the following three steps: 
+
+1. Create the executable you want to use and make sure that this executable accepts, if we are in "matlab land" it would probably be a compiled (deployed) code. The executable should be such that it accept a single filename as input argument (see more in step 3). 
+
+2. Decide on what images / collections you want your analysis to be performed and write the appropriate inputquery for it. examples: 
+
+work on all images:
+	SELECT filename from images; 
+work on all plates collections: 
+	SELECT filename from collections JOIN collection_types USING (collection_type_id) 
+                WHERE collection_types.name = 'PLATE'; 
+
+This can get complicated... 
+work on all segmented image that have more then 50 cells in them and
+the average cell size is more then 100: 
+
+	SELECT filename from images JOIN img_qdata USING (img_qdata.id) 
+		WHERE img_type = 'segmented' 
+                  AND img_qdata.type = 'cell_num' 
+                  AND img_qdata.value[0] >= 50
+	INTERSECT 
+	SELECT filename,average(img_qdata.value[0]) as avgcell FROM images 
+	        JOIN img_qdata USING (img_qdata.id) 
+		WHERE img_type = 'segmented'   
+		  AND img_qdata_type = 'cell_area'
+		  AND avg > 100
+		GROUP BY filename;
+
+altough its could be complicated, it specifically defines on which image or collection we are working on. 
+As input, a job can get either a single file name (either an image or collection) of a tmp file with some data. 
+
+"Under the hood" this query will be stored in a VIEW that uses this query but uses an additional: 
+... EXCEPT SELECT filename FROM jobs WHERE job_type_id = 'the-job-type-id' 
+		AND status = 'success'
+
+This way it will keep on running on all files that have not finished running yet (what to do with repeated error, especially if there are other jobs more important?)
+
+3. Determine what inputs does the job need to work on. In most cases this will only be the image/collection file. If this is the case, this file is passed to the analysis job. 
+However, there are cases that the input need to be something else (for example, a set of random 100000 cell area from plate MSA023) this information is not written in the filename itself and is based on relation between our plate (MSA023) to other collections. The way to deal with these special cases is to write a short perl script that will run on the head node, will access the database and create this set. The result would be written in a tmp file and the filename will be passed to the analysis module. 
+
+This might be a bit cumbersome but by seperating the query part from the analysis part we maintain the separation that says that all analysis node have access to the FS but only the head node has access to the DB. 
+
+
+Open design question - stuff to think about:
+============================================
+* What happens if images from unknown collections are avaliable in the FS? 
+* How to define new job types (and do I want to call them ananlysis modules?)
+* How are files transfered to the FS - is it only for the user to solve...? or is there a general importer solution?
+* Filenames - currently they include the full path and this als oprovides the primary key, still debatable...
+* Client to view image? 
+* Error / exception managment? 
+* Library of image analysis functionallity adapted to III system  - do I want to have this as part of III? 
+* Do I really need a trigger for the job_type view? 
+
+
