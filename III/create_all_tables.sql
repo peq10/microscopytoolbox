@@ -173,6 +173,7 @@ CREATE TABLE job_types (
 	id serial primary key, 
 	executable varchar NOT NULL, 
 	-- part II - conditions to create a new job
+        view_name varchar NOT NULL, 
 	run_on_query text NOT NULL, -- this field hold the sql query that defines on whom this job_type should be performed.
                                     -- a trigger on insert will turn it also into a view for ease of use. 
                                     -- the view should have one column named input_id that store a list of input to run on. 
@@ -210,7 +211,6 @@ CREATE TABLE jobs (
 	filename varchar NOT NULL -- this could reference either collections, images filename. This would be the input to inputqryfcn 
 	                          -- in the job_type table
 );
-
 
 ------------------------------------------------
 -- DATABASE DEFINED FUNCTIONS and TRIGGERS------

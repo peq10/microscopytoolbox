@@ -77,7 +77,9 @@ $db=DBI->connect("dbi:Pg:dbname=getDBname()" ,"", "",{AutoCommit => 0,RaiseError
     InsertCollQdata => $db->prepare('INSERT INTO coll_qdata (type,coll,value,label) VALUES (?,?,?,?)'),
     InsertImgQdata => $db->prepare('INSERT INTO img_qdata (type,img,value,label) VALUES (?,?,?,?)'),
     InsertCollFileNameType => $db->prepare('INSERT into collections (filename,name,type) VALUES (?,?,?)'),
-    InsertCollQdataType => $db->prepare('INSERT into coll_qdata_types (name,description) VALUES (?,?)')
+    InsertCollQdataType => $db->prepare('INSERT into coll_qdata_types (name,description) VALUES (?,?)'),
+    SelectAllViewNames => $db->prepare('SELECT view_name,id,executable from job_types'),
+    InsertNewJob => $db->prepare('INSERT into jobs (filename,job_type_id) VALUES (?,?)')
     ) or die "Could not prepare queries";
 }
 
@@ -655,7 +657,42 @@ sub merge2file {}
 package III::Job;
 use III;
 
-sub new {}
+sub new {
+# create a new job based on need from one of the view
+# 1. get the names of all views from the job_types table
+
+my $class=shift;
+
+$Queries{SelectAllViewNames}->execute();
+my $listOfViews = $Queries{CollNameType}->fetchall_arrayref;
+
+my ($filename,$job_type_id,$executable);
+$filename='';
+$_=$filename;
+my $row;
+# loop around all view names
+foreach $row in (@$listOvViews) {
+    $filename=$db->do('SELECT filename from $row[0]') or die $db->errstr;
+    $_=$filename;
+    if ~m// { break;}
+}
+
+# check to see that a filename was found
+# if so create a job entry with $row[1],$row
+
+my $jobTypeId=$row[1];
+my $executable=$row[2];
+
+$Queries{InsertNewJob}->execute($filename,$jobTypeId);
+
+# finish the OO stuff (blessing the reference etc. )
+%job=(job_type_id => $jobTypeId,
+      executable => $executable,
+      filename => $filename);
+
+bless \%job, $class;
+    
+}
 sub updateDB {}
 sub createInputFile {}
 

@@ -79,7 +79,7 @@ As input, a job can get either a single file name (either an image or collection
 
 "Under the hood" this query will be stored in a VIEW that uses this query but uses an additional: 
 ... EXCEPT SELECT filename FROM jobs WHERE job_type_id = 'the-job-type-id' 
-		AND status = 'success'
+		AND status != 'queue'
 
 This way it will keep on running on all files that have not finished running yet (what to do with repeated error, especially if there are other jobs more important?)
 
