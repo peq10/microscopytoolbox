@@ -9,6 +9,7 @@ use Data::Compare;
 use List::Compare;
 use IO::LockedFile;
 use Switch;
+
 #use IO::Uncompress::Bunzip2;
 #use Graph::Easy;
 
@@ -59,8 +60,8 @@ sub connectToDB {
 # outputs: 
 #    ($db) a DBI database handle
 #
-$db=DBI->connect("dbi:Pg:dbname=$Config->{DBname}" ,"", "",{AutoCommit => 0,RaiseError => 0}) or
-        die "Can't connect to $Config->{DBname}: $DBI::errstr";
+$db=DBI->connect("dbi:Pg:dbname=getDBname()" ,"", "",{AutoCommit => 0,RaiseError => 0}) or
+        die "Can't connect to getDBname(): $DBI::errstr";
 # prepare the statement handles hash
 %Queries=(
     CollNameType => $db->prepare('SELECT filename,name,type FROM collections WHERE filename= ?'),
@@ -109,13 +110,10 @@ sub parseConfigFile {
 #    ($Config) a ref for hash
 #
 # Hash keys are: 
-#   SourceFolder - where to move images from 
-#   TargetFolder - where to put images in (root folder)
+#   DataRootFolder - where to put images in (root folder)
 #   DBname       - database name
 #   verbose      - determine level of output (currently has only 1 and 0 levels)
-#   checkMount   - should the ImportManager check to see if SourceFolder is mounted properly
-#   mountCommand - what to execute to mount the source folder
-#
+#   
 # Basically it just parses the file lines that must be XXX=YYY such that XXX is the Key and YYY is the value
 #
     open(FIN,$_[0]) or die "Couldn't open filename $_[0]\n";
@@ -129,11 +127,12 @@ sub parseConfigFile {
     return $Config;
 }
 
+sub getDBname { return $Config->{DBname}; }
+sub getDataRootFolder { return $Config->{DataRootFolder}; }
+sub getVerbose { return $Config->{verbose};}
 sub compress {}
 sub deompress {}
-sub isCompressed {}
-sub ListNewFiles {}
-sub Sleep {}
+sub isCompressed { return 0; } # for now, nothing is compressed....
 
 ############ Class that defines the behavior of Qdata data type ##########
 package III::Qdata;
