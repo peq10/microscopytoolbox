@@ -183,6 +183,8 @@ CREATE TABLE job_types (
                         -- for the job, it should be an execulable that runs on the head-node and gets as input
                         -- the input_id from the jobs table. 
                         -- If Null - than the filename is provided as input without any other arguments (including argv)
+        run_times integer DEFAULT 1,
+        max_simultanious_nodes DEFAULT 1
 );
 
 -- Legal Job status
@@ -203,13 +205,17 @@ INSERT INTO job_status (status) values ('queue');
 CREATE TABLE jobs (
 	id serial primary key, 
 	job_type_id integer references job_types (id) NOT NULL, 
-	added timestamp DEFAULT CURRENT_TIMESTAMP,
-	started timestamp,
-	finished timestamp, 
 	status varchar references job_status (status) DEFAULT 'queue' NOT NULL, 
 	errormsg text,
 	filename varchar NOT NULL -- this could reference either collections, images filename. This would be the input to inputqryfcn 
 	                          -- in the job_type table
+);
+
+CREATE TABLE job_log (
+    id serial primary key,
+    job_id integer references jobs (id) NOT NULL,
+    status varchar NOT NULL,
+    time timestamp DEFAULT CURRENT_TIMESTAMP,
 );
 
 ------------------------------------------------

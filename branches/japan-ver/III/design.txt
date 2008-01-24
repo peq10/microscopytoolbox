@@ -1,4 +1,4 @@
-Some thought about III system
+Some thought about III system 
 ===============================
 
 III - the meaning of the name
@@ -78,7 +78,7 @@ altough its could be complicated, it specifically defines on which image or coll
 As input, a job can get either a single file name (either an image or collection) of a tmp file with some data. 
 
 "Under the hood" this query will be stored in a VIEW that uses this query but uses an additional: 
-... EXCEPT SELECT filename FROM jobs WHERE job_type_id = 'the-job-type-id' 
+... EXCEPT ALL SELECT filename FROM jobs WHERE job_type_id = 'the-job-type-id' 
 		AND status != 'queue'
 
 This way it will keep on running on all files that have not finished running yet (what to do with repeated error, especially if there are other jobs more important?)
@@ -88,16 +88,29 @@ However, there are cases that the input need to be something else (for example, 
 
 This might be a bit cumbersome but by seperating the query part from the analysis part we maintain the separation that says that all analysis node have access to the FS but only the head node has access to the DB. 
 
+A few design remarks
+====================
+
+Class structure
+---------------
+There are 4 classes in the III package, out of which Qdata is a "private" accessory class so no need to worry about it. 
+MD and CD classes are basically very similar, they hold the data in a datastructure, havd a get/set/add to manipulate the data. in addition there are two important methods "sync" synchronizes the data between the object and the database and as needed another objects on the FS. merge2file updates any changes done to the object to file without deleting other changes that might happened to this file since it was loaded to memory. 
+JobQueue is the job manager tool, 
+Comments on some module behaviour
+---------------------------------
+q: What happens if images from unknown collections are avaliable in the FS? 
+a: It should create the skeleton collection for you when syncing the image. Since lateron the collection would be merged2file anyway there is no real danger for it to already exist. Better have a palceholder then nothing. 
+
+
 
 Open design question - stuff to think about:
 ============================================
-* What happens if images from unknown collections are avaliable in the FS? 
-* How to define new job types (and do I want to call them ananlysis modules?)
+* How to define new job types (and do I want to call them ananlysis modules?). Do I really need a trigger for the job_type view? or would the core that would parse a new job defenition would create the view for me. 
 * How are files transfered to the FS - is it only for the user to solve...? or is there a general importer solution?
 * Filenames - currently they include the full path and this als oprovides the primary key, still debatable...
 * Client to view image? 
-* Error / exception managment? 
+* Error / exception managment, especially with jobs, if an error acured do we start the job again? report it? what?
 * Library of image analysis functionallity adapted to III system  - do I want to have this as part of III? 
-* Do I really need a trigger for the job_type view? 
+
 
 
