@@ -1,12 +1,7 @@
-function plotPlannedSchedule(rS,fig)
+function plotPlannedSchedule(rS)
 %PLOTPLANNEDSCHEDULE Summary of this function goes here
 %   Detailed explanation goes here
 
-if ~exist('fig','var')
-    fig=figure;
-end
-
-figure(fig);
 TskNonExec=getTasks(rS,'status','inqueue');
 [x,y,id]=get(TskNonExec,'stagex','stagey','id');
 if iscell(x)

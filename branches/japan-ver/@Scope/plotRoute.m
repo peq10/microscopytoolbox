@@ -1,17 +1,9 @@
-function plotRoute(rS,fig)
+function plotRoute(rS)
 %PLOTPLANNEDSCHEDULE Summary of this function goes here
 %   Detailed explanation goes here
 
-if ~exist('fig','var')
-    fig=figure;
-end
-
-
-
 allsym='^<>vdh*h+o.sph';
 
-
-figure(fig)
 cla
 tb=getTasks(rS,'status','executed');
 [X,Y,T,typ]=get(tb,'stagex','stagey','planetime','fcnstr');
