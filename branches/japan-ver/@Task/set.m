@@ -6,6 +6,7 @@ if numel(Tsk)~=1
 end
 
 %% load the list of MetaDataAttributes from file
+% UGLY PROGRAMMING !!!!
 persistent MetaDataAttributes;
 if isempty(MetaDataAttributes)
     MetaDataAttributes=textread(['@Task' filesep 'MetaDataAttributes'], '%s');

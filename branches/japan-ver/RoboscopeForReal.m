@@ -7,24 +7,24 @@ catch
 end
 % clear persistent variables
 clear functions
+close all 
 
-delete(get(0,'Children')) % a more aggressive form of close (doesn't ask for confirmation)
 ScopeConfigFileName='MM_Roboscope.cfg';
 
 Red=struct('Number',1,'ChannelName','TRITC', 'Content','');
-Green=struct('Number',1,'ChannelName','FITC', 'Content','');
+Green=struct('Number',2,'ChannelName','FITC', 'Content','');
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)
 if ~strcmp(class(rS),'Scope')
     rS=Scope(ScopeConfigFileName);
 end
+
 initFocalPlane(rS);
 removeTasks(rS,'all');
-set(rS,'rootfolder','C:\RawData\RoboData6');
-set(rS,'PFS',1,'refreshschedule',10);
+set(rS,'rootfolder','C:\RawData\RoboData6',...
+       'PFS',1,'refreshschedule',10);
 warning('off','MATLAB:divideByZero');
-warning off
 gotoOrigin(rS)
 addpath ImageAnalysis
 disp('Scope initialized');
@@ -102,35 +102,6 @@ removeTasks(rS,'all');
 set(rS,'schedulingmethod','greedy');
 addTasks(rS,Tsk);
 
-
-%% set up status figures
-plotPlannedSchedule(rS,1)
-figure(1)
-set(1,'position',[10   597   350   309],...
-    'Toolbar','none','Menubar','none','name','Throopi''s route');
-hold on
-
-figure(2)
-set(2,'position',[ 10   246   350   309],...
-    'Toolbar','none','Menubar','none','name','Focal Plane');
-
-plotFocalPlaneGrid(rS);
-
-figure(3)
-subplot('position',[0 0 1 1])
-set(3,'position',[  380   348   894   627],...
-    'Toolbar','none','Menubar','none','name','Focal Plane');
-
-figure(4)
-set(4,'position',[ 10    40   364   169],...
-    'Toolbar','none','Menubar','none','name','Task Status');
-
-figure(5)
-set(5,'position',[ 380    40   483   173],...
-    'Toolbar','none','Menubar','none','name','Task Status');
-
-% call the memory monitor - you can enable logging there if u want to...
-mm;
 %% MechTurk part
 
 for i=1:20

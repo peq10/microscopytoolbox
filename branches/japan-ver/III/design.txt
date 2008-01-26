@@ -95,11 +95,21 @@ Class structure
 ---------------
 There are 4 classes in the III package, out of which Qdata is a "private" accessory class so no need to worry about it. 
 MD and CD classes are basically very similar, they hold the data in a datastructure, havd a get/set/add to manipulate the data. in addition there are two important methods "sync" synchronizes the data between the object and the database and as needed another objects on the FS. merge2file updates any changes done to the object to file without deleting other changes that might happened to this file since it was loaded to memory. 
-JobQueue is the job manager tool, 
+
+JobQueue is the job manager tool, it provides an abstract class structure and a few methods of interest. It is planned to have the following classes which would provide lots of ways to crunch numbers: 
+
+JobQueue::Local (use threads and call executables)
+JobQueue::Matlab (use threads and the Math::Matlab module)
+JobQueue::PVM  (use Parallel::PVM to run in a cluster with a signle submission) 
+JobQueue::SGE (use Schedule::SGE for the queue)
+JobQueue::EC2 (using Net::Amazon::EC2) 
+
+Each of these classes would submit the jobs differently and run the check their status. They all share same charachteristics such that: 1. The "head node" has access to the DB. 2. All nodes have access to the file system
+
 Comments on some module behaviour
 ---------------------------------
 q: What happens if images from unknown collections are avaliable in the FS? 
-a: It should create the skeleton collection for you when syncing the image. Since lateron the collection would be merged2file anyway there is no real danger for it to already exist. Better have a palceholder then nothing. 
+a: It should create the skeleton collection for you when syncing the image. Since later on the collection would be merged2file anyway there is no real danger for it to already exist. Better have a palceholder then nothing. 
 
 
 

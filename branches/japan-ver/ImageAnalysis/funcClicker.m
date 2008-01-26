@@ -1,12 +1,13 @@
-function [PlausiblyProphase,msg]=funcClicker(img,fig)
+function [PlausiblyProphase,msg]=funcClicker(img,param,fig)
 
 %% paramters
 % used to create the freq filters
-fCentCutoffs=[0.075 0.1];
 fCellCutoffs=[0.01 0.05];
+fCentCutoffs=[0.075 0.1];
+
 ordr=3;
 
-CentThresh=0.02;
+CentThresh=param;
 
 minCentSize=4;
 RadiusMultiply=1.5;
@@ -143,7 +144,7 @@ drawnow
 
 %% plotting
     function plotCurrnetStatus(varargin)
-        if exist('fig','var')
+        if exist('fig','var') && ~isempty(fig) && fig>0
             figure(fig)
             hold on
             if sum(strcmp(varargin,'circles'))
@@ -160,8 +161,8 @@ drawnow
                     end
                 end
             end
+            set(fig,'name',msg);
         end
-        set(fig,'name',msg);
     end % of nested function plot...
 
 %%

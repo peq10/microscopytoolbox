@@ -30,17 +30,19 @@ catch
     error('An error occured when loading devices - rS is not a functional Roboscope!');
 end
 
-%% This is the stage/autofocus hacks
+%% names of devices in the configuration file. 
 rS.XYstageName='XY-Stage';
 rS.ZstageName='Z-Stage';
-rS.COM='COM2'; %the focus port
+rS.COM='COM2'; %the focus port for ASI 
+rS.OBJName='OBJ'; % the GroupConfig for the objectives
+rS.ChannelName='Channel';
 
 %% Additional properties not part of Stage or MMC:
 % task ID
 rS.taskID=0;
 
-%root folder
-rS.rootFolder='D:\GiardiaDataBuffer';
+%root folder - defaults is current 
+rS.rootFolder='./';
 
 % resolve error - default is yes
 rS.resolveErrors=true;
@@ -53,7 +55,15 @@ rS.schedulingMethod='greedy';
 
 % the last image captured, only saving that one (but could be a 3 channel
 % image as well...
-rS.lastImage=0;
+rS.lastImage=[];
+
+% create the defaults plots
+Plots={'planned schedule',1,[10   597   350   309];
+       'focal plane',2,[10   246   350   309];
+       'image',3,[380   348   894   627];
+       'task schedule',4,[ 10    40   364   169];
+       'task status',5,[ 380    40   483   173]};
+rS.plotInfo=cell2struct(Plots,{'type','num','position'},2);
 
 % the task buffer and schedule (the schedule carry the task id in the right order)
 rS.TaskBuffer=[];
@@ -67,24 +77,6 @@ rS.FocusPointHistory=1/1440; %Number of days that are used in the updateFocalPla
 rS.FocusPointProximity=10; %the distance of points for which the history is relevant
 rS.FocalPlaneGridSize=25;
 
-% a flag to note whether scope is currently executing tasks
-rS.isRunning=false;
-
-% the handle for the statusbar
-rS.statusBarHandle=[];
-%Current Objective - TODO: get objective name from mmc config file. 
-% if value was not supplied, ask the user
-% if ~exist('ObjectiveLbl','var')
-%     
-%     disp('What Objective are you using?, please tell');
-%     disp('==========================================');
-%     disp('1 - Nikon 40X Plan Apo')
-%     disp('2 - Nikon 20X Plan Fluor DIC')
-%     disp('3 - Nikon 20X Plan Fluor')
-%     disp('4 - Nikon 10X Plan Fluor')
-% 
-%     ObjectiveLbl=input('Please chose a number (1/2/3/4)');
-% end
 % % set it in mmc
 % rS.mmc.setState('Objective',ObjectiveLbl);
 
