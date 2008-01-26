@@ -20,6 +20,7 @@ MinAxisRationForSplot=0.75;
 
 MergeDistance=50;
 
+%% regionprops features
 features={'ConvexArea','ConvexHull','ConvexImage',...
     'BoundingBox','MajorAxisLength','MinorAxisLength',...
     'FilledImage','Image','PixelIdxList'};

@@ -16,7 +16,7 @@ end
 curr_xy=rS.FocusPoints(:,1:2)';
 D=distance(curr_xy,[x; y]);
 T=(t-rS.FocusPoints(:,4));
-ix=find((D>rS.FocusPointProximity).*(T<rS.FocusPointHistory)); 
+ix=find((D>get(rS,'FocusPointsProximity')).*(T<get(rS,'FocusPointsHistory'))); 
 rS.FocusPoints(ix,5)=0; %#ok<FNDSB>
 
 % add current point

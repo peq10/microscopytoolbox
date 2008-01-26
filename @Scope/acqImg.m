@@ -1,12 +1,14 @@
-function img = acqImg(rS,Channel,Exposure)
+function img = acqImg(rSin,Channel,Exposure)
 %ACQIMG captues an image based on current acqDetails and enters it to DB
 %   img=acqImg(rS,chnls,exposuretime)
 %   rS        - the roboscope object
 %   Channel   - the channel to image a cell array of strings
 %   Exposure:  - the exposure time for all channels (a double array)
 
+global rS;
+rS=rSin;
+
 [w,h,bd]=get(rS,'Width','Height','BitDepth');
-crnt_chnl=get(rS,'channel');
 
 % if no exposure settings, use current rS setting
 if ~exist('Channel','var')
@@ -32,6 +34,6 @@ for i=1:n
     img(:,:,i)=reshape(single(imgtmp)./(2^bd),w,h)';
 end
 
-% set(rS,'channel',crnt_chnl);
+set(rS,'lastimg',img);
 
 

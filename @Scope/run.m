@@ -1,5 +1,7 @@
 function  run( rSin )
-%RUN all tasks in TaskSchedule
+%RUN all tasks in TaskSchedule acording their order. 
+% 
+% Exception handling - if error occur during a 
 
 global rS;
 rS=rSin;
