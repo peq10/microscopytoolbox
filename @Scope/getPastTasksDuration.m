@@ -1,6 +1,6 @@
 function [durVector,fncStrUnq]=getPastTasksDuration(rS)
 % calcualtes the vector of all past duration by type
-% returns two cell array - one with cevtor of durations (DAYS units!!!
+% returns two cell array - one with cevtor of durations (DAYS units!!!)
 % other is function names
 
 fncStrUnq={};
