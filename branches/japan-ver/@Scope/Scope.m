@@ -1,9 +1,10 @@
 function rS = Scope(config_file)
-%SCOPE Constuctor of the Score class
-%   rS = Scope( config_file,objective,varargin )
-%   
-%   config_file goes directly to mmc for configuration and initialization
-%   objective determine the pixel size
+% Scope Constuctor of the Scope class
+% creates a rS object based on the config file. If no config file is
+% supplied, it create the Micro-Manager GUI which asks for the config file.
+%
+% All devices etc must be configured in the MMC config_file
+
 
 %% Here we initialize the MMC core part of rS
 % if config file is empty - start witht he GUI otherwise
@@ -25,7 +26,7 @@ try
     rS.mmc.loadSystemConfiguration(config_file);
 catch
     rS.mmc.unloadAllDevices;
-    rS=[];
+    rS=[]; %#ok<NASGU>
     uiwait(msgbox('An error occured during device loading - please close MM, correct the hardware problema and try again'))
     error('An error occured when loading devices - rS is not a functional Roboscope!');
 end
@@ -100,9 +101,4 @@ rS=class(rS,'Scope');
 %% add path - "Plug-in" folders
 addpath TaskFcns
 addpath SchedulerFcns
-
-%% Other toolboxes
-% addpath 
-
-
 

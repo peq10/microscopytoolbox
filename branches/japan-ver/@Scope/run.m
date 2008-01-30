@@ -1,7 +1,15 @@
 function  run( rSin )
-%RUN all tasks in TaskSchedule acording their order. 
+% run : performs all tasks in TaskSchedule acording their order. 
+%    The main functionality here is just to go over all tasks 
+%    using getTasks(rS,'next'). 
+%    Beside that it also manages rS behaviour that is related to schedule
+%    refresh (when the schedule is reclaculted every N tasks. 
+%    Also if get(rS,'resolveErrors') is true it tries to resolve the error
+%    using its private function resoveErrors. Currently only mmc and memory
+%    related error are recoverable. 
 % 
-% Exception handling - if error occur during a 
+% example: 
+%           run(rS)
 
 global rS;
 rS=rSin;
@@ -16,7 +24,6 @@ while ~isempty(rS.TaskSchedule)
         cnt=0;
     end
     Tsk=getTasks(rS,'next');
-%     updateStatusBar(rS,0)
     if ~isempty(Tsk)
         if get(rS,'resolveErrors')
             try
@@ -49,22 +56,21 @@ while ~isempty(rS.TaskSchedule)
 end
 
 function resolveError(err)
-% this subfunction 
+% this subfunction tries to resolve the error based on what it was. 
+% if it is MMC related it unloads and load devices. 
+% if it is memory - closes all figures and only keep rS
+
 global rS;
 
-%% try to recover from MM errors by unloading and loading all
+%% try to recover from MM errors by unloading and loading all devices
 % devices, than give it another shot.
-if~isempty(findstr(err,'mmcorej'))
-    unload(rS);
-    loadDevices(rS);
+if ~isempty(findstr(err,'mmcorej'))
+    unload(rS,'config.dump');
+    loadDevices(rS,'config.dump');
 end
 
 %% try to recover from memory error by unloading packing and reloading mmc
 if ~isempty(findstr(err,'memory'))
-    unload(rS);
-    rS.mmc=[];
-    pack('packfile.mat');
-    import mmcorej.*;
-    rS.mmc=CMMCore;
-    rS.mmc.loadSystemConfiguration('MM_Roboscope.cfg');
+    close all
+    keep rS
 end

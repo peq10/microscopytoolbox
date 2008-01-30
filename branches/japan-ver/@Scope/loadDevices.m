@@ -1,5 +1,7 @@
-function loadDevices(rS)
-%LOADDEVICES Summary of this function goes here
-%   Detailed explanation goes here
+function loadDevices(rS,config_file)
+% loadDevices :  loads all the devices based on conig_file
+%   basically passes this config_file into mmc
+%
+% example: loadDevices(rS,'config.dump')
 
-rS.mmc.loadSystemConfiguration('MM_Roboscope.cfg');
+rS.mmc.loadSystemConfiguration(config_file);
