@@ -1,5 +1,5 @@
 function [Tsks,indx] = getTasks( rS,property,value )
-%GETTASKS from rS that have specfic value for each property
+% getTasks : retrives Tasks from rS that have specfic value for each property
 % if property is an cell array, than value must be a cell array as well and
 % in that case the returned Tasks are ones that have ALL the propery value
 % pairs.
@@ -7,12 +7,12 @@ function [Tsks,indx] = getTasks( rS,property,value )
 % Note: Value are only allowed to be scalars (either char of numeric)
 % others will be ignored
 %
-% to special cases are the 'all' and 'next', all returns them all, and next
+% two special cases are the 'all' and 'next', all returns them all, and next
 % return the next task from the scheduer
 %
 % examples:
-% [Tsk,id]=getTasks(rS,'status','executed')
-% [Tsk,id]=getTasks(rS,{'status','fncstr'},{'executed','acq_simple'})
+%          [Tsk,id]=getTasks(rS,'status','executed')
+%          [Tsk,id]=getTasks(rS,{'status','fncstr'},{'executed','acq_simple'})
 
 % check if its empty
 if isempty(rS.TaskBuffer)

@@ -1,5 +1,8 @@
 function autofocus(rSin,updateFocalPlaneGridFlag)
 % rS autofocus based on rS currnet properties
+%
+% TODO: need a complete re-write based and move to using only MMC autofocus
+% devices. 
 
 % to use the global rS
 global rS;

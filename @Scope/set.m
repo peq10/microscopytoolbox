@@ -1,6 +1,10 @@
 function set(rSin, varargin)
-%SET sets rS internal properties. 
-% call set(rs) for list of arguments
+% set : changes the attributes of the Scope object rS
+%   for details on what the properties are see doc 
+%   it can change multiple attributes in the same call
+%
+% example: 
+%          [fldr,xpos,pfson]=get(rS,'rootFolder','x','pfs')
 
 global rS;
 rS=rSin;

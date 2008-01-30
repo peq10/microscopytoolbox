@@ -8,7 +8,9 @@ global rS;
 rS=rSin;
 
 %% get info about tasks in buffer
-[durVector,fncStrUnq]=getPastTasksDuration(rS);
+PastTasks=getPastTasksDuration(rS);
+durVector=PastTasks.durVector;
+fncStrUnq=PastTasks.fncStrUnq;
 
 NonExecTasks=getTasks(rS,'status','inqueue');
 % get the IDs,x,y of all non-executed tasks. 
@@ -37,6 +39,13 @@ end
 schedulerFcn = str2func(get(rS,'schedulingMethod')); 
 
 %% run this function
+
+% construct the schedule data struct
 [xCurrent,yCurrent]=get(rS,'x','y');
-rS.TaskSchedule=schedulerFcn(x,y,t,id,xCurrent,yCurrent,duration,now);
+schdle_data=struct('x',x,'y',y,'t',t,'id',id,...
+               'xCurrent',xCurrent,'yCurrent',yCurrent,...
+               'tCurrent',now,'duration',duration);
+           
+% call the scheduler function with stuct as input
+rS.TaskSchedule=schedulerFcn(schdle_data);
 

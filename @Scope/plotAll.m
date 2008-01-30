@@ -1,4 +1,15 @@
 function plotAll(rS)
+% plotAll updates all figures as configured in plotInfo attribute
+%    there are several types of plots that rS know how to generate. Which
+%    one is ploted, its figure number and position is determined using the
+%    plotInfo attribute (use set/get). 
+% 
+% plotAll is basically the aggregator of all the private plotting function.
+% It is possible to also set manually the configuration and save it using
+% set(rS,'plotInfo','current'). 
+% 
+% example: 
+%         plotAll(rS)
 
 plotInfo=get(rS,'plotInfo');
 

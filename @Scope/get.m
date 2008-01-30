@@ -1,12 +1,47 @@
-function varargout = get(rS,varargin)
-%GET properties of the Score object rS
-%   for details on what the properties are see developer guide. 
+function varargout = get(rSin,varargin)
+% get : retrives the attributes of the Scope object rS
+%   for details on what the properties are see doc 
+%   can retrive multiple attributes in the same call
+%
+% example: 
+%          [fldr,xpos,pfson]=get(rS,'rootFolder','x','pfs');
+
+% this trick make sure rS is updated 
+% notice that rSin MUST be the same global rS object. 
+global rS;
+rS=rSin;
 
 varargout={};
 % get: 
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'pasttimeduration' % a struct with two fileds, fncStrUnq which contains a cell arrya of all past tasks acqFcn amd a durVector which contain the average time it took to perform that task. 
+            
+            PastTasks.fncStrUnq={};
+            PastTasks.durVector={};
+
+            % get past tasks
+            ExecTsks=getTasks(rS,'status','executed');
+            if isempty(ExecTsks)
+                return
+            end
+
+            % get past tasks names and durations
+            [fncStr,AllDuration]=get(ExecTsks,'fcnstr','duration');
+            if iscell(AllDuration)
+                AllDuration=[AllDuration{:}];
+            end
+            if ~iscell(fncStr)
+                fncStr={fncStr};
+            end
+            PastTasks.fncStrUnq=unique(fncStr);
+            for ii=1:length(PastTasks.fncStrUnq)
+                PastTasks.durVector{ii}=AllDuration(ismember(fncStr,PastTasks.fncStrUnq{ii}));
+            end
+        case 'newtaskid' % a new Task id (each task has a unique id number)
+            rS.taskID=rS.taskID+1;
+            varargout=[varargout; {rS.taskID}];
         case 'plotinfo' % a struct that describes what ploting the plotAll methods should create. The struct have the following fields: 'type','num','positoin'. For more details check help plotAll
             varargout=[varargout; {rS.plotInfo}];
         case 'resolveerrors'  % a binary flag that determines whether Roboscope run mode, if true (default) rS will try to resolve errors (by clearing, initializing hardware components etc) 

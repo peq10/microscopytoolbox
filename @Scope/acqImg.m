@@ -1,9 +1,17 @@
 function img = acqImg(rSin,Channel,Exposure)
-%ACQIMG captues an image based on current acqDetails and enters it to DB
-%   img=acqImg(rS,chnls,exposuretime)
+% acqImg : performs image acquisition 
+% captues a (multichannel) image based on Channel / Exposure arguments.
+% 
+% sets the channel and exposure for each channel  
 %   rS        - the roboscope object
 %   Channel   - the channel to image a cell array of strings
 %   Exposure:  - the exposure time for all channels (a double array)
+%   img - a 3D matrix where size(img,3)==length(Channels)
+%  
+% example: 
+%          img = acqImg(rS,'FITC',100) 
+%          img = acqImg(rS,{'FITC','Cy3'},{300,100})
+%          img = acqImg(rS)
 
 global rS;
 rS=rSin;
