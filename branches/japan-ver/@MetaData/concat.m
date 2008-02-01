@@ -15,11 +15,10 @@ function md = concat( mdarray )
 
 % TODO: What should happen to Qdata on a merges? right now its getting the last one, I don't really like it
 
-%% get the metadata out of the mdarray WHY WHAT IS THIS GOOD FOR? When I
-%TODO find out where matlab polymorphism sucked and comments here....
-
+%% get the metadata out of the mdarray.
 % this is because OO programing in matlab is not perfect
-% it doesn't do polymorphism properly
+% it doesn't do polymorphism properly. I think it because some problems I
+% had with writeTiff
 if ~strcmp(class(mdarray),'MetaData')
     mdarray=get(mdarray,'metadata');
     mdarray=[mdarray{:}];
@@ -52,8 +51,8 @@ acqTime=[acqTime{:}];
 [bla,ind]=sort(acqTime);
 newmdarray=newmdarray(ind);
 
-%% Create the concatenated one. 
-md=mdarray(end); 
+%% Create the concatenated MetaData md object. 
+md=mdarray(end); % use last object, that where its getting most of its attributes from. 
 md.TimePoint=[newmdarray(:).TimePoint];
 
 

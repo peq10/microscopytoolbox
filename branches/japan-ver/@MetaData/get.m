@@ -93,6 +93,7 @@ for i=1:length(varargin)
         case 'stagez' % Returns the Z-position of the stage when the image was captured. Uses method for input reduction, see Binning attribute for details.  rules. 
             cl_in=str2arr({md.TimePoint(:).StageZ});
             varargout{i}=reduceInput(cl_in);
+        case 'channelidx' %TODO: add channelidx for each timepoint
             
         case 'acqtime' % A list of the acquisition timepoints. Units are in Matlab's numeric date number internal representation is in datestr(now,0)
             varargout{i}=datenum({md.TimePoint(:).AcqTime}); 
