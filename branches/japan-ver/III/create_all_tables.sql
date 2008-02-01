@@ -79,7 +79,10 @@ CREATE TABLE img_types (
 );
 
 --
--- Examples of few image types 
+-- every matrix with data in it is an image!
+-- (including edge detection, binary masks, labeled images etc.)
+-- the database supports them all under a single table, 
+-- therfore there is the img_types to tell them apart
 --
 INSERT into img_types (name,description) values ('raw','straight from the scope...'); 
 INSERT into img_types (name,description) values ('raw 3D-XYC','straight from the scope...'); 
@@ -87,6 +90,8 @@ INSERT into img_types (name,description) values ('raw 4D-XYCZ','straight from th
 INSERT into img_types (name,description) values ('raw 5D-XYCZT','straight from the scope...'); 
 INSERT into img_types (name,description) values ('gallery','a collection of cells');
 INSERT into img_types (name,description) values ('cell','an image of a single cell'); 
+INSERT into img_types (name,description) values ('edge','edge detection');
+INSERT into img_types (name,description) values ('label','labeled image'); 
 
 --
 -- an image is a matrix ([2-5]D) with its metadata
@@ -100,21 +105,28 @@ CREATE TABLE images (
 	dim_order char(5),
 	dim_size numeric[3],
 	pix_type varchar,
-	pix_size numeric[3],
-	creation_date timestamp,
+	pix_size numeric[3], --- always x y z
+	creation_date timestamp, -- when the image was first saved to disk
+        last_modified timestamp, -- when the image was last modified
 	description text,
 	channel_num integer DEFAULT 1 NOT NULL,
 	channel_names varchar[],
-	channel_contents text[],
-	stage_x numeric[][][],
-	stage_y numeric[][][],
-	stage_z numeric[][][],
-	plane_time numeric[][][],
-	exposure_time numeric[][][],
-	binning numeric[][][],
+	channel_description text[],
 	img_height numeric, --- This is the height if binning was 1, real height is height/binning no need to save this twice...
 	img_width numeric  --- same with width... 
 	
+);
+
+-- a table to store the metadata of the image for each timepoints
+CREATE TABLE timepoints (
+        id serial PRIMARY KEY,
+	img varchar REFERENCES images(filename) NOT NULL,
+	acq_time time,
+	stage_x numeric[][],
+	stage_y numeric[][],
+	stage_z numeric[][],
+	exposure_time numeric[][],
+	binning numeric[][],
 );
 
 -- create a many-many relation between images and collections 
@@ -127,10 +139,7 @@ CREATE TABLE img_X_coll (
 
 	
 --
--- every matrix with data in it is an image!
--- (including edge detection, binary masks, labeled images etc.)
--- the database supports them all under a single table, 
--- therfore there is the img_data_types to tell them apart
+-- 
 --
 CREATE TABLE img_qdata_types (	
 	name varchar primary key,
@@ -148,6 +157,18 @@ CREATE TABLE img_qdata (
 	label text
 );
 
+CREATE TABLE timepoint_qdata_types (
+	name varchar primary key,
+	description varchar
+);
+
+CREATE TABLE timepoint_qdata (
+        id serial PRIMARY KEY,
+	type varchar references timepoint_qdata_types(name) NOT NULL,
+	timepoint_id integer references timepoints(id) NOT NULL,
+        value numeric[] NOT NULL, 
+	label text
+);
 
 
 --------------------------------------------------------------

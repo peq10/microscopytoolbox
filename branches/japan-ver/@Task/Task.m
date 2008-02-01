@@ -1,10 +1,14 @@
-function Tsk = Task(md,fcn,UserData)
+function Tsk = Task(md,fcn)
 %TASK Constructor of the Task class
 %   Where (n is the number iof Tasks to create):
 %
-%  md  -  a MetaData object (basically the base class object)
+%  md  -  a MetaData object (basically the base class object) if empty uses
+%         metadata default values. 
 %  fcn -  str or fcn_handle of the actual task execution job
-%  UserData - optional user data that will be accessed.                                                   
+%
+% example: 
+%           Tsk=Task([],'acq_simple')
+ 
 global rS;
 
 %% check if MetaData is supplied
@@ -46,13 +50,13 @@ end
 %% create the Tsk struct
 
 % get the ID from the rS object
-Tsk.id=getNewTaskIDs(rS);
+Tsk.id=get(rS,'NewTaskID');
 
 % get function handles
 Tsk.fcn=fcn;
 
 % run time: acqTime and stageMoveTime and fucosTime
-Tsk.acqTime=10/86400; %default value for a task duration is 10 sec
+Tsk.duration=10/86400; %default value for a task duration is 10 sec
 Tsk.waitTime=0; % the time we waited for this Task to start
 
 % z-shift where to image - can have either scalar or array with number of

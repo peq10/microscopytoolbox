@@ -1,8 +1,18 @@
 function Tsk=do(Tsk)
-% DO the task
+% do : perform the Task (e.g. runs tskfcn when it should)
 %     basically runs the fcn with the Tsk as input
-
-global rS;
+%     before that it waits if needed based on the task time. Also if task
+%     is overdue and has LateBehaviour drop, its ignored. In the end it
+%     updates the Tsk attributes, wait_time and duration in addition to
+%     whatever was changed in the task function. Tsk is then returned to
+%     sender so it could be replaced with its new copy. 
+%
+%     In most cases, do is called via he Roboscope run method, but it is
+%     possible to run Tasks outside the schedule but just calling the do
+%     method. 
+%
+% example: 
+%          do(Tsk); 
 
 if isempty(Tsk)
     error('cannot do an empty task - what do you think I am?');

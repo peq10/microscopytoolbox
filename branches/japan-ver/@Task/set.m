@@ -1,58 +1,65 @@
 function Tsk = set(Tsk, varargin )
-%SET method for the Task class
+% set : changes retrives the attributes of the Tsk (Tsk must be a single
+%      element). Task attributes are all the MetaData attributes (since Task inherites
+%       from MetaData) and a few additional ones. See HTML docs for details. 
+% 
+%
+% example: 
+%           Tsk=set(Tsk,'waittime',12)
 
 if numel(Tsk)~=1
     error('Can only set a single Task at a time');
 end
 
-%% load the list of MetaDataAttributes from file
-% UGLY PROGRAMMING !!!!
+%% get the list of MetaDataAttributes from its get/set methods
+
 persistent MetaDataAttributes;
 if isempty(MetaDataAttributes)
-    MetaDataAttributes=textread(['@Task' filesep 'MetaDataAttributes'], '%s');
+    attrib=getClassAttributes('@MetaData');
+    MetaDataAttributes={attrib.name};
+    % don't allow read only properties
+    MetaDataAttributes=MetaDataAttributes(~ismember({attrib.input},'READONLY'));
 end
 
 %% Set the calues
 for i=1:2:length(varargin)
     switch lower(varargin{i})
-        case 'waittime'
+        case 'waittime' % units of DAYS
             Tsk.waitTime=varargin{i+1};
-        case 'duration'
-            Tsk.acqTime=varargin{i+1};
-        case 'timedependent'
+        case 'duration' % units of DAYS
+            Tsk.duration=varargin{i+1};
+        case 'timedependent' % logical (will be converted)
             Tsk.timedep=logical(varargin{i+1});
-        case 'tskfcn'
-            switch class(varargin{i+1})
-                case 'char'
-                    varargin{i+1}=str2func(varargin{i+1});
-                case 'function_handle'
-                    % check to make sure its only one
-                    if numel(varargin{i+1})~=1
-                        error('You must supply only a single function handle');
-                    end
-                otherwise
+        case 'tskfcn' % could be either string or a single function handle
+            if ischar(varargin{i+1})
+                varargin{i+1}=str2func(varargin{i+1});
+            elseif strcmp(class(varargin{i+1}),'function_handle')
+                % check to make sure its only one
+                if numel(varargin{i+1})~=1
+                    error('You must supply only a single function handle');
+                end
+            else
                     error('Function handle must be supplied either as a string or a function handle!');
             end
             Tsk.fcn=varargin{i+1};
-        case 'latebehavior'
+        case 'latebehavior' % a string, must be either {'do','drop'} default is 'do'
             if sum(ismember(varargin{i+1},{'do','drop'}))==0
                 error('Can only set LateBehavior to DO or DROP !!');
             end
             Tsk.LateBehavior=varargin{i+1};
-        case 'stagemovetime'
-            Tsk.stageMoveTime=varargin{i+1};
-        case 'focustime'
-            Tsk.focusTime=varargin{i+1};
-        case 'status'
+        case 'status'% a string, must be either {'inqueue','executed','error'} default is 'do'
             Tsk.status=varargin{i+1};
-        case 'userdata'
+        case 'userdata' % anything you want :)
             Tsk.UserData=varargin{i+1};
-        case MetaDataAttributes %deligates the attributes to the MetaData class
-            Tsk.MetaData=set(Tsk.MetaData,varargin{i},varargin{i+1});
-        case 'id'
+        case 'id' % an integer
+            if ~isinteger(id), 
+                error('id must be an integer'); 
+            end
             Tsk.id=varargin{i+1};
-        case 'zshift'
+        case 'zshift' % units of \mum
             Tsk.Zshift=varargin{i+1}';
+        case MetaDataAttributes % see MetaData class docs
+            Tsk.MetaData=set(Tsk.MetaData,varargin{i},varargin{i+1});
         otherwise
             warning('Throopi:Task:UpdateTimes','Cannot set property %s',varargin{i});
     end

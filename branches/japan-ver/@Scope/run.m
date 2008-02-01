@@ -2,6 +2,7 @@ function  run( rSin )
 % run : performs all tasks in TaskSchedule acording their order. 
 %    The main functionality here is just to go over all tasks 
 %    using getTasks(rS,'next'). 
+%
 %    Beside that it also manages rS behaviour that is related to schedule
 %    refresh (when the schedule is reclaculted every N tasks. 
 %    Also if get(rS,'resolveErrors') is true it tries to resolve the error

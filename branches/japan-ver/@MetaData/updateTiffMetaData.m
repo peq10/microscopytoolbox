@@ -1,5 +1,14 @@
 function updateTiffMetaData( md,pth )
-%UPDATETIFFMETADATA replaces the metadata in a Tiff file
+% updateTiffMetaData : replaces the metadata in a Tiff file
+%    This methods gets the xml form of the MetaData object md and writes 
+%    it in the first plane of the (possible multi-plane) tiff file:
+%    [pth filesep get(md,filename))].
+%
+%    It overwrites any existing metadata information. 
+%
+%    TODO: Current implementation uses tiffset. This is UGLY and should be replaced
+%
+%    TODO: the current implementation doesn't block for write, it should!
 
 str=get(md,'xml');
 filename=fullfile(pth,[get(md,'filename') '.tiff']);

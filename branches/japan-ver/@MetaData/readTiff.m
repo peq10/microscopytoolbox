@@ -1,7 +1,31 @@
 function img=readTiff(md,pth,varargin)
-% img=readTiff(md,pth) - a method of an MetaData object, get the filename from the md
-% object and return the image. reads an multi-plane tiff file and returns an image. 
-% It will reshape the img multi-D array acording to metadata 
+% readTiff : reads an multi-plane tiff file and returns a proper 5D image. 
+%   It will reshape the img multi-D array acording to metadata. 
+%   The image is saved by its full path name relative to pth. In addition
+%   to reading the whole images (default behaviour) readTiff can read parts
+%   of the images or perform a z-projection of the image. This can be usefull
+%   for very large tiff files that won't fit in memory. To specify reading
+%   parts of the images you should specify one (or more) of the following
+%   parameters as additional inputs. Each additional parameter is provided
+%   as a pair of action/parameters:
+%
+%   action:                   paramters: 
+%         'zprojection'   -              'mean' / 'max'
+%         'timeslice'     -              'first' / 'last' / 'all' /  [begin:end]
+%
+%   TODO: add channel to the possible types of slices.         
+%   TODO: add a speicific z-slice to read 
+%
+%   NOTES:
+%   ======
+%   The image is assumed to be of 16 bit ! and the returned image is 
+%   a [0-1] range (double). 
+%
+%   If the image is compress, it tries to uncompress it (depends on
+%   tifftool tiffcp). 
+%
+%   Currently reading the whole thing (using Nedelec readtiff) is faster
+%   then reading parts so the different slicing is not very useful. 
 
 %% check to see if md is a filename, if so create a MetaData object out of it
 if ischar(md) && exist(fullfile(pth,[md '.tiff']),'file')

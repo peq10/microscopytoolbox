@@ -1,57 +1,78 @@
-<III>
-<CollectionData>
-     <Collection><CollType></CollType><CollName></CollName></Collection> 
-     <Collection><CollType></CollType><CollName></CollName></Collection>
-     <Relation><sub></sub><dom></dom></Relation>
-</CollectionData>
-<Image>
+<MD>
+    <mdVer>0.2</mdVer>
     <ImageType></ImageType>
     <ImageFileName></ImageFileName>
+    <InCollection></InCollection>
+    <InCollection></InCollection>
     <CreationDate></CreationDate>
+    <LastChangeDate></LastChangeDate>
     <Description></Description>
-    <PixelType></PixelType>
+    <PixelType>uint16</PixelType>
     <BitDepth></BitDepth>
-    <PixelSizeX></PixelSizeX><PixelSizeY></PixelSizeY><PixelSizeZ></PixelSizeZ>
-  	<ChannelInfo>
-            <Number>1</Number>
-            <ChannelName></ChannelName>
-            <Content></Content>
-    </ChannelInfo>
-    <ChannelInfo>
-           <Number>2</Number>
-           <ChannelName></ChannelName>
-           <Content></Content>
-     </ChannelInfo>
-	 <DimensionOrder>XYCZT</DimensionOrder>
-     <DimensionSize>{1,1,1}</DimensionSize>
-     <PlaneData>
-            <ImgHeight>{}</ImgHeight>
-            <ImgWidth>{}</ImgWidth>
-            <StageX>{}</StageX>
-            <StageY>{}</StageY>
-            <StageZ>{}</StageZ>
-            <PlaneTime>{}</PlaneTime>
-            <Binning>{}</Binning>
-            <ExposureTime>{}</ExposureTime>
-      </PlaneData>
-      <Qdata>
-            <QdataType></QdataType>
-            <Value></Value>
-            <QdataDescription></QdataDescription>
-       </Qdata>
-	   <Qdata>
-             <QdataType></QdataType>
-             <Value></Value>
-             <QdataDescription></QdataDescription>
-       </Qdata>
-</Image>
-<DisplayOptions>
-        <DisplayMode>Gray</DisplayMode>
-        <Levels>{{0,1},{0,1},{0,1},{0,1}}</Levels>
-        <Channels>{}</Channels>
-        <ROI>{}</ROI>
-		<ZProjection>{}</ZProjection>
-</DisplayOptions>
-</III>
+    <PixelSize>{}</PixelSize>
+    <Channels>{}</Channels>
+    <ChannelDescriptoin></ChannelDescriptoin>
+  	<DimensionOrder>XYCZT</DimensionOrder>
+    <DimensionSize>{1,1,1}</DimensionSize>
+    <ImgHeight>{}</ImgHeight>
+    <ImgWidth>{}</ImgWidth>
+    <TimePoint>
+         <AcqTime>NaN</AcqTime>
+         <StageX>{{}}</StageX>
+         <StageY>{{}}</StageY>
+         <StageZ>{{}}</StageZ>
+         <Binning>{{}}</Binning>
+         <ExposureTime>{{}}</ExposureTime>
+         <Qdata>
+               <QdataType></QdataType>
+               <Value></Value>
+               <Label></Label>
+         </Qdata>
+         <Qdata>
+               <QdataType></QdataType>
+               <Value></Value>
+               <Label></Label>
+         </Qdata>
+    </TimePoint>
+    <TimePoint>
+         <AcqTime>NaN</AcqTime>
+         <StageX>{{}}</StageX>
+         <StageY>{{}}</StageY>
+         <StageZ>{{}}</StageZ>
+         <Binning>{{}}</Binning>
+         <ExposureTime>{{}}</ExposureTime>
+         <Qdata>
+               <QdataType></QdataType>
+               <Value></Value>
+               <Label></Label>
+               <QdataDescription></QdataDescription>
+         </Qdata>
+         <Qdata>
+               <QdataType></QdataType>
+               <Value></Value>
+               <Label></Label>
+               <QdataDescription></QdataDescription>
+         </Qdata>
+    </TimePoint>
+    <Qdata>
+         <QdataType></QdataType>
+         <Value></Value>
+         <Label></Label>
+         <QdataDescription></QdataDescription>
+    </Qdata>
+	<Qdata>
+          <QdataType></QdataType>
+          <Value></Value>
+          <Label></Label>
+          <QdataDescription></QdataDescription>
+    </Qdata>
+    <DisplayOptions>
+          <DisplayMode>Gray</DisplayMode>
+          <Levels>{{0,1},{0,1},{0,1},{0,1}}</Levels>
+          <ChannelIdx>{}</ChannelIdx>
+          <ROI>{}</ROI>
+          <ZProjection>{}</ZProjection>
+    </DisplayOptions>
+</MD>
 
 

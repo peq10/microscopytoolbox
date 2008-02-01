@@ -1,5 +1,15 @@
 function writeTiff(md,img,pth)
-% writeTiff(md,img,pth)to disk using md properties for filename 
+% writeTiff : write an image (img) to disk based on the md object
+%   The final filename would be relative to the path pth. 
+%   Images are saved as 16 bit tiffs of the III format, e.g. all the
+%   metadata information is saved in the first plane description tag. 
+%   if a filename already exist, it will APPEND the image to the end and 
+%   merge the metadata using the merge method. 
+%
+%   example: 
+%           md=MetaData('myfilename');
+%           img=acqImg(rS); 
+%           writeTiff(md,img,get(rS,'rootFolder'));
 
 filename=fullfile(pth,[get(md,'filename') '.tiff']);
 
@@ -8,11 +18,11 @@ if length(md)>1
     md=md(1);
 end
 
-%% check to see if file exist - if so merges the MetaData objects
+%% check to see if file exist - if so concatenates the MetaData objects
 if exist(filename,'file')
     meta(1)=get(md,'metadata');
     meta(2)=MetaData(filename);
-    md=merge(meta([2 1]));
+    md=concat(meta([2 1]));
 end
 
 %% figure out the number of tiff planes

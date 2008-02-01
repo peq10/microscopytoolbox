@@ -17,6 +17,19 @@ if numel(arr)==1
     return
 end
 
+%% If input is provided as a cell array, loop around all cells and convert
+% each one seperatrly, returning a cell array of the same size
+
+if iscell(arr)
+    str=cell(size(arr));
+    for i=1:numel(att)
+        str{i}=arr2str(arr{i});
+    end
+    return
+end
+
+
+%%
 [r,c,dz]=size(arr);
 str_1d=cell(r,dz);
 

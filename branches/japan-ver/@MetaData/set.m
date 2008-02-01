@@ -1,6 +1,8 @@
 function md = set(md, varargin )
-%SET properties of MetaData
-%   can set a only a single object at a time. 
+%SET properties of MetaData obect. 
+%   can set a only a single object at a time so md must be a single object.
+%   varargin must be pairs of attribute / value. 
+
 
 if ~numel(varargin) || mod(length(varargin),2)
     error('set must get at least one PAIR of proerpty name / values')
@@ -12,158 +14,233 @@ end
 
 for i=1:2:length(varargin)
     switch lower(varargin{i})
-        case 'collections'
-            if sum(ismember(fieldnames(varargin{i+1}),{'CollType';'CollName'}))~=2
-                error('Wrong fields for collection structs')
+        case 'collections' % input must be a cell array of chars or a single char. 
+            if ~iscell(varargin{i+1}) && ~ischar(varargin{i+1})
+                error('for collection input must be a cell array or single char')
             end
-            varargin{i+1}=orderfields(varargin{i+1},{'CollType';'CollName'});
-            md.CollectionData.Collection=varargin{i+1};
-        case 'relations'
-            if sum(strcmp(fieldnames(varargin{i+1}),{'sub';'dom'}))~=2
-                error('Wrong fields for collection structs')
+            if ischar(varargin{i+1})
+                varargin{i+1}={varargin{i+1}};
             end
-            md.CollectionData.Relation=varargin{i+1};
-        case 'imagetype'
+            % concatenates the collection 
+            str='{';
+            for ii=1:length(varargin{i+1})
+                str=[str ',' varargin{i+1}];
+            end
+            str=[str '}'];
+            md.CollectionData.Collection=str;
+        case 'imagetype' % must be a char
             if ~ischar(varargin{i+1})
                 error('Image type must be a char');
             end
             md.Image.ImageType=varargin{i+1};
-        case 'filename'
+        case 'filename' % must be a char
             if ~ischar(varargin{i+1})
                 error('Image filename must be a char');
             end
             md.Image.ImageFileName=varargin{i+1};
-        case 'creationdate'
-            if ~ischar(varargin{i+1})
-                error('Image CreationDate must be a char');
+        case 'creationdate' % must be a char and a parsible date format
+            % I don't really like using try/catch for input check but since
+            % the error is in the catch I think its ok. 
+            try
+                datenum(varargin{i+1});
+            catch
+                error('CreationDate could not be parsed by matlab!');
             end
-            md.Image.CreationDate=varargin{i+1};
-        case 'description'
+            if ~ischar(varargin{i+1})
+                error('CreationDate must be a char');
+            end
+            md.CreationDate=varargin{i+1};
+        case 'lastchangedate' % must be a char and a parsible date format
+            % I don't really like using try/catch for input check but since
+            % the error is in the catch I think its ok. 
+            try
+                datenum(varargin{i+1});
+            catch
+                error('LastChangeDate could not be parsed by matlab!');
+            end
+            if ~ischar(varargin{i+1})
+                error('LastChangeDate must be a char');
+            end
+            md.LastChangeDate=varargin{i+1};
+        case 'description' % must be a char
             if ~ischar(varargin{i+1})
                 error('Image Description must be a char');
             end
             md.Image.Description=varargin{i+1};
-        case 'pixeltype'
+        case 'pixeltype' % must be one of: (uint8,uint16,logical,single,double)
             if ~ischar(varargin{i+1})
                 error('Image PixelType must be a char');
+            elseif ~ismember(varargin{i+1},{'uint8','uint16','logical','single','double'})
+                error('Image Type must be one of: (uint8,uint16,logical,single,double)');
             end
             md.Image.PixelType=varargin{i+1};
-        case 'bitdepth'
-            if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=1
+        case 'bitdepth' % must be numeric integer (will be rounded anyway)
+            if ~isa(varargin{i+1},'numeric') || ismember(numel(varargin{i+1}),[1 3])
                 error('Image BitDepth must be signle numeric');
             end
-            md.Image.BitDepth=num2str(varargin{i+1});
-        case 'pixelsizex'
+            md.Image.BitDepth=num2str(round(varargin{i+1}));
+        case 'pixelsize' % must be a numeric scalar (x/y when they are the same) of an array of size 3 ([x y z])
             if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=1
                 error('Image PixelSize must be signle numeric');
             end
             md.Image.PixelSizeX=num2str(varargin{i+1});
-        case 'pixelsizey'
-            if ~isa(varargin{i+1},'numeric')|| numel(varargin{i+1})~=1
-                error('Image PixelSize must be signle numeric');
+        case 'channels' % a cell array of strings (or single string)
+            if ~iscell(varargin{i+1}) && ~ischar(varargin{i+1})
+                error('Channels must be a cell array or string')
             end
-            md.Image.PixelSizeY=num2str(varargin{i+1});
-        case 'pixelsizez'
-            if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=1
-                error('Image PixelSize must be signle numeric');
+            if ischar(varargin{i+1})
+                varargin{i+1}={varargin{i+1}};
             end
-            md.Image.PixelSizeZ=num2str(varargin{i+1});
-        case 'channels'
-            if sum(ismember(fieldnames(varargin{i+1}),{'Number'; 'ChannelName'; 'Content'}))~=3
-                error('Wrong fields for Channel struct')
-            end
-            varargin{i+1}=orderfields(varargin{i+1},{'Number'; 'ChannelName'; 'Content'});
             md.Image.ChannelInfo=varargin{i+1};
-        case 'dimensionorder'
-            if ~ischar(varargin{i+1})
+        case 'channeldescription' % must be a single struct with fields subset of get(md,'channels')
+            if ~isstruct(varargin{i+1}) && numel(varargin{i+1}) ~=1 
+                error('ChannelDescriptoin must be a single struct');
+            end
+            if ~isempty(setdiff(filednames(varargin{i+1}),get(md,'Channels')))
+                error('ChannelDescriptoin struct must have Channel names for fields names');
+            end
+            md.ChannelDescriptoin=arr2str(varargin{i+1});
+            
+        case 'dimensionorder' % must be a char and one of the following: {'XYTCZ', 'XYTZC', 'XYZTC', 'XYZCT', 'XYCZT', 'XYCTZ'} 
+            if ~ischar(varargin{i+1}) 
                 error('Image DimensionOrder must be a char');
             end
+            if ~ismember(varargin{i+1},{'XYTCZ', 'XYTZC', 'XYZTC', 'XYZCT', 'XYCZT', 'XYCTZ'})
+               error('Dimension Order must be one of {XYTCZ, XYTZC, XYZTC, XYZCT, XYCZT, XYCTZ}'); 
+            end
             md.Image.DimensionOrder=varargin{i+1};
-        case 'dimensionsize'
+        case 'dimensionsize' % Image DimensionSize must be numeric with numel smaller or euqal to3
             if ~isnumeric(varargin{i+1}) || numel(varargin{i+1}) > 3
                 error('Image DimensionSize must be numeric with numel <=3');
             end
             md.Image.DimensionSize=arr2str(varargin{i+1});
-        case 'imgheight'
-            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
-                error('ImgHeight must be numeris and <= 3D')
+        case 'imgheight' % ImgHeight must be numeric scalar
+            if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~= 1
+                error('ImgHeight must be numeric scalar')
             end
-            md.Image.PlaneData.ImgHeight=arr2str(varargin{i+1});
-        case 'imgwidth'
-            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
+            md.Image.PlaneData.ImgHeight=double2str(varargin{i+1});
+        case 'imgwidth' % ImgWidth must be numeric scalar
+            if ~isa(varargin{i+1},'numeric') ||  numel(varargin{i+1})~= 1
                 error('ImgWidth must be numeris and <= 3D')
             end
-            md.Image.PlaneData.ImgWidth=arr2str(varargin{i+1});
-        case 'stagex'
+            md.Image.PlaneData.ImgWidth=double2str(varargin{i+1});
+            
+            
+        %% Timepoint related attributes    
+        case 'acqtime' % must be numeric in matlab datenum units, will be converted to a row vector
             if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
-                error('StageX must be numeris and <= 3D')
+                error('Timepoint must be numeric')
             end
-            md.Image.PlaneData.StageX=arr2str(varargin{i+1});
-        case 'stagey'
-            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
-                error('StageY must be numeris and <= 3D')
+            tp=varargin{i+1};
+            for ii=1:length(tp)
+                md.TimePoint(i).AcqTime=datestr(tp(i),0);
             end
-            md.Image.PlaneData.StageY=arr2str(varargin{i+1});
-        case 'stagez'
-            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
-                error('StageZ must be numeris and <= 3D')
+            
+        case 'binning' % must be: 1. numeric and smaller or equal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
+            if ~iscell(varargin{i+1}) &&  ( ~isa(varargin{i+1},'numeric') || ndims(varargin{i+1}) > 3)  
+                error('Binning must be cell array OR a numeric with upto <= 3D')
             end
-            md.Image.PlaneData.StageZ=arr2str(varargin{i+1});
-        case 'planetime'
-            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
-                error('PlaneTime must be numeric and <= 3D')
+            
+            [sz,ordr,tpn]=get(md,'dimensionsize','dimensionorder','timepointnum');
+            inpt=varargin{i+1};
+            output=repinput(sz,ordr,inpt);
+            for ii=1:tpn
+                md.TimePoint(ii).Binning=output{ii};
             end
-            md.Image.PlaneData.PlaneTime=arr2str(varargin{i+1});
-        case 'exposuretime'
-            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
-                error('ExposureTime must be numeris and <= 3D')
+
+        case 'stagex' % must be: 1. numeric and smaller or euqal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
+            if ~iscell(varargin{i+1}) &&  ( ~isa(varargin{i+1},'numeric') || ndims(varargin{i+1}) > 3)  
+                error('StageX must be cell array OR a numeric with upto <= 3D')
             end
-            md.Image.PlaneData.ExposureTime=arr2str(varargin{i+1});
-        case 'binning'
-            if ~isa(varargin{i+1},'numeric') || length(size(varargin{i+1})) > 3
-                error('Binning must be numeris and <= 3D')
+            
+            [sz,ordr,tpn]=get(md,'dimensionsize','dimensionorder','timepointnum');
+            inpt=varargin{i+1};
+            output=repinput(sz,ordr,inpt);
+            for ii=1:tpn
+                md.TimePoint(ii).StageX=output{ii};
             end
-            md.Image.PlaneData.Binning=arr2str(varargin{i+1});
-        case 'qdata'
-            if ~isstruct(varargin{i+1}), 
-                error('Qdata must be a struct');
+            
+        case 'stagey' % must be: 1. numeric and smaller or euqal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
+            if ~iscell(varargin{i+1}) &&  ( ~isa(varargin{i+1},'numeric') || ndims(varargin{i+1}) > 3)  
+                error('StageY must be cell array OR a numeric with upto <= 3D')
             end
-            if ~isequal(fieldnames(varargin{i+1}),{'QdataType';'Value';'QdataDescription'})
-                % test it only a matter of order
-                varargin{i+1}=orderfields(varargin{i+1},{'QdataType'; 'Value'; 'QdataDescription'});
-                % if still not equal, throw an error
-                if ~isequal(fieldnames(varargin{i+1}),{'QdataType';'Value';'QdataDescription'})
-                    error('Wrong fields for Qdata struct')
-                end
+            
+            [sz,ordr,tpn]=get(md,'dimensionsize','dimensionorder','timepointnum');
+            inpt=varargin{i+1};
+            output=repinput(sz,ordr,inpt);
+            for ii=1:tpn
+                md.TimePoint(ii).StageY=output{ii};
             end
-            for j=1:length(varargin{i+1})
-                varargin{i+1}(j).Value=arr2str(varargin{i+1}(j).Value);
+        case 'stagez' % must be: 1. numeric and smaller or euqal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
+            if ~iscell(varargin{i+1}) &&  ( ~isa(varargin{i+1},'numeric') || ndims(varargin{i+1}) > 3)  
+                error('StageZ must be cell array OR a numeric with upto <= 3D')
             end
-            md.Image.Qdata=varargin{i+1};
-        case 'displaymode'
+            
+            [sz,ordr,tpn]=get(md,'dimensionsize','dimensionorder','timepointnum');
+            inpt=varargin{i+1};
+            output=repinput(sz,ordr,inpt);
+            for ii=1:tpn
+                md.TimePoint(ii).StageZ=output{ii};
+            end
+            
+        case 'exposuretime' % must be: 1. numeric and smaller or euqal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
+            if ~iscell(varargin{i+1}) &&  ( ~isa(varargin{i+1},'numeric') || ndims(varargin{i+1}) > 3)  
+                error('Exposure Time must be cell array OR a numeric with upto <= 3D')
+            end
+            
+            [sz,ordr,tpn]=get(md,'dimensionsize','dimensionorder','timepointnum');
+            inpt=varargin{i+1};
+            output=repinput(sz,ordr,inpt);
+            for ii=1:tpn
+                md.TimePoint(ii).ExposureTime=output{ii};
+            end
+        case 'timepointqdata' % a Qdata struct (array), see Qdata,  or a cell array of Qdata struct (arrays) with the same number of cells as there are timepoits!
+            if istruct(varargin{i+1})
+                varargin{i+1}={varargin{i+1}};
+            end
+            if ~iscell(varargin{i+1}) 
+                error('TimePoint Qdata must be a struct or a cell array');
+            end
+            if length(varargin{i+1}) ~= length(md.Timepoint)
+                error('TimePoint Qdata must be the same length as Timpoints');
+            end
+            for ii=1:length(varargin{i+1});
+                md.TimePoint(ii).Qdata=formatQdata(varargin{i+1}{ii}); 
+            end
+            
+            
+        case 'qdata' % must be a struct array with fields: {'QdataType';'Value'; 'Label'; 'QdataDescription'}
+            md.Qdata=formatQdata(varargin{i+1});
+            
+        % attributes related only to how to diaply the images    
+        case 'displaymode' % one of: 'Gray','RGB','Comp' (Comp is composite)
             if ~ischar(varargin{i+1}) || ~sum(ismember(varargin{i+1},{'Gray','RGB','Comp'}))
                 error('Unsupported disaply mode - must be Gray / RGB / Comp');
             end
             md.Image.DisplayOptions.DisplayMode=varargin{i+1};
-        case 'displaylevels'
+        case 'displaylevels' % 'Display levels must be numeric 4 x 2 matrix'
             if ~isa(varargin{i+1},'numeric') || size(varargin{i+1},1)~=4 || size(varargin{i+1},2)~=2
                 error('Display levels must be numeric 4 x 2 matrix')
             end
             md.Image.DisplayOptions.Levels=arr2str(varargin{i+1});
-        case 'displaychannels'
-            if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=4 
-                error(['Display channel must be numeric 4 element vector which references the:\n'...
+        case 'displaychannels' % 'Display channel must be either a 4 element cell array with channel names (or 'None') or a  numeric 4 element vector which references the channel for the Red Green Blue and Gray disaply channels, set 0 for none
+            if ~isa(varargin{i+1},'numeric') && ~iscell(varargin{i+1}) || numel(varargin{i+1})~=4 
+                error(['Display channel must be a 4 element cell array with channel mames numeric 4 element vector which references the:\n'...
                          'channel for the Red Green Blue and Gray disaply channels, set 0 for none']);
             end
-            %check that all the channels are legal 
-            chnlstrct=get(md,'Channels'); 
-            for j=1:length(varargin{i+1})
-                if varargin{i+1}(j)>0 && ((varargin{i+1}(j) > length(chnlstrct)) || (isempty(chnlstrct(varargin{i+1}(j)).Content))) 
-                    error('Content index for display channels indexes an illegal channel\n either channel doesni''t exist or its empty')
-                end
+            % if its a cell array, convert it into indexes based on
+            % channesl. 
+            if iscell(varargin{i+1})
+                chnls=get(md,'Channels');
+                chnls=[{'None'},chnls];
+                [bla,ind]=ismember(varargin{i+1},chnls);
+                ind=ind-1;
+            else
+                ind=varargin{i+1};
             end
-            md.Image.DisplayOptions.Channels=arr2str(varargin{i+1});
-        case 'displayroi'
+            md.Image.DisplayOptions.Channels=arr2str(ind);
+            
+        case 'displayroi' % 'Display levels must be numeric 4 element matrix
             if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=4 
                 error('Display levels must be numeric 4 element matrix')
             end
@@ -172,4 +249,50 @@ for i=1:2:length(varargin)
             error('attribute %s is not part of MetaData properties interface',varargin{i});
     end
 end
+
+%%%%%%%%%%%%%%%%%%%%%% private accesory functions
+
+function outpt=repinput(sz,ordr,inpt)
+% create a cell array the size of number of timepoints and where in each
+% cell there is a 2D matrix of size [Zn x Cn] (# z-planes x # channels)
+% do this by prelicating as necessary. 
+
+Tind=strfind(ordr,'T')-2;
+Zind=strfind(ordr,'Z')-2;
+Cind=strfind(ordr,'C')-2;
+outpt=cell(1,sz(Tind));
+rep=sz([Zind Cind]);
+rep(sz([Zind Cind])>1)=1;
+
+for ii=1:sz(Tind)
+    if iscell(inpt)
+        mat=inpt{ii};
+    elseif ndims(inpt) == 3
+        mat=inpt(:,:,ii);
+    end
+    outpt{ii}=repmat(mat,rep);
+end
+
+%%%%
+
+function Qdata=formatQdata(Qdata)
+% checks for Qdata legality and format is for storage using arr2str on
+% every Value field
+if ~isstruct(Qdata),
+    error('Qdata must be a struct');
+end
+if ~isequal(fieldnames(Qdata),{'QdataType';'Value'; 'Label'; 'QdataDescription'})
+    % test it only a matter of order
+    Qdata=orderfields(Qdata,{'QdataType'; 'Value'; 'Label'; 'QdataDescription'});
+    % if still not equal, throw an error
+    if ~isequal(fieldnames(Qdata),{'QdataType';'Value'; 'Label'; 'QdataDescription'})
+        error('Wrong fields for Qdata struct')
+    end
+end
+for j=1:length(Qdata)
+    Qdata(j).Value=arr2str(Qdata(j).Value);
+end
+
+
+
  

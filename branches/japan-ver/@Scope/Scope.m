@@ -11,19 +11,17 @@ function rS = Scope(config_file)
 % start using the cnfig file directly. 
 
 import mmcorej.*;
-if nargin ==0 || isempty(config_file)
-    rS.gui=MMStudioPlugin;
-    rS.gui.run('')
-    uiwait(msgbox('Click me - I''m beutiful'))
-    rS.mmc=rS.gui.getMMCoreInstance;
-else
-    rS.mmc=CMMCore;
-end
-% rS.mmc=CMMCore;
-
-%% try to load devices - if an error occurs unload and clean
 try
-    rS.mmc.loadSystemConfiguration(config_file);
+    if nargin ==0 || isempty(config_file)
+        rS.gui=MMStudioPlugin;
+        rS.gui.run('')
+        uiwait(msgbox('Click me - I''m beutiful'))
+        rS.mmc=rS.gui.getMMCoreInstance;
+    else
+        rS.mmc=CMMCore;
+        rS.mmc.loadSystemConfiguration(config_file);
+    end
+    % try to load devices - if an error occurs unload and clean
 catch
     rS.mmc.unloadAllDevices;
     rS=[]; %#ok<NASGU>
