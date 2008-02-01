@@ -1,5 +1,5 @@
 function success = uncompressTiff( filename )
-%UNCOMPRESSTIFF uses command line tools (hence private) 
+% uncompressTiff : uses command line tools (hence private) 
 %to uncompress the tiff file into a tmp.tiff file. 
 % its ugly but it works...
 

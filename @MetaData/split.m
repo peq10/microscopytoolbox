@@ -1,24 +1,15 @@
 function mdarray = split( md )
-%SPLIT an array of similar metadata objects IN THE TIME DOMAIN
+% split : breaks up a timelapse metadata into an array of single timepoints 
+%    It is working directly on the struct data and not on using set/get so it will 
+%    need to be update if there is an internal change in data
+%    representation
+%    
 
+%% split the TimePont array struct into components 
+% everything else remain the same 
 
-%% get the critical fields:
-[planetime,qdata]=get(md,'planetime','qdata');
-sz=get(md,'dimensionsize');          
-mdarray=[];
-
-%% create the array
-for i=1:length(planetime)
-    q=qdata;
-%     for j=1:length(q)
-%         if ~isempty(q(j).Value)
-%             q(j).Value=q(j).Value(i);
-%         end
-%     end
-    mdarray=[mdarray; set(md,'DimensionSize',[sz(1:2) 1],...
-                             'planetime',planetime(i))];
+n=get(md,'timepointnum'); 
+for i=1:n
+    mdarray(i)=md;
+    mdarray(i).TimePoint=md.TimePoint(i); 
 end
-
-
-
-

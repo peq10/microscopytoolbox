@@ -41,17 +41,7 @@ Tsk=set(Tsk,'planetime',now,...
 img=acqImg(rS,Channels,Exposure);
 
 %% update plots
-figure(3)
-clf
-subplot('position',[0 0 1 1])
-imshow(img(:,:,1),[],'initialmagnification','fit')
-figure(4)
-plotTaskStatusByType(rS)
-plotFocalPlaneGrid(rS,2);
-plotPlannedSchedule(rS,1)
-plotRoute(rS,1)
-plotPastTaskDuration(rS,5)
-drawnow
+plotAll(rS);
 
 %% check for prophase cells
 [PlausiblyProphase,msg]=funcClicker(img,3);

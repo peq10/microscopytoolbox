@@ -20,16 +20,42 @@
     </ChannelInfo>
     <DimensionOrder>XYCZT</DimensionOrder>
     <DimensionSize>{1,1,1}</DimensionSize>
-    <PlaneData>
-        <ImgHeight></ImgHeight>
-        <ImgWidth></ImgWidth>
-        <StageX>{}</StageX>
-        <StageY>{}</StageY>
-        <StageZ>{}</StageZ>
-        <PlaneTime>{}</PlaneTime>
-        <Binning>{}</Binning>
-        <ExposureTime>{}</ExposureTime>
-    </PlaneData>
+    <TimeSlice>
+            <AcqTime>NaN</AcqTime>
+            <StageX>{{}}</StageX>
+            <StageY>{{}}</StageY>
+            <StageZ>{{}}</StageZ>
+            <Binning>{{}}</Binning>
+            <ExposureTime>{{}}</ExposureTime>
+            <Qdata>
+                  <QdataType></QdataType>
+                  <Value></Value>
+                  <Label></Label>
+            </Qdata>
+            <Qdata>
+                  <QdataType></QdataType>
+                  <Value></Value>
+                  <Label></Label>
+            </Qdata>
+     </TimeSlice>
+     <TimeSlice>
+            <AcqTime>NaN</AcqTime>
+            <StageX>{{}}</StageX>
+            <StageY>{{}}</StageY>
+            <StageZ>{{}}</StageZ>
+            <Binning>{{}}</Binning>
+            <ExposureTime>{{}}</ExposureTime>
+            <Qdata>
+                  <QdataType></QdataType>
+                  <Value></Value>
+                  <Label></Label>
+            </Qdata>
+            <Qdata>
+                  <QdataType></QdataType>
+                  <Value></Value>
+                  <Label></Label>
+            </Qdata>
+    </TimeSlice>
     <Qdata>
         <QdataType></QdataType>
         <Value></Value>

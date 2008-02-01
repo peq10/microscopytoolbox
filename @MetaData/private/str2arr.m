@@ -35,7 +35,19 @@ if strcmp(str,'{}')
     return
 end
 
-%% add '' around NaNs
+%% If input is provided as a cell array, loop around all cells and convert
+% each one seperatrly, returning a cell array of the same size
+
+if iscell(str)
+    arr=cell(size(str));
+    for i=1:numel(str)
+        arr{i}=str2arr(str{i});
+    end
+    return
+end
+
+
+%% remove '' around NaNs
 str=regexprep(str,'''NaN''','NaN');
 
 %% main switch based on dimensionality

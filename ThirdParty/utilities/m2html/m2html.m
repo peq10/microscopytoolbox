@@ -131,7 +131,8 @@ options = struct('verbose', 1,...
 				 'template', 'blue',...
                  'rootdir', pwd,...
 				 'ignoredDir', {{'.svn' 'cvs'}}, ...
-                 'language', 'english');
+                 'language', 'english',...
+                 'attributes',true);
 
 if nargin == 1 & isstruct(varargin{1})
 	paramlist = [ fieldnames(varargin{1}) ...
@@ -316,7 +317,9 @@ for i=1:2:length(paramlist)
 				options.language = pvalue;
 			else
 				error(sprintf(msgInvalidPair,pname));
-			end
+            end
+        case 'attributes'
+            options.attributes=logical(pvalue);
 		otherwise
 			error(['Invalid parameter: ''' pname '''.']);
 	end
@@ -722,6 +725,7 @@ tpl = set(tpl,'block','TPL_MDIR','subfolder','subfold');
 tpl = set(tpl,'block','subfolder','subdir','subdirs');
 tpl = set(tpl,'block','TPL_MDIR','todolist','todolists');
 tpl = set(tpl,'block','TPL_MDIR','graph','graphs');
+tpl = set(tpl,'block','TPL_MDIR','attribute','attributes');
 tpl = set(tpl,'var','DATE',[datestr(now,8) ' ' datestr(now,1) ' ' ...
 							datestr(now,13)]);
 
@@ -799,10 +803,17 @@ for i=1:length(mdir)
 	
 	%- Link to the dependency graph if necessary
 	tpl = set(tpl,'var','graphs','');
-	if options.graph
+	if options.graph 
 		tpl = set(tpl,'var','LGRAPH',[dotbase options.extension]);
 		tpl = parse(tpl,'graphs','graph',1);
-	end
+    end
+    
+    %- Link to the attributes table if necessary
+    tpl = set(tpl,'var','attributes','');
+    if options.attributes && ~isempty(regexp(mdir{i},'^@','once'))
+        tpl = set(tpl,'var','ATTRIBUTEFILE',['attributes' options.extension]);
+		tpl = parse(tpl,'attributes','attribute',1);
+    end
 	
 	%- Print the template in the HTML file
 	tpl = parse(tpl,'OUT','TPL_MDIR');
@@ -864,6 +875,57 @@ if options.todo
 		end
 	end
 end
+
+%-------------------------------------------------------------------------------
+%- Write a TODO list file for each output directory, if necessary
+%-------------------------------------------------------------------------------
+tpl_props = 'attributes.tpl';
+
+if options.attributes
+	%- Create the HTML template
+	tpl = template(options.template,'remove');
+	tpl = set(tpl,'file','TPL_PROPS',tpl_props);
+	tpl = set(tpl,'block','TPL_PROPS','row','rows');
+	tpl = set(tpl,'var','DATE',[datestr(now,8) ' ' datestr(now,1) ' ' ...
+								datestr(now,13)]);
+
+	for i=1:length(mdir)
+        % if its not a class, skip this folder
+        if isempty(regexp(mdir{i},'^@','once')) 
+            continue
+        end
+        % get the list of properties for this class
+	props = getClassAttributes(mdir{i});
+		if ~isempty(props)
+			%- Open for writing each Property list file
+			curfile = fullfile(options.htmlDir,mdir{i},...
+							   ['attributes' options.extension]);
+			if options.verbose
+				fprintf('Creating HTML file %s...\n',curfile);
+			end
+			fid = openfile(curfile,'w');
+			
+			%- Set template fields
+			tpl = set(tpl,'var','INDEX',[options.indexFile options.extension]);
+			tpl = set(tpl,'var','MASTERPATH', backtomaster(mdir{i}));
+			tpl = set(tpl,'var','MDIR',       mdir{i});
+			
+            tpl = set(tpl,'var','rows','');
+			for k=1:length(props)
+                tpl = set(tpl,'var','PROPERTY',props(k).name);
+                tpl = set(tpl,'var','DESCRIPTION',props(k).cmt);
+                tpl = set(tpl,'var','INPUT',props(k).input);
+                tpl = parse(tpl,'rows','row',1);
+			end
+	
+			%- Print the template in the HTML file
+			tpl = parse(tpl,'OUT','TPL_PROPS');
+			fprintf(fid,'%s',get(tpl,'OUT'));
+			fclose(fid);
+		end
+	end
+end
+
 
 %-------------------------------------------------------------------------------
 %- Create dependency graphs using GraphViz, if requested
@@ -1381,7 +1443,7 @@ function name = extractname(synopsis)
 		if isempty(ind)
 			ind = findstr(synopsis{i},'function');
 			s = synopsis{i}(ind(1)+8:end);
-		else
+        else
 			s = synopsis{i}(ind(1)+1:end);
 		end
 		name{i} = strtok(s,[9:13 32 40]); % white space characters and '('
@@ -1419,4 +1481,8 @@ function str = horztab(str,n)
 	
 	if n > 0
 		str = strrep(str,sprintf('\t'),blanks(n));
-	end
+    end
+    
+
+
+

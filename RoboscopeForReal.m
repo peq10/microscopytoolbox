@@ -11,8 +11,8 @@ close all
 
 ScopeConfigFileName='MM_Roboscope.cfg';
 
-Red=struct('Number',1,'ChannelName','TRITC', 'Content','');
-Green=struct('Number',2,'ChannelName','FITC', 'Content','');
+Red=struct('ChannelName','TRITC', 'Content','');
+Green=struct('ChannelName','FITC', 'Content','');
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)

@@ -23,6 +23,13 @@
 <!-- END row-m -->
 </ul>
 
+<!-- BEGIN attribute -->
+<h2>Class Attributes</h2>
+<ul style="list-style-image:url({MASTERPATH}microscope.gif)">
+<li>View the <a href="{ATTRIBUTEFILE}" target="function">Attributes</a>.</li>
+</ul>
+<!-- END attribute -->
+
 <!-- BEGIN othermatlab -->
 <h2>Other Matlab-specific files in this directory:</h2>
 <ul style="list-style-image:url({MASTERPATH}matlabicon.gif)">

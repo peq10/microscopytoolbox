@@ -1,87 +1,66 @@
-function md = merge( mdarray )
-%MERGE md = merge( mdarray )merges a set of MetaData objects into one - ON THE TIME DOMAIN. 
-% Its important which is the last one in the array since this is the one
-% that most of the properties are going to be set by (e.g. display etc.)
+function md = concat( mdarray )
+% concat : combines an array of metadata objects into a single one. 
+%
+% The concatanation will happen via these rules: 
+%
+% 1. The following fileds must be the same otherwise it will throw an error:
+%    Filename, DimensionOrder, (any more?)
+% 2. Collection is a merge of all collection attributes from the array. 
+% 3. TimePoint will be concatenated
+% 4. Array order will be sorted by AcqTime for the TimePoint. 
+% 5. Each element in mdarray is first splited if necessary
+% 6. Few Attributes will get by default the value of the last (by AcqTime)
+%    MetaData: Everything to do with display, 
+% 
 
-%% if mdarry is not an array return itseld
-if numel(mdarray)<=1
-    md=mdarray;
-    return
-end
+% TODO: What should happen to Qdata on a merges? right now its getting the last one, I don't really like it
 
-%% The first element in mdarray is allowed to be multi-timed point 
-% so split it first before merging
-if numel(get(mdarray(1),'planetime'))>1
-    mdarray=[split(mdarray(1)); mdarray(2:end)];
-end
+%% get the metadata out of the mdarray WHY WHAT IS THIS GOOD FOR? When I
+%TODO find out where matlab polymorphism sucked and comments here....
 
-%% get the metadata out of the mdarray 
 % this is because OO programing in matlab is not perfect
-% it doesn:t do polymorphism properly
+% it doesn't do polymorphism properly
 if ~strcmp(class(mdarray),'MetaData')
     mdarray=get(mdarray,'metadata');
     mdarray=[mdarray{:}];
 end
 
-%% First check that Collection data and filename and the same
-% 
-% mdstruct=struct(mdarray);
-% for i=1:length(mdstruct),
-%     str{i}=struct2xml(mdstruct(i).CollectionData);
-% end
-% 
-% cnt=ones(1,3);
-% for i=2:length(mdstruct)
-%     cnt(1)=cnt(1)+double(strcmp(str{1},str{i}));
-%     cnt(2)=cnt(2)+double(strcmp(mdstruct(1).Image.ImageFileName,mdstruct(i).Image.ImageFileName));
-%     cnt(3)=cnt(3)+double(isempty(setxor({mdstruct(1).Image.Qdata(:).QdataType},...
-%                                         {mdstruct(i).Image.Qdata(:).QdataType})));
-% end
-% 
-% if cnt(1)~=length(mdstruct), 
-%     error('Cannot merge metadata object that differ in their collection data'); 
-% end
-% 
-% if cnt(2)~=length(mdstruct), 
-%     error('Cannot merge metadata object that have different file names'); 
-% end
-% 
-% if cnt(3)~=length(mdstruct), 
-%     error('Cannot merge metadata object that have different qdata field types'); 
-% end
-
-
-%% calculate the new Plane Data (stagex,stagey, etc.)
-sz=get(mdarray(end),'dimensionsize');
-
-switch get(mdarray(1),'dimensionorder')
-    case {'XYCZT','XYZCT'}
-        sz(3)=length(mdarray);
-    case {'XYCTZ','XYZTC'}
-        sz(2)=length(mdarray);
-    case {'XYTCZ','XYTZC'}
-        sz(1)=length(mdarray);
+%% be lazy, if there is nothing to do, return
+if numel(mdarray)<=1
+    md=mdarray;
+    return
 end
 
-planetime=get(mdarray,'planetime');
-planetime=[planetime{:}];
+%% split the elements of mdarray if needed
+newmdarray=[];
+for i=1:numel(mdarray)
+    newmdarray=[newmdarray split(mdarray(i))];
+end
+
+%% now check to see if  Filename / DimensionOrder are the same
+[filenames,dimorder]=get(newmdarray,'filename','dimensionorder');
+if numel(unique(filenames))~=1
+    error('All MetaData elements to concatenate must have the same filename');
+end
+if numel(unique(dimorder))~=1
+    error('All MetaData elements to concatenate must have the same dimension order');
+end
+
+%% Sort them by time
+acqTime=get(newmdarray,'acqtime');
+acqTime=[acqTime{:}];
+[bla,ind]=sort(acqTime);
+newmdarray=newmdarray(ind);
+
+%% Create the concatenated one. 
+md=mdarray(end); 
+md.TimePoint=[newmdarray(:).TimePoint];
 
 
-%% create the qdata - do a few cell .struct etc transformation 
-% qnum=length(get(mdarray(1),'qdata'));
-% qcell=get(mdarray,'qdata');
-% qarr=reshape([qcell{:}]',qnum,length(mdarray))';
-% for i=1:qnum
-%     Value{i}=arr2str([qarr(:,i).Value]);
-% end
-% QdataType={qcell{1}.QdataType};
-% QdataDescription={qcell{1}.QdataDescription};
-% qdata=struct('QdataType',QdataType,'Value',Value,'QdataDescription',QdataDescription);
-% 
-%% create the md based on the last md in the array
-md=mdarray(end);
+%% create a union list of collections and set it as the collection
+collections=get(newmdarray,'collections');
+collections=[collections{:}];
+collections=unique(collections);
 
-md=set(md,'creationdate',datestr(now),...
-          'dimensionsize',sz,...
-          'planetime',planetime);
-            
+% set the last one collection attributes 
+md=set(md,'collections',collections);

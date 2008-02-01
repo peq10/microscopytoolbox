@@ -1,5 +1,5 @@
 function updateTaskSchedule( rSin)
-%UPDATETASKSCHEDULE update the current TaskBuffer schedule 
+% updateTaskSchedule : recalculates the  schedule 
 %based on the current SchedulerFcn
 
 % this trick make sure rS is updated 
