@@ -8,7 +8,9 @@ global rS;
 rS=rSin;
 
 %% get info about tasks in buffer
-PastTasks=getPastTasksDuration(rS);
+
+%% 
+PastTasks=get(rS,'PastTasksDuration');
 durVector=PastTasks.durVector;
 fncStrUnq=PastTasks.fncStrUnq;
 
@@ -18,12 +20,14 @@ x=get(NonExecTasks,'stageX');
 if iscell(x), x=[x{:}]'; end
 y=get(NonExecTasks,'stagey');
 if iscell(y), y=[y{:}]'; end
-t=get(NonExecTasks,'planetime');
+t=get(NonExecTasks,'acqTime');
 if iscell(t), t=[t{:}]'; end
 id=get(NonExecTasks,'ID');
 if iscell(id), id=[id{:}]'; end
 
 fncStr=get(NonExecTasks,'fcnstr');
+if ~iscell(fncStr),fncStr={fncStr}; end
+
 duration=zeros(length(NonExecTasks),1);
 for i=1:length(NonExecTasks)
     ix=find(strcmp(fncStrUnq,fncStr{i})); %#ok<EFIND>

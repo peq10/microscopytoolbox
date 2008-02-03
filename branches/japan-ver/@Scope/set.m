@@ -163,6 +163,6 @@ for i=1:2:n
         case 'autoshutter' % logical (would be convered if necessary)
             rS.mmc.setAutoShutter(logical(varargin{i+1}))
         otherwise
-            warning('Unrecognized attribute') %#ok
+            warning(['Unrecognized attribute: ' varargin{i}]) %#ok
     end
 end

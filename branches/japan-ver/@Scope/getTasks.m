@@ -50,6 +50,9 @@ rtrns=true(length(rS.TaskBuffer),1);
 
 for i=1:length(property)
     v=get(rS.TaskBuffer,property{i});
+    if ~iscell(v)
+        v={v};
+    end
     if isa(value{i},'numeric')
         v=[v{:}]';
     end
