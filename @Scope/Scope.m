@@ -99,4 +99,5 @@ rS=class(rS,'Scope');
 %% add path - "Plug-in" folders
 addpath TaskFcns
 addpath SchedulerFcns
+addpath(['ThirdParty' filesep 'utilities'])
 

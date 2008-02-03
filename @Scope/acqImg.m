@@ -4,7 +4,8 @@ function img = acqImg(rSin,Channel,Exposure)
 % 
 % sets the channel and exposure for each channel  
 %   rS        - the roboscope object
-%   Channel   - the channel to image a cell array of strings
+%   Channel   - the channel to image a cell array of strings (single char
+%               will be converted to a cell array with single element)
 %   Exposure:  - the exposure time for all channels (a double array)
 %   img - a 3D matrix where size(img,3)==length(Channels)
 %  
@@ -15,6 +16,11 @@ function img = acqImg(rSin,Channel,Exposure)
 
 global rS;
 rS=rSin;
+
+% if channels is not a cell array make it oue
+if ~iscell(Channel)
+    Channel={Channel};
+end
 
 [w,h,bd]=get(rS,'Width','Height','BitDepth');
 
@@ -42,6 +48,8 @@ for i=1:n
     img(:,:,i)=reshape(single(imgtmp)./(2^bd),w,h)';
 end
 
-set(rS,'lastimg',img);
+% Only acqImg can change lastImage attribute - 
+% so ite not done via reaugular set/get
+rS.lastImage=img;
 
 

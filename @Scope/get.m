@@ -16,14 +16,21 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
-        case 'pasttimeduration' % a struct with two fileds, fncStrUnq which contains a cell arrya of all past tasks acqFcn amd a durVector which contain the average time it took to perform that task. 
+        case 'avaliabletskfcns' % returns a cell array of all the avaliable task functions
+            tskfcn=dir(['TaskFcns' filesep '*.m']);
+            varargout=[varargout; {{tskfcn(:).name}}];
+        case 'avaliableschedulers' % returns a cell array of all the avaliable schedluing algorithms
+            schfcn=dir(['SchedulerFcns' filesep '*.m']);
+            varargout=[varargout; {{schfcn(:).name}}];
+        case 'pasttasksduration' % a struct with two fileds, fncStrUnq which contains a cell arrya of all past tasks acqFcn amd a durVector which contain the average time it took to perform that task. 
             
-            PastTasks.fncStrUnq={};
-            PastTasks.durVector={};
+            PastTasks.fncStrUnq={''};
+            PastTasks.durVector={0};
 
             % get past tasks
             ExecTsks=getTasks(rS,'status','executed');
             if isempty(ExecTsks)
+                varargout=[varargout; {PastTasks}];
                 return
             end
 
@@ -39,6 +46,7 @@ for i=1:length(varargin)
             for ii=1:length(PastTasks.fncStrUnq)
                 PastTasks.durVector{ii}=AllDuration(ismember(fncStr,PastTasks.fncStrUnq{ii}));
             end
+            varargout=[varargout; {PastTasks}];
         case 'newtaskid' % a new Task id (each task has a unique id number)
             rS.taskID=rS.taskID+1;
             varargout=[varargout; {rS.taskID}];
