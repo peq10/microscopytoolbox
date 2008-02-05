@@ -28,7 +28,7 @@ set(rS,'resolveErrors',false);
 
 % set schdeuler to be the most fitting for these type of combined scane /
 % timelapse schedule.
-set(rS,'schedulingmethod','greedy')
+set(rS,'schedulingmethod','greedy','refreshschedule',20)
 
 % clean any images in that folder
 delete(['Demos' filesep 'Junk' filesep '*'])

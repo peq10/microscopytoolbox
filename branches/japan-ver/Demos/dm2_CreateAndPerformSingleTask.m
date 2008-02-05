@@ -18,7 +18,7 @@ global rS; % name of the scope (rS=roboScope)
 rS=Scope(ScopeConfigFileName);
 
 % Specify where to save images
-set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk']);
+set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk'],'schedulingmethod','asadded');
 
 % clean any images in that folder
 delete(['Demos' filesep 'Junk' filesep '*'])

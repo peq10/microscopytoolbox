@@ -35,8 +35,8 @@ disp('Scope initialized');
 % We create a 5x5 grid where distance between sites is 1000 um. The
 % center of the grid is at [0 0]
 
-rows=7;
-cols=7;
+rows=5;
+cols=5;
 cntr=[0 0];
 dX=1000;
 Pos=createAcqPattern('grid',cntr,rows,cols,dX,zeros(rows*cols,1));
