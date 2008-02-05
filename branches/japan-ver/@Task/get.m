@@ -42,6 +42,22 @@ varargout=cell(length(varargin),1);
 
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'spawn_happened' % a logical flag that sways whether a task was spawned 
+            varargout{i}=Tsk.spawn.happened;
+        case 'spawn_flag' % a logical flag that says whether the task should spawn new tasks. 
+            varargout{i}=Tsk.spawn.flag;
+        case 'spawn_attributes2modify' % what attributes to modify in the child tasks. Other that these attributes, the child task gets basically all the task of the parent task
+            varargout{i}=Tsk.spawn.Attributes2Modify;
+        case 'spawn_filenameaddition' % what changes to do to the filename, this is just an addition rather than renaming the whole thing. To rename just add filename in attributes2modify
+            varargout{i}=Tsk.spawn.filenameAddition;
+        case 'spawn_testfcn' % the function to run on the image which decides whether a task (or tasks) should be spawned. 
+            varargout{i}=Tsk.spawn.TestFcn;
+        case 'spawn_tskfcn' % what task function the new tasks get. 
+            varargout{i}=Tsk.spawn.TskFcn;
+        case 'plotduringtask' % a flag that determines if during Tasks to call plotAll(rS) or not. 
+            varargout{i}=Tsk.plotDuringTask;
+        case 'writeimagetofile' % a flag that determines if during Tasks to perform image writes using writeTiff(Tsk,img,pth)
+            varargout{i}=Tsk.writeImageToFile;
         case 'waittime' % the time (in DAYS) out of the overall time the Roboscope spent doing this task that was spent waiting for the right time to do it
             varargout{i}=Tsk.waitTime;
         case 'metadata' % returns the MetaData part of the Task object, basically it strips done all the Task functionality. 

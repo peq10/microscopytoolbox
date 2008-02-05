@@ -1,33 +1,38 @@
-% function Tsk=acq_simple(Tsk) 
+function Tsk=acq_simple(Tsk) 
 
 global rS; % give access to the Scope functionality 
 
 %% get the crnt acq details 
-[X,Y,Exposure,Channels,Binning]=get(Tsk,'stageX',...
-                                          'stageY',...
-                                          'exposuretime',...
-                                          'ChannelNames',...
-                                          'Binning');
+[X,Y,Exposure,Channels]=get(Tsk,'stageX',...
+                                'stageY',...
+                                'exposuretime',...
+                                'Channels');
 
 %% goto XYZ
-set(rS,'xy',[X Y],'binning',Binning);
+set(rS,'xy',[X Y]);
 
-Tsk=set(Tsk,'planetime',now,... % time the image was taken
-            'stagex',get(rS,'x'),... % real position (xyz)
-            'stagey',get(rS,'y'),...
-            'stagez',get(rS,'z'));
-        
 %% snap image
 img=acqImg(rS,Channels,Exposure);
 
-%% Analyze image
-% automatic thresholding
-bw=im2bw(img,graythresh(img));
-[lbl,n]=bwlabel(bw);
+%% check if spawning is needed
+if get(Tsk,'spawn_flag')
+    spawned=spawn(Tsk,img);
+    if spawned, disp('spawned a task'); end
+    Tsk=set(Tsk,'spawn_happened',spawned);
+end
 
-%% Write image to disk
-if n>100
+%% update Task metadata
+Tsk=updateMetaData(Tsk);
+
+%% Write to disk
+if get(Tsk,'writeImageToFile')
     writeTiff(Tsk,img,get(rS,'rootfolder'));
 end
+
+%% plot 
+if get(Tsk,'plotDuringTask')
+    plotAll(rS);
+end
+
 
 

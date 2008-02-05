@@ -56,7 +56,7 @@ Tsk.id=get(rS,'NewTaskID');
 Tsk.fcn=fcn;
 
 % run time: acqTime and stageMoveTime and fucosTime
-Tsk.duration=10/86400; %default value for a task duration is 10 sec
+Tsk.duration=1/86400; %default value for a task duration is 10 sec
 Tsk.waitTime=0; % the time we waited for this Task to start
 
 % z-shift where to image - can have either scalar or array with number of
@@ -76,6 +76,25 @@ if exist('UserData','var')
 else
     Tsk.UserData=[];
 end
+
+% write behaviour - flag that says if during task execution (do(Task)) to
+% perform writeTiff operation. 
+Tsk.writeImageToFile=true; 
+
+% plot behaviour - flag that says if during task execution (do(Task)) to
+% perform plotting using Roboscope plotAll. 
+Tsk.plotDuringTask=true; 
+
+% spawnning - Task can spawn new tasks. Here are the fields that control
+% this behaviour
+Tsk.spawn.flag=false; % don't spawn by default. 
+Tsk.spawn.filenameAddition='_spawned';
+Tsk.spawn.Attributes2Modify=struct([]);
+Tsk.spawn.TskFcn='';
+Tsk.spawn.TestFcn=@(x) false;
+Tsk.spawn.happened=false; 
+
+
 
 
 %% create the object from the struct array

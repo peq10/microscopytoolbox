@@ -16,12 +16,11 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'units' % a struct the defines what type of units are used by Roboscope for different stuff. <br> Defaults: stageXY='micro-menter'; stageZ='micro-meter'; exposureTime='msec'; acqTime='sec';
+            varargout=[varargout; {rS.units}];
         case 'avaliabletskfcns' % returns a cell array of all the avaliable task functions
             tskfcn=dir(['TaskFcns' filesep '*.m']);
             varargout=[varargout; {{tskfcn(:).name}}];
-        case 'avaliableschedulers' % returns a cell array of all the avaliable schedluing algorithms
-            schfcn=dir(['SchedulerFcns' filesep '*.m']);
-            varargout=[varargout; {{schfcn(:).name}}];
         case 'pasttasksduration' % a struct with two fileds, fncStrUnq which contains a cell arrya of all past tasks acqFcn amd a durVector which contain the average time it took to perform that task. 
             
             PastTasks.fncStrUnq={''};
@@ -114,7 +113,7 @@ for i=1:length(varargin)
             varargout=[varargout; {rS.pxlsz.um(strcmp(rS.pxlsz.label,get(rS,rS.OBJName)))}];
         case 'focusmethod' % what is the currrent focus method - STILL PERLIMINARY needs more work
             varargout=[varargout; {rS.focusMethod}];
-        case 'avaliableschdeulingmethods' % the avaliable schedulng methods that are defined in the SchedualerFcns folder
+        case 'avaliableschedulers' % the avaliable schedualing methods that are defined in the SchedualerFcns folder
             dr=dir('SchedulerFcns/*.m');
             m=cell(size(dr));
             [m{:}]=dr.name;

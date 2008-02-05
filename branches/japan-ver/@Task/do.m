@@ -21,23 +21,26 @@ if length(Tsk)~=1
     error('Can only do one task at a time...'); 
 end
 
-fprintf(['--------------------\nTask id: ' num2str(get(Tsk,'id')) '\nfunction: ' func2str(get(Tsk,'fcn')) '\nfilename: ' get(Tsk,'filename') '\ntime: ' datestr(now,0) '\n']);
+fprintf(['--------------------\nTask id: ' num2str(get(Tsk,'id')) '\nfunction: ' func2str(get(Tsk,'tskfcn')) '\nfilename: ' get(Tsk,'filename') '\ntime: ' datestr(now,0) '\n']);
 
 % check to see if task was already executed?
 if strcmp(get(Tsk,'status'),'inqueue')
     wait_time=0;
-    %check if its a timed task
+    % check if its a timed task
     if get(Tsk,'timedependent');
-        tm=get(Tsk,'planetime');
+        tm=get(Tsk,'acqtime');
         if tm > now && strcmp(get(Tsk,'LateBehavior'),'drop')
             fprintf('Task (with id %i) was droped from queue since we are late....\n',get(Tsk,'id'));
             Tsk.executed=-1;
             return
         end
         wait_time=tm-now;
+        if wait_time > 0
+            fprintf('waiting for %s ',datestr(wait_time,13))
+        end
         while now < tm
-%             updateStatusBar( rS,1-(tm-now)/wait_time )
             pause(0.1)
+            fprintf('.')
         end
         disp(sprintf('Task time %s',datestr(tm,0)))
     end

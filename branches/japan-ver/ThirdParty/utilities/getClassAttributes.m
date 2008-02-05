@@ -38,7 +38,7 @@ prop=prop(ind);
     
 function prop=getPropsFromFile(filename)
 % used to actually extract the prperties from a giver set/get file
-[bla,L]=grep('case',filename); %#ok<SETNU,NASGU>
+[bla,L]=grep('-s','case',filename); %#ok<SETNU,NASGU>
 for i=1:length(L.match)
     ln=regexprep(L.match{i},char(13),'');
     delIx=strfind(ln,'%');
@@ -49,6 +49,7 @@ for i=1:length(L.match)
         f=ln;
         l='';
     end
-    prop{i,1}=regexprep(f,{'case','''',' ',},'');
+    f=regexprep(f,{'case','''',' ','{','}'},'');
+    prop{i,1}=regexprep(f,',',' , ');
     prop{i,2}=l;
 end

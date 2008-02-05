@@ -30,6 +30,10 @@ end
 varargout=cell(size(varargin));
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'creationtime' % date the image was first written to disk
+            varargout{i}=md.CreationTime;
+        case 'lastchangetime' % date the image was last written to disk
+            varargout{i}=md.LastChangeTime;
         case 'imgwidth' % number of columns in the image matrix. 
             varargout{i}=str2arr(md.ImgWidth);
         case 'imgheight' % number of rows in the image matrix.
@@ -60,7 +64,8 @@ for i=1:length(varargin)
             % remove bracets and break into multi line
             str = regexprep(regexprep(str,'[{}]',''),',','\n');
             % return the cell array
-            varargout{i}=textscan(str,'%s');
+            cl=textscan(str,'%s');
+            varargout{i}=cl{1};
         case 'channeldescription' %  A hash table (struct) where each channel is a key (field name) and there is freedom as to the value. Could na a number, a char or additional struct with several keys. Also doesn't have to be the same to all channels
             % we use str2arr to convert string into struct
             varargout{i}=str2arr(md.ChannelDescription);
@@ -84,6 +89,9 @@ for i=1:length(varargin)
         case 'exposuretime' % return the exposure time used. Uses method for input reduction, see Binning attribute for details. 
             cl_in=str2arr({md.TimePoint(:).ExposureTime});
             varargout{i}=reduceInput(cl_in);
+        case 'exposure' % return the exposure time used. Uses method for input reduction, see Binning attribute for details.
+            cl_in=str2arr({md.TimePoint(:).ExposureTime});
+            varargout{i}=reduceInput(cl_in);
         case 'stagex' % return the X-position of the stage when the image was captured. Uses method for input reduction, see Binning attribute for details. 
             cl_in=str2arr({md.TimePoint(:).StageX});
             varargout{i}=reduceInput(cl_in);
@@ -96,7 +104,14 @@ for i=1:length(varargin)
         case 'channelidx' %TODO: add channelidx for each timepoint
             
         case 'acqtime' % A list of the acquisition timepoints. Units are in Matlab's numeric date number internal representation is in datestr(now,0)
-            varargout{i}=datenum({md.TimePoint(:).AcqTime}); 
+            dt={md.TimePoint(:).AcqTime};
+            ind=find(ismember(dt,'NaN'));
+            if ~isempty(ind)
+                dt{ind}='00-Jan-0000';
+            end
+            dt=datenum(dt);
+            dt(dt==0)=NaN;
+            varargout{i}=dt; 
         case 'timepointnum' % the number of timepoints there are
             varargout{i}=length(md.TimePoint);
         case 'displaymode' % provides information on how to display the image. is it displayed, is it RGB, GRAY, JET
@@ -108,7 +123,7 @@ for i=1:length(varargin)
         case 'displayroi' % If only a subset of the image needs diplaying, these are the indexes for it. 
             varargout{i}=str2arr(md.DisplayOptions.ROI);
         case 'xml' % a dump of all the metadata in an xml format. 
-            varargout{i}=['<III>' struct2xml(struct(md)) '</III>'];
+            varargout{i}=['<MD>' struct2xml(struct(md)) '</MD>'];
         otherwise
             error('attribute %s is not part of MetaData properties interface',varargin{i});
     end
