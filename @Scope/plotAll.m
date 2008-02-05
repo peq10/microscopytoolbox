@@ -13,16 +13,20 @@ function plotAll(rS)
 
 plotInfo=get(rS,'plotInfo');
 
-for i=1:length(plotTypes)
-    figure(plotInfo(i).num,'position',plotInfo(i).position,...
+for i=1:length(plotInfo)
+    if plotInfo(i).num == 0
+        fig=figure; 
+    else
+        fig=plotInfo(i).num;
+    end
+    figure(fig)
+    set(fig,'position',plotInfo(i).position,...
                         'Toolbar','none','Menubar','none',...
                         'name',plotInfo(i).type);
     clf
     switch lower(plotInfo(i).type)
         case 'focal plane'
             plotFocalPlaneGrid(rS);
-        case 'past route'
-            plotPastRoute(rS);
         case 'planned schedule'
             plotPlannedSchedule(rS);
         case 'route'

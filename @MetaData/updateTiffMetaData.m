@@ -10,10 +10,16 @@ function updateTiffMetaData( md,pth )
 %
 %    TODO: the current implementation doesn't block for write, it should!
 
-str=get(md,'xml');
-filename=fullfile(pth,[get(md,'filename') '.tiff']);
 
-%% write the tag str to temp file
+%% get the filename & check it
+filename=fullfile(pth,get(md,'filename'));
+[p,f,ext]=fileparts(filename);
+if ~ismember(ext,{'.tif','.tiff'})
+    filename=[filename '.tiff'];
+end
+
+%% get the XML as string (str) and write it to to temp file
+str=get(md,'xml');
 fid=fopen('MetaDataTemp.tmp','w');
 fprintf(fid,'%s',str);
 fclose(fid);

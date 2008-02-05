@@ -132,7 +132,8 @@ options = struct('verbose', 1,...
                  'rootdir', pwd,...
 				 'ignoredDir', {{'.svn' 'cvs'}}, ...
                  'language', 'english',...
-                 'attributes',true);
+                 'attributes',true,...
+                 'demos',false);
 
 if nargin == 1 & isstruct(varargin{1})
 	paramlist = [ fieldnames(varargin{1}) ...
@@ -320,6 +321,8 @@ for i=1:2:length(paramlist)
             end
         case 'attributes'
             options.attributes=logical(pvalue);
+        case 'demos' 
+            options.demos=logical(pvalue);
 		otherwise
 			error(['Invalid parameter: ''' pname '''.']);
 	end
@@ -504,6 +507,7 @@ tpl = set(tpl,'block','TPL_MASTER','idrow','idrows');
 tpl = set(tpl,'block','idrow','idcolumn','idcolumns');
 tpl = set(tpl,'block','TPL_MASTER','search','searchs');
 tpl = set(tpl,'block','TPL_MASTER','graph','graphs');
+tpl = set(tpl,'block','TPL_MASTER','demo','demos');
 
 %- Open for writing the HTML master index file
 curfile = fullfile(options.htmlDir,[options.indexFile options.extension]);
@@ -564,6 +568,37 @@ tpl = set(tpl,'var','graphs','');
 if options.graph & options.globalHypertextLinks & length(mdir) > 1
     tpl = set(tpl,'var','LGRAPH',[dotbase options.extension]);
     tpl = parse(tpl,'graphs','graph',1);
+end
+
+%- Link to the demos file if asked for
+tpl = set(tpl,'var','demos','');
+tpl_demo='demo.tpl';
+dm_files=dir([pwd filesep options.htmlDir filesep 'Demos' filesep 'dm*.html']);
+if options.demos  && ~isempty(dm_files)
+    tpl = set(tpl,'var','LDEMO',['Demos' options.extension]);
+    tpl = parse(tpl,'demos','demo',1);
+    
+    %% create the Demo.html file
+    tpldemo = template(options.template,'remove');
+    tpldemo = set(tpldemo,'file','TPL_DEMO',tpl_demo);
+    
+    %- Set template fields
+	tpldemo = set(tpldemo,'var','INDEX',     [options.indexFile options.extension]);
+	tpldemo = set(tpldemo,'var','MASTERPATH','');
+    tpldemo = set(tpldemo,'block','TPL_DEMO','demo','demos');
+    tpldemo = set(tpldemo,'var','demos','');
+    for i=1:length(dm_files)
+        nm=dm_files(i).name;
+        [bla,nm]=strtok(nm,'_'); %#ok<STTOK>
+        [bla,nm]=fileparts(nm(2:end));
+        tpldemo = set(tpldemo,'var','L_NAME', ['Demos/' dm_files(i).name]);
+        tpldemo = set(tpldemo,'var','NAME',   nm);
+        tpldemo = parse(tpldemo,'demos','demo',1);
+    end
+    tpldemo=parse(tpldemo,'OUT','TPL_DEMO');
+    fid_demo=fopen([options.htmlDir filesep 'Demos.html'],'w');
+    fprintf(fid_demo,'%s',get(tpldemo,'OUT'));
+    fclose(fid_demo);
 end
 
 %- Print the template in the HTML file

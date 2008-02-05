@@ -11,11 +11,18 @@ function writeTiff(md,img,pth)
 %           img=acqImg(rS); 
 %           writeTiff(md,img,get(rS,'rootFolder'));
 
-filename=fullfile(pth,[get(md,'filename') '.tiff']);
 
+%% check if its more then one MetaData element
 if length(md)>1
     warning('You supplied an array, using only the first MetaData object in it');  %#ok<WNTAG>
     md=md(1);
+end
+
+%% get the filename and check if need to add .tff
+filename=fullfile(pth,get(md,'filename'));
+[p,f,ext]=fileparts(filename);
+if ~ismember(ext,{'.tif','.tiff'})
+    filename=[filename '.tiff'];
 end
 
 %% check to see if file exist - if so concatenates the MetaData objects

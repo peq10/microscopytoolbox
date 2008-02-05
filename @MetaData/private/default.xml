@@ -4,14 +4,13 @@
     <ImageFileName></ImageFileName>
     <InCollection></InCollection>
     <InCollection></InCollection>
-    <CreationDate></CreationDate>
-    <LastChangeDate></LastChangeDate>
-    <Description></Description>
+    <CreationTime></CreationTime>
+    <LastChangeTime></LastChangeTime>
     <PixelType>uint16</PixelType>
     <BitDepth></BitDepth>
     <PixelSize>{}</PixelSize>
     <Channels>{}</Channels>
-    <ChannelDescriptoin></ChannelDescriptoin>
+    <ChannelDescription></ChannelDescription>
   	<DimensionOrder>XYCZT</DimensionOrder>
     <DimensionSize>{1,1,1}</DimensionSize>
     <ImgHeight>{}</ImgHeight>
@@ -22,6 +21,7 @@
          <StageY>{{}}</StageY>
          <StageZ>{{}}</StageZ>
          <Binning>{{}}</Binning>
+         <ChannelIdx>{{}}</ChannelIdx>
          <ExposureTime>{{}}</ExposureTime>
          <Qdata>
                <QdataType></QdataType>
@@ -32,26 +32,6 @@
                <QdataType></QdataType>
                <Value></Value>
                <Label></Label>
-         </Qdata>
-    </TimePoint>
-    <TimePoint>
-         <AcqTime>NaN</AcqTime>
-         <StageX>{{}}</StageX>
-         <StageY>{{}}</StageY>
-         <StageZ>{{}}</StageZ>
-         <Binning>{{}}</Binning>
-         <ExposureTime>{{}}</ExposureTime>
-         <Qdata>
-               <QdataType></QdataType>
-               <Value></Value>
-               <Label></Label>
-               <QdataDescription></QdataDescription>
-         </Qdata>
-         <Qdata>
-               <QdataType></QdataType>
-               <Value></Value>
-               <Label></Label>
-               <QdataDescription></QdataDescription>
          </Qdata>
     </TimePoint>
     <Qdata>
@@ -59,12 +39,6 @@
          <Value></Value>
          <Label></Label>
          <QdataDescription></QdataDescription>
-    </Qdata>
-	<Qdata>
-          <QdataType></QdataType>
-          <Value></Value>
-          <Label></Label>
-          <QdataDescription></QdataDescription>
     </Qdata>
     <DisplayOptions>
           <DisplayMode>Gray</DisplayMode>

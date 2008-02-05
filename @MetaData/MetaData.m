@@ -37,12 +37,10 @@ if nargin == 1 && ischar(varargin{1}) && exist(varargin{1},'file')
     md=md.MD;
     md=class(md,'MetaData');
     return
-else 
-    error('Input for MetaData is wrong - if you supply a single input it should be a filename');
 end
 
 % Here I deal with the case of pairs of properties name and values
-if ~mod(length(varargin),2) %#ok<NODEF>
+if mod(length(varargin),2) %#ok<NODEF>
     error('Must Supply PAIRS of property name, value')
 end
 

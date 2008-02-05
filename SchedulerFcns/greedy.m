@@ -3,7 +3,7 @@ function ordr = greedy(schdle_data)
 
 x=schdle_data.x;
 y=schdle_data.y;
-t=schdle_data.t;
+t=schdle_data.t-now;
 id=schdle_data.id;
 xcurrent=schdle_data.xCurrent;
 ycurrent=schdle_data.yCurrent;

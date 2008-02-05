@@ -14,6 +14,20 @@ end
 
 for i=1:2:length(varargin)
     switch lower(varargin{i})
+        case 'creationtime' % valid date string
+            try
+                datenum(varargin{i+1}); 
+            catch 
+                error('LastChangeDate value must be legitimate date string');
+            end
+            md.CreationTime=varargin{i+1};
+        case 'lastchangetime' % valid date string
+            try
+                datenum(varargin{i+1}); 
+            catch 
+                error('LastChangeDate value must be legitimate date string');
+            end
+            md.LastChangeTime=varargin{i+1};
         case 'collections' % input must be a cell array of chars or a single char. 
             if ~iscell(varargin{i+1}) && ~ischar(varargin{i+1})
                 error('for collection input must be a cell array or single char')
@@ -27,17 +41,17 @@ for i=1:2:length(varargin)
                 str=[str ',' varargin{i+1}];
             end
             str=[str '}'];
-            md.CollectionData.Collection=str;
+            md.InCollection=str;
         case 'imagetype' % must be a char
             if ~ischar(varargin{i+1})
                 error('Image type must be a char');
             end
-            md.Image.ImageType=varargin{i+1};
+            md.ImageType=varargin{i+1};
         case 'filename' % must be a char
             if ~ischar(varargin{i+1})
                 error('Image filename must be a char');
             end
-            md.Image.ImageFileName=varargin{i+1};
+            md.ImageFileName=varargin{i+1};
         case 'creationdate' % must be a char and a parsible date format
             % I don't really like using try/catch for input check but since
             % the error is in the catch I think its ok. 
@@ -49,7 +63,7 @@ for i=1:2:length(varargin)
             if ~ischar(varargin{i+1})
                 error('CreationDate must be a char');
             end
-            md.CreationDate=varargin{i+1};
+            md.CreationTime=varargin{i+1};
         case 'lastchangedate' % must be a char and a parsible date format
             % I don't really like using try/catch for input check but since
             % the error is in the catch I think its ok. 
@@ -61,29 +75,29 @@ for i=1:2:length(varargin)
             if ~ischar(varargin{i+1})
                 error('LastChangeDate must be a char');
             end
-            md.LastChangeDate=varargin{i+1};
+            md.LastChangeTime=varargin{i+1};
         case 'description' % must be a char
             if ~ischar(varargin{i+1})
                 error('Image Description must be a char');
             end
-            md.Image.Description=varargin{i+1};
+            md.Description=varargin{i+1};
         case 'pixeltype' % must be one of: (uint8,uint16,logical,single,double)
             if ~ischar(varargin{i+1})
                 error('Image PixelType must be a char');
             elseif ~ismember(varargin{i+1},{'uint8','uint16','logical','single','double'})
                 error('Image Type must be one of: (uint8,uint16,logical,single,double)');
             end
-            md.Image.PixelType=varargin{i+1};
+            md.PixelType=varargin{i+1};
         case 'bitdepth' % must be numeric integer (will be rounded anyway)
-            if ~isa(varargin{i+1},'numeric') || ismember(numel(varargin{i+1}),[1 3])
-                error('Image BitDepth must be signle numeric');
+            if ~isa(varargin{i+1},'numeric') || ~ismember(numel(varargin{i+1}),[1 3])
+                error('Image BitDepth must be single numeric');
             end
-            md.Image.BitDepth=num2str(round(varargin{i+1}));
+            md.BitDepth=num2str(round(varargin{i+1}));
         case 'pixelsize' % must be a numeric scalar (x/y when they are the same) of an array of size 3 ([x y z])
             if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=1
                 error('Image PixelSize must be signle numeric');
             end
-            md.Image.PixelSizeX=num2str(varargin{i+1});
+            md.PixelSizeX=num2str(varargin{i+1});
         case 'channels' % a cell array of strings (or single string)
             if ~iscell(varargin{i+1}) && ~ischar(varargin{i+1})
                 error('Channels must be a cell array or string')
@@ -91,7 +105,20 @@ for i=1:2:length(varargin)
             if ischar(varargin{i+1})
                 varargin{i+1}={varargin{i+1}};
             end
-            md.Image.ChannelInfo=varargin{i+1};
+            str=['{' varargin{i+1}{1}];
+            for ii=2:length(varargin{i+1})
+                str=[str ',' varargin{i+1}{ii}];
+            end
+            str=[str '}'];
+            md.Channels=str;
+            
+            
+            % update the DimensionSize metadata
+            [ordr,sz]=get(md,'dimensionorder','dimensionsize');
+            Tind=strfind(ordr,'T')-2;
+            sz(Tind)=length(varargin{i+1});
+            md=set(md,'dimensionsize',sz);
+            
         case 'channeldescription' % must be a single struct with fields subset of get(md,'channels')
             if ~isstruct(varargin{i+1}) && numel(varargin{i+1}) ~=1 
                 error('ChannelDescriptoin must be a single struct');
@@ -108,22 +135,22 @@ for i=1:2:length(varargin)
             if ~ismember(varargin{i+1},{'XYTCZ', 'XYTZC', 'XYZTC', 'XYZCT', 'XYCZT', 'XYCTZ'})
                error('Dimension Order must be one of {XYTCZ, XYTZC, XYZTC, XYZCT, XYCZT, XYCTZ}'); 
             end
-            md.Image.DimensionOrder=varargin{i+1};
+            md.DimensionOrder=varargin{i+1};
         case 'dimensionsize' % Image DimensionSize must be numeric with numel smaller or euqal to3
             if ~isnumeric(varargin{i+1}) || numel(varargin{i+1}) > 3
                 error('Image DimensionSize must be numeric with numel <=3');
             end
-            md.Image.DimensionSize=arr2str(varargin{i+1});
+            md.DimensionSize=arr2str(varargin{i+1});
         case 'imgheight' % ImgHeight must be numeric scalar
             if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~= 1
                 error('ImgHeight must be numeric scalar')
             end
-            md.Image.PlaneData.ImgHeight=double2str(varargin{i+1});
+            md.ImgHeight=num2str(varargin{i+1});
         case 'imgwidth' % ImgWidth must be numeric scalar
             if ~isa(varargin{i+1},'numeric') ||  numel(varargin{i+1})~= 1
                 error('ImgWidth must be numeris and <= 3D')
             end
-            md.Image.PlaneData.ImgWidth=double2str(varargin{i+1});
+            md.ImgWidth=num2str(varargin{i+1});
             
             
         %% Timepoint related attributes    
@@ -132,9 +159,20 @@ for i=1:2:length(varargin)
                 error('Timepoint must be numeric')
             end
             tp=varargin{i+1};
+            % If I'm speccifying more timepoints that exist, use the last
+            % timepoint that exist as the default to define the rest
+            crnt_tp_num=get(md,'timepointnum');
             for ii=1:length(tp)
-                md.TimePoint(i).AcqTime=datestr(tp(i),0);
+                if ii>crnt_tp_num
+                    md.TimePoint(ii)=md.TimePoint(crnt_tp_num);
+                end
+                md.TimePoint(ii).AcqTime=datestr(tp(ii),0);
             end
+            [ordr,sz]=get(md,'dimensionorder','dimensionsize');
+            % update the DimensionSize metadata
+            Tind=strfind(ordr,'T')-2;
+            sz(Tind)=length(tp);
+            md=set(md,'dimensionsize',sz);
             
         case 'binning' % must be: 1. numeric and smaller or equal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
             if ~iscell(varargin{i+1}) &&  ( ~isa(varargin{i+1},'numeric') || ndims(varargin{i+1}) > 3)  
@@ -145,7 +183,7 @@ for i=1:2:length(varargin)
             inpt=varargin{i+1};
             output=repinput(sz,ordr,inpt);
             for ii=1:tpn
-                md.TimePoint(ii).Binning=output{ii};
+                md.TimePoint(ii).Binning=arr2str(output{ii});
             end
 
         case 'stagex' % must be: 1. numeric and smaller or euqal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
@@ -157,7 +195,7 @@ for i=1:2:length(varargin)
             inpt=varargin{i+1};
             output=repinput(sz,ordr,inpt);
             for ii=1:tpn
-                md.TimePoint(ii).StageX=output{ii};
+                md.TimePoint(ii).StageX=arr2str(output{ii});
             end
             
         case 'stagey' % must be: 1. numeric and smaller or euqal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
@@ -169,7 +207,7 @@ for i=1:2:length(varargin)
             inpt=varargin{i+1};
             output=repinput(sz,ordr,inpt);
             for ii=1:tpn
-                md.TimePoint(ii).StageY=output{ii};
+                md.TimePoint(ii).StageY=arr2str(output{ii});
             end
         case 'stagez' % must be: 1. numeric and smaller or euqal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
             if ~iscell(varargin{i+1}) &&  ( ~isa(varargin{i+1},'numeric') || ndims(varargin{i+1}) > 3)  
@@ -180,8 +218,13 @@ for i=1:2:length(varargin)
             inpt=varargin{i+1};
             output=repinput(sz,ordr,inpt);
             for ii=1:tpn
-                md.TimePoint(ii).StageZ=output{ii};
+                md.TimePoint(ii).StageZ=arr2str(output{ii});
             end
+            
+            % update the DimensionSize metadata
+            Zind=strfind(ordr,'Z')-2;
+            sz(Zind)=length(inpt);
+            md=set(md,'dimensionsize',sz);
             
         case 'exposuretime' % must be: 1. numeric and smaller or euqal to 3D OR cell array where each cell is a 1-2D numeric, for cases where its 2D its [ZxC] z-planes for rows and channels for columns
             if ~iscell(varargin{i+1}) &&  ( ~isa(varargin{i+1},'numeric') || ndims(varargin{i+1}) > 3)  
@@ -192,7 +235,18 @@ for i=1:2:length(varargin)
             inpt=varargin{i+1};
             output=repinput(sz,ordr,inpt);
             for ii=1:tpn
-                md.TimePoint(ii).ExposureTime=output{ii};
+                md.TimePoint(ii).ExposureTime=arr2str(output{ii});
+            end
+        case 'exposure'
+            if ~iscell(varargin{i+1}) &&  ( ~isa(varargin{i+1},'numeric') || ndims(varargin{i+1}) > 3)
+                error('Exposure Time must be cell array OR a numeric with upto <= 3D')
+            end
+            
+            [sz,ordr,tpn]=get(md,'dimensionsize','dimensionorder','timepointnum');
+            inpt=varargin{i+1};
+            output=repinput(sz,ordr,inpt);
+            for ii=1:tpn
+                md.TimePoint(ii).ExposureTime=arr2str(output{ii});
             end
         case 'timepointqdata' % a Qdata struct (array), see Qdata,  or a cell array of Qdata struct (arrays) with the same number of cells as there are timepoits!
             if istruct(varargin{i+1})
@@ -217,12 +271,12 @@ for i=1:2:length(varargin)
             if ~ischar(varargin{i+1}) || ~sum(ismember(varargin{i+1},{'Gray','RGB','Comp'}))
                 error('Unsupported disaply mode - must be Gray / RGB / Comp');
             end
-            md.Image.DisplayOptions.DisplayMode=varargin{i+1};
+            md.DisplayOptions.DisplayMode=varargin{i+1};
         case 'displaylevels' % 'Display levels must be numeric 4 x 2 matrix'
             if ~isa(varargin{i+1},'numeric') || size(varargin{i+1},1)~=4 || size(varargin{i+1},2)~=2
                 error('Display levels must be numeric 4 x 2 matrix')
             end
-            md.Image.DisplayOptions.Levels=arr2str(varargin{i+1});
+            md.DisplayOptions.Levels=arr2str(varargin{i+1});
         case 'displaychannels' % 'Display channel must be either a 4 element cell array with channel names (or 'None') or a  numeric 4 element vector which references the channel for the Red Green Blue and Gray disaply channels, set 0 for none
             if ~isa(varargin{i+1},'numeric') && ~iscell(varargin{i+1}) || numel(varargin{i+1})~=4 
                 error(['Display channel must be a 4 element cell array with channel mames numeric 4 element vector which references the:\n'...
@@ -238,13 +292,13 @@ for i=1:2:length(varargin)
             else
                 ind=varargin{i+1};
             end
-            md.Image.DisplayOptions.Channels=arr2str(ind);
+            md.DisplayOptions.Channels=arr2str(ind);
             
         case 'displayroi' % 'Display levels must be numeric 4 element matrix
             if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=4 
                 error('Display levels must be numeric 4 element matrix')
             end
-            md.Image.DisplayOptions.ROI=arr2str(varargin{i+1});
+            md.DisplayOptions.ROI=arr2str(varargin{i+1});
         otherwise
             error('attribute %s is not part of MetaData properties interface',varargin{i});
     end
@@ -269,6 +323,8 @@ for ii=1:sz(Tind)
         mat=inpt{ii};
     elseif ndims(inpt) == 3
         mat=inpt(:,:,ii);
+    else
+        mat=inpt;
     end
     outpt{ii}=repmat(mat,rep);
 end

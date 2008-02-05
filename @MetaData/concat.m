@@ -57,9 +57,11 @@ md.TimePoint=[newmdarray(:).TimePoint];
 
 
 %% create a union list of collections and set it as the collection
-collections=get(newmdarray,'collections');
+[collections,creationtime,lastchagetime]=get(newmdarray,'collections','creationtime','lastchangetime');
 collections=[collections{:}];
 collections=unique(collections);
+creationtime=min([creationtime{:}]);
+lastchagetime=min([lastchagetime{:}]);
 
 % set the last one collection attributes 
-md=set(md,'collections',collections);
+md=set(md,'collections',collections,'lastchangetime',lastchagetime,'creationtime',creationtime);

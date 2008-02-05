@@ -15,6 +15,25 @@ if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
+        case 'units' % input must be a struct with the following fields: {'stageXY','stageZ','exposureTime','acqTime'}; Allowed values for spatial fileds (stage) are: mili-meter micro-meter, nano-meter. For temporal fileds: msec, sec, min, hours
+            units=varargin{i+1};
+            if ~isstruct(units), error('Units must be a struct'); end
+            if ~isempty(setxor(fields(units),{'stageXY','stageZ','exposureTime','acqTime'}))
+                error('Units must have the following fields: {''stageXY'',''stageZ'',''exposureTime'',''acqTime''}');
+            end
+            if ~ismember(units.stageXY,{'mili-meter','micro-meter', 'nano-meter'})
+                error('stageXY units must be: mili-meter micro-meter, nano-meter');
+            end
+            if ~ismember(units.stageZ,{'mili-meter','micro-meter', 'nano-meter'})
+                error('stageXY units must be: mili-meter micro-meter, nano-meter');
+            end
+            if ~ismember(units.exposureTime,{'msec', 'sec', 'min', 'hours'})
+                error('Exposure Time units must be: msec, sec, min, hours');
+            end
+            if ~ismember(units.acqTime,{'msec', 'sec', 'min', 'hours'})
+                error('Exposure Time units must be: msec, sec, min, hours');
+            end
+            rS.units
         case 'plotinfo' % inputs: the char 'current' that would grab the figure status as they are or a struct with fields: 'type','num','positoin' fields. 
             % array from current open figures. 
             if ischar(varargin{i+1}) && strcmp(varargin{i+1},'current')
@@ -30,7 +49,7 @@ for i=1:2:n
             if ~isstruct(varargin{i+1})
                 error('plotInfo must be a struct')
             end
-            if ~isequal(sort(fieldnames(varargin{i+1})),{'num','position','type',})
+            if ~isempty(setxor(fieldnames(varargin{i+1}),{'num';'position';'type'}))
                 error('plotInfo must have the fields: num / position /type');
             end
             rS.plotInfo=varargin{i+1};
@@ -74,35 +93,26 @@ for i=1:2:n
                 error('''focuspointshistory'' must be positive scalar');
             end
             rS.FocusPointHistory=varargin{i+1};
-        case 'x' % single number in um units (absolute cordinates)
+        case 'x' % single number (absolute cordinates) units are based on rS unit property
             x=varargin{i+1};
+            x=transformUnits( rS, 'stageXY', x );
             y=rS.mmc.getYPosition(rS.XYstageName);
             rS.mmc.setXYPosition(rS.XYstageName,x,y);
-        case 'y' % single number in um units (absolute cordinates)
+        case 'y' % single number (absolute cordinates) units are based on rS unit property
             x=rS.mmc.getXPosition(rS.XYstageName);
             y=varargin{i+1};
+            y=transformUnits( rS, 'stageXY', y );
             rS.mmc.setXYPosition(rS.XYstageName,x,y);
-        case 'xy' % a vector of [x,y] position in um
+        case 'xy' % a vector of [x,y] position absolute coordinates, units are based on rS unit property
             x=varargin{i+1}(1);
+            x=transformUnits( rS, 'stageXY', x );
             y=varargin{i+1}(2);
+            y=transformUnits( rS, 'stageXY', y );
             rS.mmc.setXYPosition(rS.XYstageName,x,y);
-%   %% Following section is a "HACK" done to artificially slow the speed, better 
-%   %% to fix the speed property and use that. 
-%       c ase 'xy-slow'
-%             x=varargin{i+1}(1);
-%             y=varargin{i+1}(2);
-%             [curr_x,curr_y]=get(rS,'x','y');
-%             xint=linspace(curr_x,x,6);
-%             yint=linspace(curr_y,y,6);
-%             xint=xint(2:end);
-%             yint=yint(2:end);
-%             for j=1:5
-%                 set(rS,'xy',[xint(j) yint(j)])
-%                 pause(0.2);
-%             end
-            
-        case'z' % single number in um units (absolute cordinates)
-            rS.mmc.setPosition(rS.ZstageName,varargin{i+1})
+        case 'z' % single number (absolute cordinates) units are based on rS unit property
+            z=varargin{i+1};
+            z=transformUnits( rS, 'stageZ', z );
+            rS.mmc.setPosition(rS.ZstageName,z)
         case 'stagespeed.x' % TODO: implement stagtespeed.X via mmc
         case 'stagespeed.y' % TODO: implement stagtespeed.y via mmc
         case 'stagespeed.z' % TODO: implement stagtespeed.z via mmc
@@ -134,7 +144,9 @@ for i=1:2:n
             if ~isreal(varargin{i+1}) || numel(varargin{i+1})~=1 || varargin{i+1} <0
                 error('Exposure must be a double positive scalar!');
             end
-            rS.mmc.setExposure(varargin{i+1});
+            exptime=varargin{i+1};
+            exptime=transformUnits( rS, 'exposureTime', exptime );
+            rS.mmc.setExposure(exptime);
         case 'rootfolder' % a legal path to somewhere in the file system. 
             if ~ischar(varargin{i+1}) || ~exist(varargin{i+1},'dir')
                 error('rootFolder must be a string and a legit folder, please check');
@@ -149,7 +161,7 @@ for i=1:2:n
         case 'lastimage' % an image
             rS.lastImage=varargin{i+1};
         case 'schedulingmethod' % a string speficiying a legal scheduling method e.g. it exist in the SchdualerFcns folder
-            if ~ismember(varargin{i+1},get(rS,'avaliableschdeulingmethods'))
+            if ~ismember(varargin{i+1},get(rS,'avaliableschedulers'))
                 error('Not a legal scheduling method');
             end
             rS.schedulingMethod=varargin{i+1};

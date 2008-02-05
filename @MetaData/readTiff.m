@@ -33,7 +33,11 @@ if ischar(md) && exist(fullfile(pth,[md '.tiff']),'file')
 end
 
 %% get the filename & check it
-filename=fullfile(pth,[get(md,'filename') '.tiff']);
+filename=fullfile(pth,get(md,'filename'));
+[p,f,ext]=fileparts(filename);
+if ~ismember(ext,{'.tif','.tiff'})
+    filename=[filename '.tiff'];
+end
 
 % checks to see that filename exists
 if ~exist(filename,'file')
@@ -49,7 +53,9 @@ ordr=get(md,'dimensionorder');
 Tdim=find(ordr=='T');
 Zdim=find(ordr=='Z');
 
-if N ~= prod(dim), error('Number of planes in file is different that expected by attribute DimensionSize, please check'); end
+if N ~= prod(dim), 
+    error('Number of planes in file is different that expected by attribute DimensionSize, please check'); 
+end
 
 %% If no projection or timeslice - read all in fast way
 if isempty(varargin)

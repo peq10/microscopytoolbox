@@ -32,6 +32,9 @@ fclose(fid);
 
 % run ACOTSP
 cmd=sprintf('acotsp -i Tasks.tsp -r 1 -t 3 -g %i > acotsp.log',min(length(id),20));
+if isunix
+    cmd=['./' cmd];
+end
 msg=system(cmd); %#ok<NASGU>
 if msg==0
     tr = dlmread('Tour.txt');

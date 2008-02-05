@@ -52,6 +52,12 @@ rS.focusMethod='ASI';
 % default scheduling method
 rS.schedulingMethod='greedy'; 
 
+% Units
+rS.units.stageXY='micro-meter';
+rS.units.stageZ='micro-meter';
+rS.units.exposureTime='msec';
+rS.units.acqTime='sec';
+
 % the last image captured, only saving that one (but could be a 3 channel
 % image as well...
 rS.lastImage=[];

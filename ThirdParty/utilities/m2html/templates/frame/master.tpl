@@ -33,6 +33,13 @@
 </form>
 <!-- END search -->
 
+<!-- BEGIN demo -->
+<h2>System Demo:</h2>
+<ul style="list-style-image:url({MASTERPATH}microscope.gif)">
+<li>View the <a href="{LDEMO}" target="menu">Demos</a>.</li>
+</ul>
+<!-- END demo -->
+
 <!-- BEGIN graph -->
 <h2>Dependency Graph</h2>
 <ul style="list-style-image:url({MASTERPATH}simulinkicon.gif)">

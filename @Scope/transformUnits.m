@@ -25,26 +25,26 @@ end
 %% perform the transformation
 
 switch lower(typ)
-    case 'stagexy'
+    case 'stagexy' % transform to micro-meter
         switch rS.units.stageXY
             case 'mili-meter'
                 outpt=inpt*1000;
             case 'micro-meter'
-                outpt=input;
+                outpt=inpt;
             case 'nano-meter'
                 outpt=inpt/1000;
         end
-    case 'stagez'
+    case 'stagez' % transform to micro-meter
         switch rS.units.stageZ
             case 'mili-meter'
                 outpt=inpt*1000;
             case 'micro-meter'
-                outpt=input;
+                outpt=inpt;
             case 'nano-meter'
                 outpt=inpt/1000;
         end
-    case 'exposuretime'
-        switch rS.exposureTime
+    case 'exposuretime' % transform to msec
+        switch rS.units.exposureTime
             case 'msec'
                 outpt=inpt;
             case 'sec'
@@ -54,8 +54,8 @@ switch lower(typ)
             case 'hours'
                 outpt=inpt*1000*60*60;
         end
-    case 'acqtime'
-        switch rS.acqTime
+    case 'acqtime' % convert into Matlab's serial num (days since 1-1-0000); 
+        switch rS.units.acqTime
             case 'msec'
                 outpt=inpt/24/60/60/1000;
             case 'sec'
