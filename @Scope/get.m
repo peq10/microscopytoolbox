@@ -16,6 +16,9 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'lightpath' % the light path: Camera or EyePiece
+            lightpath=rS.mmc.getConfigGroupState(rS.LightPathName);
+            varargout=[varargout; {lightpath}];
         case 'units' % a struct the defines what type of units are used by Roboscope for different stuff. <br> Defaults: stageXY='micro-menter'; stageZ='micro-meter'; exposureTime='msec'; acqTime='sec';
             varargout=[varargout; {rS.units}];
         case 'avaliabletskfcns' % returns a cell array of all the avaliable task functions

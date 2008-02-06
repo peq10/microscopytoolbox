@@ -15,7 +15,12 @@ if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
-        case 'units' % input must be a struct with the following fields: {'stageXY','stageZ','exposureTime','acqTime'}; Allowed values for spatial fileds (stage) are: mili-meter micro-meter, nano-meter. For temporal fileds: msec, sec, min, hours
+        case 'lightpath' % a light path state as defined in MMC cofig file
+            if ~(rS.mmc.isConfigDefined(rS.LightPathName,varargin{i+1}))
+                error([varargin{i+1} ' is not a legitimate LightPath configuration, check config file']);
+            end
+            rS.mmc.setConfig(rS.LightPathName,varargin{i+1});
+          case 'units' % input must be a struct with the following fields: {'stageXY','stageZ','exposureTime','acqTime'}; Allowed values for spatial fileds (stage) are: mili-meter micro-meter, nano-meter. For temporal fileds: msec, sec, min, hours
             units=varargin{i+1};
             if ~isstruct(units), error('Units must be a struct'); end
             if ~isempty(setxor(fields(units),{'stageXY','stageZ','exposureTime','acqTime'}))

@@ -11,6 +11,7 @@ function rS = Scope(config_file)
 % start using the cnfig file directly. 
 
 import mmcorej.*;
+rS.gui=[];
 try
     if nargin ==0 || isempty(config_file)
         rS.gui=MMStudioPlugin;
@@ -26,7 +27,7 @@ catch
     rS.mmc.unloadAllDevices;
     rS=[]; %#ok<NASGU>
     uiwait(msgbox('An error occured during device loading - please close MM, correct the hardware problema and try again'))
-    error('An error occured when loading devices - rS is not a functional Roboscope!');
+    error('An error occured when loading devices - rS is not a functional Roboscope! \n %s',lasterr);
 end
 
 %% names of devices in the configuration file. 
@@ -35,6 +36,7 @@ rS.ZstageName='Z-Stage';
 rS.COM='COM2'; %the focus port for ASI 
 rS.OBJName='OBJ'; % the GroupConfig for the objectives
 rS.ChannelName='Channel';
+rS.LightPathName='LightPath';
 
 %% Additional properties not part of Stage or MMC:
 % task ID
