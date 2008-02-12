@@ -27,6 +27,9 @@ if toSpawn
     % change attr as needed (allowing overwritting the built-ins)
     fld=fieldnames(attr2mod);
     for i=1:length(fld)
+        if strcmpi(fld{i},'acqTime')
+            attr2mod.(fld{i})=transformUnits(rS,'acqTime',attr2mod.(fld{i}));
+        end
         NewTsk=set(NewTsk,fld{i},attr2mod.(fld{i}));
     end              
                   
