@@ -41,11 +41,20 @@
          <QdataDescription></QdataDescription>
     </Qdata>
     <DisplayOptions>
-          <DisplayMode>Gray</DisplayMode>
+          <DisplayMode></DisplayMode>
           <Levels>{{0,1},{0,1},{0,1},{0,1}}</Levels>
           <ChannelIdx>{}</ChannelIdx>
           <ROI>{}</ROI>
           <ZProjection>{}</ZProjection>
+          <FPS>5</FPS>
+          <Disp5D>
+              <Channel>
+                   <Name></Name>
+                   <Min>0</Min>
+                   <Max>1</Max>
+                   <Hue>0</Hue>
+              </Channel>  
+          </Disp5D>
     </DisplayOptions>
 </MD>
 

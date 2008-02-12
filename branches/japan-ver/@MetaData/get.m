@@ -74,10 +74,10 @@ for i=1:length(varargin)
         case 'dimensionsize' % the image is 5D, what are the sizes of the last three dimensions. 
             varargout{i}=str2arr(md.DimensionSize);
         case 'qdata' % returns a struct array with ALL the quantitative data about the image. See also getQ,setQ,addQ to get specific types of data
-            for j=1:length(md.Image.Qdata)
-                md.Qdata(j).Value=str2arr(md.Image.Qdata(j).Value);
+            for j=1:length(md.Qdata)
+                md.Qdata(j).Value=str2arr(md.Qdata(j).Value);
             end
-            varargout{i}=md.Image.Qdata;
+            varargout{i}=md.Qdata;
         case 'timepointqdata' % returns a cell array of struct array (one cell for each timeslice) for the qdata struct for timepoints
             varargout{i}={md.TimePoint(:).Qdata};
         case 'planenum' % return the overall number of plane that would be in the mutli-plane tiff. Basically its prod(dimsize) ? 
@@ -114,14 +114,21 @@ for i=1:length(varargin)
             varargout{i}=dt; 
         case 'timepointnum' % the number of timepoints there are
             varargout{i}=length(md.TimePoint);
+        case 'displaychnlidx' % the mapping of channles into RGB channels
+            varargout{i}=str2arr(md.DisplayOptions.ChannelIdx);
+        case 'displayfps' % frame per second when showing a movie
+            varargout{i}=str2double(md.DisplayOptions.FPS);
         case 'displaymode' % provides information on how to display the image. is it displayed, is it RGB, GRAY, JET
             varargout{i}=md.DisplayOptions.DisplayMode;
         case 'displaylevels' % the levels [min max] to show the image in. 
             varargout{i}=str2arr(md.DisplayOptions.Levels);
-        case 'displaychannels' % which channels to display
-            varargout{i}=str2arr(md.DisplayOptions.Channels);
+        case 'displaychannels' % which channels to display in the RGBG layers
+            chnls=get(md,'channels');
+            varargout{i}=chnls(str2arr(md.DisplayOptions.Channels));
         case 'displayroi' % If only a subset of the image needs diplaying, these are the indexes for it. 
             varargout{i}=str2arr(md.DisplayOptions.ROI);
+        case 'displaystruct' % returns the entire struct, good for "cloning" settings from one image to the other
+            varargout{i}=md.DisplayOptions;
         case 'xml' % a dump of all the metadata in an xml format. 
             varargout{i}=['<MD>' struct2xml(struct(md)) '</MD>'];
         otherwise

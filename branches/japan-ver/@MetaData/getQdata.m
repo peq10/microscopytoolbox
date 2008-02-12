@@ -7,3 +7,6 @@ function Qdata=getQdata(md,QdataType,TimePointIdx)
 if ~exist('TimePointIdx','var')
     TimePointIdx=0;
 end
+
+Qdata=get(md,'qdata');
+Qdata=Qdata(strcmp(QdataType,{Qdata.QdataType}));
