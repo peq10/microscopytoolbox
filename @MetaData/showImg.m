@@ -1,9 +1,9 @@
-function showImg(md,pth,img,hFig)
+function showImg(md,pth,img,catfilename,hFig)
 %SHOWIMG opens a GUI that is useful in looking at 5D images 
 %
 % Calling arguments: 
-% showImg(md,img,pth) - show img with md metadata
-%                       if img is empty - will read it from disk
+% showImg(md,pth) -     show img with md metadata
+%                       if img is empty  or missing, will read it from disk
 %
 % showImg(...,hFig) - hFig is the figure number to show image in
 
@@ -20,6 +20,14 @@ if ~exist('hFig','var')
     hFig=figure;
 end
 
+if ~exist(catfilename,'var')
+    catfilename='showImgPref.txt';
+end
+
+h=findobj('tag','pixelinfo');
+delete(h);
+
+
 %% Init all kind of things
 % variables used for icons
 plyicon=[]; pauseicon=[]; zmicon=[]; dsticon=[]; panicon=[];
@@ -29,11 +37,18 @@ defIcons;
 t=1;
 z=1;
 
+fid=fopen(catfilename);
+C=textscan(fid,'%s%s%s\n','delimiter',',');
+fclose(fid);
+Qclicks.keys=C{1};
+Qclicks.types=C{2};
+Qclicks.labels=C{3};
+
 % timer handle
 hTimerText=[];
 
 PlaybackSettingsData.ZT='T';
-PlaybackSettingsData.FPS=5;
+PlaybackSettingsData.FPS=get(md,'displayfps');
 PlaybackSettingsData.Loop='Yes';
 PlaybackSettingsData.ShowTimer='Yes';
 
@@ -52,32 +67,50 @@ end
 %% display info from md
 % levels - get from md but if doesn't exist, default is 0-1
 rgbg_levels=get(md,'displaylevels'); 
-if isempty(rgbg_levels), rgbg_levels=[0 1; 0 1; 0 1; 0 1]; end
+if isempty(rgbg_levels), 
+    rgbg_levels=[0 1; 0 1; 0 1; 0 1]; 
+end
 
 % get list of possible channels
-chnlstrct=get(md,'Channels'); 
-nm=[chnlstrct.Number]; 
-[nm,ix]=sort(nm); %#ok - I don't care about the value of nm, its ix I care about. 
-chnlstrct=chnlstrct(ix);
-pos_chnl=[{'none'}; {chnlstrct.Content}'];
+pos_chnl=[{'none'}; get(md,'Channels')];
 
 %ROI - defaults to whole image
 roi=get(md,'displayroi');
-if isempty(roi), roi=[0.5 size(img,2)+0.5 0.5 size(img,1)+0.5]; end
+if isempty(roi), 
+    roi=[0.5 size(img,2)+0.5 0.5 size(img,1)+0.5]; 
+end
 
 % Mode - defaults to Gray
 initdspmode=get(md,'displaymode');
-if isempty(initdspmode), initdspmode='Gray'; end
-
-
-%% set up figures etc.
-figure(hFig)
-clf
-
-if ~exist('img','var') || isempty(img)
-    img=readTiff(md);
+if isempty(initdspmode), 
+    switch length(pos_chnl)
+        case {0,1}
+            error('Please check that MetaData object md has at least one channel defined with number and content');
+        case 2
+            initdspmode='Gray';
+        case 3
+            initdspmode='RGB';
+        otherwise
+            initdspmode='RGB';
+    end
 end
 
+% channel Idx - mapping of channels into RGBG layers
+chnlIdx=get(md,'ChannelIdx');
+if isempty(chnlIdx);
+    switch length(pos_chnl)
+        case {0,1}
+            error('Please check that MetaData object md has at least one channel defined with number and content');
+        case 2
+            chnlIdx=[1 1 1 2];
+        case 3
+            chnlIdx=[2 3 1 2];
+        otherwise
+            chnlIdx=[2 3 4 2];
+    end
+end
+
+%% transform image dimensionality if needed
 %  Make sure that image is in XYCZT format 
 switch get(md,'DimensionOrder')
     case 'XYZTC'
@@ -97,10 +130,13 @@ switch get(md,'DimensionOrder')
 end
 img=permute(img,dimordr);
 
-
+%% set up figures etc.
+figure(hFig)
+clf
+UserData.md=md;
 set(hFig,'Toolbar','none','Menubar','none','name',get(md,'filename'),...
-         'position',[100 100 800*size(img,2)/size(img,1) 800],...
-         'CloseRequestFcn',@closeFig);
+         'position',[350 200 800*size(img,2)/size(img,1) 800],...
+         'CloseRequestFcn',@closeFig,'userdata',UserData);
 hAxes=axes('position',[0 0.1 1 0.9],'xtick',[],'ytick',[]);
 
 % those handles will be definded later, this "declares" them.
@@ -168,13 +204,21 @@ hGrchnlBtn=uicontrol(hLvl,'style','pushbutton','units','normalized','string','Co
 
                                    
 % Mode radio buttons
-hBtnGrp = uibuttongroup('parent',hLvl,'visible','off','Position',[0.81 0 .2 1]);
+hBtnGrp = uibuttongroup('parent',hLvl,'visible','on','Position',[0.81 0 .2 1]);
 hBtnGray = uicontrol('Style','Radio','String','Gray','units','normalized','pos',[0 0.66 1 0.33],'parent',hBtnGrp,'HandleVisibility','off');
 hBtnRGB= uicontrol('Style','Radio','String','RGB','units','normalized','pos',[0 0.33 1 0.33],'parent',hBtnGrp,'HandleVisibility','off');
 hBtnComp = uicontrol('Style','Radio','String','Comp','units','normalized','pos',[0 0 1 0.33],'parent',hBtnGrp,'HandleVisibility','off');
-set(hBtnGrp,'SelectionChangeFcn',@updateImage);
-
-set(hBtnGrp,'Visible','on','SelectedObject',findobj(hFig,'string',initdspmode));
+set(hBtnGrp,'SelectionChangeFcn',@updateImage,'Visible','on');
+switch initdspmode
+    case 'RGB'
+        set(hBtnGrp,'SelectedObject',hBtnRGB);
+    case 'Comp'
+        set(hBtnGrp,'SelectedObject',hBtnComp);
+    case 'Gray'
+        set(hBtnGrp,'SelectedObject',hBtnGray);
+    otherwise
+        error('can''t set mode into illegal value')
+end
 
 %% Save and zoom and pixel info panel
 
@@ -183,13 +227,12 @@ hSaveZoomPnl=uipanel('position',[0.8 0 0.2 0.1]);
 % hPixelInfo is created in updateImage function
 hSaveBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Save',...
                                 'callback',@saveDisplaySettings,'position',[0.01 0.41 0.3 0.38]);
-hShowCollBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Collections','callback',@drawCollections_callback,...
-                                                          'position',[0.33 0.41 0.3 0.38],'fontsize',8);
+hShowQdata=uicontrol(hSaveZoomPnl,'style','togglebutton','units','normalized','string','draw','callback',@updateImage,...
+                                  'value',1,'position',[0.33 0.41 0.3 0.38],'fontsize',8);
                                                       
-hAddQdata=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','string','Qdata','callback',@addQdata_callback,...
-                                                          'position',[0.66 0.41 0.3 0.38],'fontsize',8);
+hAddQdata=uicontrol(hSaveZoomPnl,'style','togglebutton','units','normalized','string','add',...
+                                 'position',[0.66 0.41 0.3 0.38],'fontsize',8,'callback',@keyPress);
                                                        
-                                                    
 hZoomBtn=uicontrol(hSaveZoomPnl,'style','togglebutton','units','normalized','cdata',zmicon,'callback',@ZoomImg,...
                                                         'position',[0.01 0.01 0.3 0.3]);
 hPanBtn=uicontrol(hSaveZoomPnl,'style','togglebutton','units','normalized','cdata',panicon,'callback',@PanImg,...
@@ -197,31 +240,17 @@ hPanBtn=uicontrol(hSaveZoomPnl,'style','togglebutton','units','normalized','cdat
 hDistToolBtn=uicontrol(hSaveZoomPnl,'style','pushbutton','units','normalized','cdata',dsticon,'callback',@AddDistTool,...
                                                         'position',[0.66 0.01 0.3 0.3]);
 
-%% this will be in the updateimage nested function
-% create initial channel picks
-switch length(pos_chnl)
-    case {0,1}
-        error('Please check that MetaData object md has at least one channel defined with number and content');
-    case 2
-        set(hBtnGrp,'SelectedObject',hBtnGray);  % Select gray mode
-        set(hGrchnlCombo,'value',2);
-        changeChannel(hGrchnlCombo);
-    case 3
-        set(hBtnGrp,'SelectedObject',hBtnRGB);  % Select RGB mode
-        set(hRchnlCombo,'value',2);
-        changeChannel(hRchnlCombo);
-        set(hGchnlCombo,'value',3);
-        changeChannel(hGchnlCombo);
-    otherwise
-        set(hBtnGrp,'SelectedObject',hBtnRGB);  % Select RGB mode
-        set(hRchnlCombo,'value',2);
-        changeChannel(hRchnlCombo);
-        set(hGchnlCombo,'value',3);
-        changeChannel(hGchnlCombo);
-        set(hBchnlCombo,'value',4);
-        changeChannel(hBchnlCombo);
-end
-    
+%% Fill in the channel data and update the image
+
+set(hRchnlCombo,'value',chnlIdx(1));
+changeChannel(hRchnlCombo);
+set(hGchnlCombo,'value',chnlIdx(2));
+changeChannel(hGchnlCombo);
+set(hBchnlCombo,'value',chnlIdx(3));
+changeChannel(hBchnlCombo);
+set(hGrchnlCombo,'value',chnlIdx(4));
+changeChannel(hGrchnlCombo);
+
 updateImage;
 
 %% That's it - from down here are all the definitions of action using nested functions
@@ -267,12 +296,12 @@ updateImage;
         axis(hAxes);
         hImg=imagesc(rgbg(:,:,toshow));
         hPixelInfo=impixelinfoval(hSaveZoomPnl,hImg);
-        set(hPixelInfo,'units','normalized','position',[0 0.8 1 0.2]);
+        set(hPixelInfo,'units','normalized','position',[0 0.8 1 0.2],'tag','pixelinfo');
         set(hAxes,'xlim',roi(1:2),'ylim',roi(3:4),'xtick',[],'ytick',[]);
         
         %% add timer
 %         delete(hTimerText);
-        TimeStamps=get(md,'planetime');
+        TimeStamps=get(md,'acqtime');
         TimeStamps=(TimeStamps-min(TimeStamps))*1440;
         tmpx=get(hAxes,'xlim');
         tmpy=get(hAxes,'ylim');
@@ -280,16 +309,36 @@ updateImage;
         TimerPos=[(tmpx(2)-tmpx(1))*0.1+tmpx(1) (tmpy(2)-tmpy(1))*0.1+tmpy(1)];
         text(TimerPos(1),TimerPos(2),sprintf('% 5.2f',TimeStamps(t)),'color','w','fontsize',20);
         
+        %% add the keypress functionality just in case it get lost during
+        %% plotting
+        %% add Qdata to the plot
+        if get(hShowQdata,'value') == get(hShowQdata,'max')
+             overlayAnnotation; 
+        end
+        
+        % update the md userdata
+        UserData.md=md;
+        set(hFig,'userdata',UserData);
+
+        
     end
+
+    function overlayAnnotation(hObject,events) %#ok<INUSD>
+        
+            qdata=getQdata(md,'click');
+            for i=1:length(qdata)
+                text(qdata(i).Value(1),qdata(i).Value(2),qdata(i).Label,'color','w');
+            end
+
+    end % overlay annotation
 
     function changeChannel(hObject,events) %#ok I don't need events
         img_ix=get(hObject,'value')-1; % this index the img matrix
         rgbg_ix=find(ismember(allchnls,get(hObject,'tag'))); % this is the channel to show it in
         if img_ix==0
-             rgbg(:,:,rgbg_ix)=zeros(size(rgbg(:,:,1)));
+             rgbg(:,:,rgbg_ix)=zeros(size(rgbg(:,:,1))); %#ok<FNDSB>
         else
-            rgbg(:,:,rgbg_ix)=img(:,:,img_ix,z,t); %#ok, I know logical indexing is faster, this is easier to understand...
-            rgbg_levels(rgbg_ix,:)=[0 1];
+            rgbg(:,:,rgbg_ix)=imadjust(img(:,:,img_ix,z,t),rgbg_levels(rgbg_ix,:)); %#ok, I know logical indexing is faster, this is easier to understand...
         end
         updateImage;
     end
@@ -384,15 +433,15 @@ updateImage;
     end
 
     function closeFig(hObject,events)
-        button = questdlg('save display setting for this image?');
-        switch button
-            case 'Yes'
+%         button = questdlg('save display setting for this image?');
+%         switch button
+%             case 'Yes'
                 saveDisplaySettings(hObject,events);
                 delete(hObject)
-            case 'No'
-                delete(hObject)
-            case 'Cancel'
-        end
+%             case 'No'
+%                 delete(hObject)
+%             case 'Cancel'
+%         end
     end
 
     function saveDisplaySettings(hObject,events) %#ok<INUSD>
@@ -410,9 +459,9 @@ updateImage;
         
         % add attributes to md
         md=set(md,'displaylevels',rgbg_levels,...
-                          'displaychannels',dspchnls,...
-                          'displaymode',get(get(hBtnGrp,'SelectedObject'),'String'),...
-                          'displayroi',roi);
+                  'displaychannels',dspchnls,...
+                  'displaymode',get(get(hBtnGrp,'SelectedObject'),'String'),...
+                  'displayroi',roi);
         updateTiffMetaData(md,pth);
     end
 
@@ -489,31 +538,36 @@ updateImage;
          imdistline(hAxes);
     end
 
-    function drawCollections_callback(hObject,events) %#ok<INUSD>
-        drawCollections(md)
-    end
-
-    function addQdata_callback(hObject,events) %#ok<INUSD>
-        hGetQdataFig=figure;
-        set(hGetQdataFig,'Toolbar','none','Menubar','none','position',[400 400 300 100],'Name','Add Qdata');
-        uicontrol('Style','Text','units','normalized','position',[0.01 0.66 0.25 0.25],'string','Type');
-        hQdataType=uicontrol('style','Edit','units','normalized','position',[0.01 0.1 0.25 0.4]);
-
-        uicontrol('Style','Text','units','normalized','position',[0.33 0.66 0.25 0.25],'string','Value');
-        hQdataValue=uicontrol('style','Edit','units','normalized','position',[0.33 0.1 0.25 0.4]);
-
-        uicontrol('Style','pushbutton','units','normalized','position',[0.65 0.4 0.25 0.3],'string','Add','callback',@addQdataButton_callback);
-
-        function addQdataButton_callback(hObject,events) %#ok<INUSD>
-            Qdata.QdataType=get(hQdataType,'String');
-            Qdata.Value=str2double(get(hQdataValue,'String'));
-            Qdata.QdataDescription='';
-            set(hQdataType,'String','');
-            set(hQdataValue,'String','');
-            NewQdata=[get(md,'Qdata'); Qdata];
-            md=set(md,'Qdata',NewQdata);
+    function keyPress(hObject,events) %#ok<INUSD>
+        % when a key is pressed and the add Qdata button is pressed 
+        % get the next click
+        if get(hAddQdata,'value') == get(hAddQdata,'min')
+            return
         end
-
+        while get(hAddQdata,'Value') == get(hAddQdata,'max')
+            axes(hAxes)
+            [x,y,k]=ginput(1); 
+            if k==32
+                set(hAddQdata,'value',get(hAddQdata,'min'))
+                return
+            end
+            pnt=[x y];
+            k=char(k);
+            ix=find(strcmp(k,Qclicks.keys));
+            if isempty(ix)
+                continue
+            end
+            typ=Qclicks.types{ix};
+            lbl=Qclicks.labels{ix};
+            switch typ
+                case 'click'
+                    md=addQdata(md,'type','click','value',pnt,'label',lbl,'description','A user click position and label on an image');
+                case 'polygon'
+            end
+            updateTiffMetaData(md,pth);
+            updateImage;
+        end
+ 
     end
   
     function defIcons
@@ -615,3 +669,12 @@ updateImage;
 
 end % main function
 
+
+%% private sub-functions
+function hsv=gray2hsv(gry,clr)
+
+img=repmat(gry,[1 1 3]);
+hsv=rgb2hsv(img);
+hsv(:,:,1)=clr;
+hsv(:,:,2)=1;
+end

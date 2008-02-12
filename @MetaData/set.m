@@ -119,6 +119,16 @@ for i=1:2:length(varargin)
             sz(Tind)=length(varargin{i+1});
             md=set(md,'dimensionsize',sz);
             
+            % if a channel is missing from channeldescription add it
+            % and if channel description has to many fields, remove them
+            chnldes=get(md,'channeldescription');
+            df=setdiff(chnls,filednames(chnldes));
+            for ii=1:length(df)
+                chnldes.(df{ii})='';
+            end
+            chnldes=rmfield(chnldes,setdiff(filednames(chnldes),chnls));
+            md=set(md,'channeldescription',chnldes);
+            
         case 'channeldescription' % must be a single struct with fields subset of get(md,'channels')
             if ~isstruct(varargin{i+1}) && numel(varargin{i+1}) ~=1 
                 error('ChannelDescriptoin must be a single struct');
@@ -266,7 +276,12 @@ for i=1:2:length(varargin)
         case 'qdata' % must be a struct array with fields: {'QdataType';'Value'; 'Label'; 'QdataDescription'}
             md.Qdata=formatQdata(varargin{i+1});
             
-        % attributes related only to how to diaply the images    
+        % attributes related only to how to diaply the images  
+        case 'displayfps' % nums be numeric
+            if ~isnumeric(varargin{i+1})
+                error('FPS must be numeric');
+            end
+            md.DisplayOptions.FPS=num2str(varargin{i+1});
         case 'displaymode' % one of: 'Gray','RGB','Comp' (Comp is composite)
             if ~ischar(varargin{i+1}) || ~sum(ismember(varargin{i+1},{'Gray','RGB','Comp'}))
                 error('Unsupported disaply mode - must be Gray / RGB / Comp');
@@ -292,13 +307,19 @@ for i=1:2:length(varargin)
             else
                 ind=varargin{i+1};
             end
-            md.DisplayOptions.Channels=arr2str(ind);
+            md.DisplayOptions.ChannelIdx=arr2str(ind);
             
         case 'displayroi' % 'Display levels must be numeric 4 element matrix
             if ~isa(varargin{i+1},'numeric') || numel(varargin{i+1})~=4 
                 error('Display levels must be numeric 4 element matrix')
             end
             md.DisplayOptions.ROI=arr2str(varargin{i+1});
+            
+        case 'displaystruct' % input must be a struct - will replace the entire disaply settings.
+            if ~isstruct(varargin{i+1})
+                error('displaystruct must be a STRUCT (Dah!)');
+            end
+            md.DisplayOptions=varargin{i+1};
         otherwise
             error('attribute %s is not part of MetaData properties interface',varargin{i});
     end
