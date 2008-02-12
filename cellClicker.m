@@ -98,7 +98,7 @@ next_callback;
             hBarLegend=legend(lbl(:,2));
             set(hBarLegend,'position',[0.5 0.3 0.35 0.35])
         end
-        showImg2(md,pth,[],catfilename,2)
+        showImg(md,pth,[],catfilename,2)
     end
 
 
