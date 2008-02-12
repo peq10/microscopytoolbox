@@ -67,7 +67,7 @@ switch lower(typ)
         end
         % if acqTime is to small, we assume that the user actually 
         % wanted to do now+t
-        if outpt < datenum('1-1-2000')
+        if outpt < datenum('1-Jan-2000')
             outpt=outpt+now;
         end
 end
