@@ -21,6 +21,10 @@ set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk']);
 % refresh schedule every 10 taksks
 % set(rS,'refreshschedule',10);
 
+% determine if I need to create movies of this demos and if its fake acq
+set(rS,'printscreen',getpref('roboscope','moviefolder',''),...
+    'fakeAcq','/home/rwollman/Photos/Patagonia');
+
 % clean any images in that folder
 delete(['Demos' filesep 'Junk' filesep '*'])
 
@@ -77,7 +81,7 @@ set(rS,'schedulingmethod','heuristicFrogLeaps')
 x=[-100 100 300];
 y=[400 135 890];
 z=[0 0 0];
-t=0:10:60;  % in seconds (that what rS is defalut units are for acquisition) 
+t=0:10:30;  % in seconds (that what rS is defalut units are for acquisition) 
 t=transformUnits(rS,'acqTime',t);
 
 %%
@@ -138,6 +142,11 @@ plotInfo(1).position=[10   597   450   309];
 plotInfo(2).num=2;
 plotInfo(2).type='planned schedule';
 plotInfo(2).position=[10   200   350   309];
+
+plotInfo(3).num=3;
+plotInfo(3).type='image';
+plotInfo(3).position=[513   272   830   703];
+
 set(rS,'plotInfo',plotInfo);
 
 %% 

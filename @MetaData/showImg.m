@@ -27,7 +27,6 @@ end
 h=findobj('tag','pixelinfo');
 delete(h);
 
-
 %% Init all kind of things
 % variables used for icons
 plyicon=[]; pauseicon=[]; zmicon=[]; dsticon=[]; panicon=[];
@@ -138,7 +137,7 @@ set(hFig,'Toolbar','none','Menubar','none','name',get(md,'filename'),...
          'position',[350 200 800*size(img,2)/size(img,1) 800],...
          'CloseRequestFcn',@closeFig,'userdata',UserData);
 hAxes=axes('position',[0 0.1 1 0.9],'xtick',[],'ytick',[]);
-
+cla
 % those handles will be definded later, this "declares" them.
 hImg=[];
 
@@ -317,6 +316,7 @@ updateImage;
         end
         
         % update the md userdata
+        saveDisplaySettings; % this would also update the md object
         UserData.md=md;
         set(hFig,'userdata',UserData);
 
@@ -344,6 +344,11 @@ updateImage;
     end
 
     function setContrast(hObject,events) %#ok event is needed for callbacks
+        % turn off zooming and panning
+        set(hZoomBtn,'value',get(hZoomBtn,'min'));
+        ZoomImg(hZoomBtn,events);
+        set(hPanBtn,'value',get(hPanBtn,'min'));
+        PanImg(hPanBtn,events);
         % first only show a single channel
         switch get(hObject,'tag')
             case 'Red'

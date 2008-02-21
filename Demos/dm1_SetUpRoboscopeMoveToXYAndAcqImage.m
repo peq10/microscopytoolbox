@@ -19,7 +19,7 @@ rS=Scope(ScopeConfigFileName);
 
 % Custom Roboscope configuration
 set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk'],...
-       'refreshschedule',10);
+       'refreshschedule',10,'fakeAcq','/home/rwollman/Photos/Patagonia');
 
 disp('Scope initialized');
 

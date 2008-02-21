@@ -26,6 +26,10 @@ set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk']);
 % for simplicity and ease of debugging don't try to handle errors
 set(rS,'resolveErrors',false);
 
+% determine if I need to create movies of this demos and if its fake acq
+set(rS,'printscreen',getpref('roboscope','moviefolder',''),...
+    'fakeAcq','/home/rwollman/Photos/Patagonia');
+
 % set schdeuler to be the most fitting for these type of combined scane /
 % timelapse schedule.
 set(rS,'schedulingmethod','greedy','refreshschedule',20)
@@ -41,8 +45,8 @@ disp('Scope initialized');
 % We create a 5x5 grid where distance between sites is 1000 um. The
 % center of the grid is at [0 0]
 
-rows=20;
-cols=20;
+rows=10;
+cols=10;
 cntr=[0 0];
 dX=1000;
 Pos=createAcqPattern('grid',cntr,rows,cols,dX,zeros(rows*cols,1));
@@ -71,7 +75,7 @@ GenericTsk=Task(...
 
 % transform time units
 % in seconds (that what rS is defalut units are for acquisition) 
-t=transformUnits(rS,'acqTime',0:10:60);
+t=transformUnits(rS,'acqTime',0:10:30);
 
 % In general checkFunction should return a scalar logical. 
 GenericTsk=set(GenericTsk,'spawn_flag',true,...

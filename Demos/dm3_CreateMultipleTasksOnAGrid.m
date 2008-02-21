@@ -21,6 +21,10 @@ rS=Scope(ScopeConfigFileName);
 % Specify where to save images
 set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk']);
 
+% determine if I need to create movies of this demos and if its fake acq
+set(rS,'printscreen',getpref('roboscope','moviefolder',''),...
+    'fakeAcq','/home/rwollman/Photos/Patagonia');
+
 % clean any images in that folder
 delete(['Demos' filesep 'Junk' filesep '*'])
 
@@ -50,7 +54,7 @@ GenericTsk=Task(...
 %%
 % setting plotting to off, just to make things simple. It would be
 % explained in demo 4+ 
-GenericTsk=set(GenericTsk,'plotDuringTask',false);
+GenericTsk=set(GenericTsk,'plotDuringTask',true);
 
 %% Create an array of Tasks 
 % This array is generated based on the Generic Task and the Pos that where
@@ -119,6 +123,22 @@ set(rS,'schedulingmethod','acotsp');
 updateTaskSchedule(rS);
 figure(3)
 plotPlannedSchedule(rS); 
+
+
+%% Define what to plot during acquisition
+plotInfo(1).num=1;
+plotInfo(1).type='route';
+plotInfo(1).position=[10   597   350   309];
+
+plotInfo(2).num=2;
+plotInfo(2).type='planned schedule';
+plotInfo(2).position=[10   200   350   309];
+
+plotInfo(3).num=3;
+plotInfo(3).type='image';
+plotInfo(3).position=[380 348 894 627];
+
+set(rS,'plotInfo',plotInfo);
 
 %% run
 run(rS)

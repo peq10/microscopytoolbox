@@ -16,6 +16,10 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'fakeacq' % a folder name to read fake images from
+            varargout=[varargout; {rS.fakeAcquisition}];
+        case 'printscreen' % a folder name to save print-screens into.
+            varargout=[varargout; {rS.printScreenFolder}];
         case 'lightpath' % the light path: Camera or EyePiece
             lightpath=rS.mmc.getConfigGroupState(rS.LightPathName);
             varargout=[varargout; {lightpath}];
