@@ -58,14 +58,20 @@ next_callback;
             updateTiffMetaData(md,pth);
             dispSettings=get(md,'displaystruct');
             newq=get(md,'qdata');
-            Qdata=[Qdata; newq(:)];
+            unqcell=unique({newq(:).QdataType});
+            if ~isempty(unqcell{1})
+                Qdata=[Qdata; newq(:)];
+            end
             PrevMDflag=true;
         else
             PrevMDflag=false;
         end
         cnt=min(cnt+1,length(dr));
         md=MetaData([pth dr(cnt).name]);
-        if PrevMDflag % flag just says whether there was a previous md object
+        % is a previous md object existed AND it had a display mode (e.g.
+        % not default) =
+        if PrevMDflag && ~isempty(dispSettings.DisplayMode)
+            % flag just says whether there was a previous md object
             md=set(md,'displaystruct',dispSettings);
         end
         refresh_plots

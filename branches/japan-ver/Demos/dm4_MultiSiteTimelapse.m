@@ -28,6 +28,11 @@ set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk']);
 % for simplicity and ease of debugging don't try to handle errors
 set(rS,'resolveErrors',false);
 
+% determine if I need to create movies of this demos and if its fake acq
+set(rS,'printscreen',getpref('roboscope','moviefolder',''),...
+    'fakeAcq','/home/rwollman/Photos/Patagonia');
+
+
 % clean any images in that folder
 delete(['Demos' filesep 'Junk' filesep '*'])
 
@@ -39,7 +44,7 @@ disp('Scope initialized');
 x=[-100 100 300];
 y=[400 135 890];
 z=[0 0 0];
-t=0:10:60;  % in seconds (that what rS is defalut units are for acquisition) 
+t=0:10:30;  % in seconds (that what rS is defalut units are for acquisition) 
 t=transformUnits(rS,'acqTime',t);
 
 %%

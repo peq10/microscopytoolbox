@@ -118,25 +118,26 @@ for i=1:2:length(varargin)
             Tind=strfind(ordr,'T')-2;
             sz(Tind)=length(varargin{i+1});
             md=set(md,'dimensionsize',sz);
-            
+            chnls=varargin{i+1};
             % if a channel is missing from channeldescription add it
             % and if channel description has to many fields, remove them
             chnldes=get(md,'channeldescription');
-            df=setdiff(chnls,filednames(chnldes));
+            if isempty(chnldes), chnldes=struct('stam',[]); end
+            df=setdiff(varargin{i+1},fieldnames(chnldes));
             for ii=1:length(df)
                 chnldes.(df{ii})='';
             end
-            chnldes=rmfield(chnldes,setdiff(filednames(chnldes),chnls));
+            chnldes=rmfield(chnldes,setdiff(fieldnames(chnldes),chnls));
             md=set(md,'channeldescription',chnldes);
             
         case 'channeldescription' % must be a single struct with fields subset of get(md,'channels')
             if ~isstruct(varargin{i+1}) && numel(varargin{i+1}) ~=1 
                 error('ChannelDescriptoin must be a single struct');
             end
-            if ~isempty(setdiff(filednames(varargin{i+1}),get(md,'Channels')))
+            if ~isempty(setdiff(fieldnames(varargin{i+1}),get(md,'Channels')))
                 error('ChannelDescriptoin struct must have Channel names for fields names');
             end
-            md.ChannelDescriptoin=arr2str(varargin{i+1});
+            md.ChannelDescription=arr2str(varargin{i+1});
             
         case 'dimensionorder' % must be a char and one of the following: {'XYTCZ', 'XYTZC', 'XYZTC', 'XYZCT', 'XYCZT', 'XYCTZ'} 
             if ~ischar(varargin{i+1}) 

@@ -15,6 +15,16 @@ if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
+        case 'fakeacq' % an existing folder with images
+            if ~exist(varargin{i+1},'dir')
+                error('fakeAcq must be a name of a valid folder');
+            end
+            rS.fakeAcquisition=varargin{i+1};
+        case 'printscreen' % an existing folder
+            if ~strcmp(varargin{i+1},'') && ~exist(varargin{i+1},'dir')
+                error('printscreen must be a name of a valid folder');
+            end
+            rS.printScreenFolder=varargin{i+1};
         case 'lightpath' % a light path state as defined in MMC cofig file
             if ~(rS.mmc.isConfigDefined(rS.LightPathName,varargin{i+1}))
                 error([varargin{i+1} ' is not a legitimate LightPath configuration, check config file']);

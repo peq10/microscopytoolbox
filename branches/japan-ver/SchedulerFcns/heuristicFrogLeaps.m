@@ -47,7 +47,7 @@ while ~isempty(id)
         schdle_data.t=schdle_data.t(ix);
         schdle_data.id=schdle_data.id(ix);
         schdle_data.duration=schdle_data.duration(ix);
-        ordr=[ordr; greedy(schdle_data)]; 
+        ordr=[ordr; acotsp(schdle_data)]; 
         return
     end
     dt=ttarget-tcurrent;

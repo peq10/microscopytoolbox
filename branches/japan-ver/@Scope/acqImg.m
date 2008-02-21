@@ -17,6 +17,19 @@ function img = acqImg(rSin,Channel,Exposure)
 global rS;
 rS=rSin;
 
+% check if its a fake acquisition
+if ~isempty(get(rS,'fakeacq'))
+    dr=dir(get(rS,'fakeacq'));
+    dr=dr(3:end);
+    dr=dr(randperm(length(dr)));
+    img=imread(fullfile(get(rS,'fakeacq'),dr(1).name));
+    rS.lastImage=img;
+    [w,h]=get(rS,'Width','Height');
+    img=imresize(img(:,:,1),[h w]);
+    pause(1)
+    return
+end
+
 % if channels is not a cell array make it oue
 if ~iscell(Channel)
     Channel={Channel};

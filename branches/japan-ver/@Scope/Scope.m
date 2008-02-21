@@ -64,6 +64,13 @@ rS.units.acqTime='sec';
 % image as well...
 rS.lastImage=[];
 
+% perform printscreen? if its not empty it must be a name of a folder
+rS.printScreenFolder='';
+
+% should it capture real or fake images?
+rS.fakeAcquisition='';
+
+
 % create the defaults plots
 Plots={'planned schedule',1,[10   597   350   309];
        'focal plane',2,[10   246   350   309];

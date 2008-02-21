@@ -43,4 +43,13 @@ for i=1:length(plotInfo)
 end
 
 drawnow;
+if ~isempty(get(rS,'printscreen'))
+    chld=get(0,'children');
+    for i=1:length(chld)
+        filename=fullfile(get(rS,'printscreen'),['frame_' num2str(chld(i)) '.tiff']);
+        imwrite(frame2im(getframe(chld(i))),filename,'WriteMode','append');
+    end
+    
+end
+    
             

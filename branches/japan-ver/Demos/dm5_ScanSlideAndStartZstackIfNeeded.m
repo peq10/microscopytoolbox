@@ -25,6 +25,10 @@ set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk']);
 % for simplicity and ease of debugging don't try to handle errors
 set(rS,'resolveErrors',false);
 
+% determine if I need to create movies of this demos and if its fake acq
+set(rS,'printscreen',getpref('roboscope','moviefolder',''),...
+    'fakeAcq','/home/rwollman/Photos/Patagonia');
+
 % clean any images in that folder
 delete(['Demos' filesep 'Junk' filesep '*'])
 

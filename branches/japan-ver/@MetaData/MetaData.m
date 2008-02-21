@@ -39,7 +39,12 @@ if nargin == 1 && ischar(varargin{1}) && exist(varargin{1},'file')
     return
 end
 
-% Here I deal with the case of pairs of properties name and values
+%check to see if there are any obvious reasons why we are here
+if nargin == 1 && ~exist(varargin{1},'file')
+    error('file %s doesn'' exist, please check',varargin{1})
+end
+
+%% Here I deal with the case of pairs of properties name and values
 if mod(length(varargin),2) %#ok<NODEF>
     error('Must Supply PAIRS of property name, value')
 end
