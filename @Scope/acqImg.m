@@ -17,6 +17,14 @@ function img = acqImg(rSin,Channel,Exposure)
 global rS;
 rS=rSin;
 
+% if channels is not a cell array make it oue
+if ~iscell(Channel)
+    Channel={Channel};
+end
+
+[w,h,bd]=get(rS,'Width','Height','BitDepth');
+
+
 % check if its a fake acquisition
 if ~isempty(get(rS,'fakeacq'))
     dr=dir(get(rS,'fakeacq'));
@@ -24,18 +32,11 @@ if ~isempty(get(rS,'fakeacq'))
     dr=dr(randperm(length(dr)));
     img=imread(fullfile(get(rS,'fakeacq'),dr(1).name));
     rS.lastImage=img;
-    [w,h]=get(rS,'Width','Height');
-    img=imresize(img(:,:,1),[h w]);
+    img=repmat(imresize(img(:,:,1),[h w]),[1 1 length(Channel)]);
     pause(1)
     return
 end
 
-% if channels is not a cell array make it oue
-if ~iscell(Channel)
-    Channel={Channel};
-end
-
-[w,h,bd]=get(rS,'Width','Height','BitDepth');
 
 % if no exposure settings, use current rS setting
 if ~exist('Channel','var')

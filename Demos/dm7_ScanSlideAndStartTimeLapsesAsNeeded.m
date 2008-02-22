@@ -14,7 +14,7 @@ clear global
 clear
 close all 
 clc
-ScopeConfigFileName='Demos/Roboscope_demo.cfg';
+ScopeConfigFileName=fullfile('Demos','Roboscope_demo.cfg');
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)
@@ -28,7 +28,7 @@ set(rS,'resolveErrors',false);
 
 % determine if I need to create movies of this demos and if its fake acq
 set(rS,'printscreen',getpref('roboscope','moviefolder',''),...
-    'fakeAcq','/home/rwollman/Photos/Patagonia');
+    'fakeAcq',['Demos' filesep 'Patagonia']);
 
 % set schdeuler to be the most fitting for these type of combined scane /
 % timelapse schedule.
@@ -73,9 +73,8 @@ GenericTsk=Task(...
 % one for the true/false flag and the other the extra data. Here I'm using
 % deal to do that. 
 
-% transform time units
-% in seconds (that what rS is defalut units are for acquisition) 
-t=transformUnits(rS,'acqTime',0:10:30);
+%  
+t=0:5:20;
 
 % In general checkFunction should return a scalar logical. 
 GenericTsk=set(GenericTsk,'spawn_flag',true,...

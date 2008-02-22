@@ -11,7 +11,7 @@
 
 clear all
 close all 
-ScopeConfigFileName='Demos/Roboscope_demo.cfg';
+ScopeConfigFileName=fullfile('Demos','Roboscope_demo.cfg');
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)
@@ -19,7 +19,7 @@ rS=Scope(ScopeConfigFileName);
 
 % Custom Roboscope configuration
 set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk'],...
-       'refreshschedule',10,'fakeAcq','/home/rwollman/Photos/Patagonia');
+       'refreshschedule',10);
 
 disp('Scope initialized');
 

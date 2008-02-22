@@ -11,7 +11,7 @@
 clear all
 close all 
 clc
-ScopeConfigFileName='Demos/Roboscope_demo.cfg';
+ScopeConfigFileName=fullfile('Demos','Roboscope_demo.cfg');
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)
@@ -19,7 +19,7 @@ rS=Scope(ScopeConfigFileName);
 
 % Specify where to save images
 set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk'],...
-       'schedulingmethod','asadded','fakeAcq','/home/rwollman/Photos/Patagonia');
+       'schedulingmethod','asadded');
 
 % clean any images in that folder
 delete(['Demos' filesep 'Junk' filesep '*'])
