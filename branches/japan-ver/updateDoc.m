@@ -117,10 +117,10 @@ m2html('mFiles','.',...
 opt.outputDir=[pwd filesep 'doc' filesep 'TaskFcns'];
 opt.evalCode=false;
 tskfiles=dir(['TaskFcns' filesep '*.m']);
-for i=1:length(tskfiles)
-    disp(['replacing ' tskfiles(i).name]);
-    publish(['TaskFcns' filesep tskfiles(i).name],opt);
-end
+% for i=1:length(tskfiles)
+%     disp(['replacing ' tskfiles(i).name]);
+%     publish(['TaskFcns' filesep tskfiles(i).name],opt);
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Sub functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

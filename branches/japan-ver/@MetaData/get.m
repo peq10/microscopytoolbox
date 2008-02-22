@@ -104,13 +104,12 @@ for i=1:length(varargin)
         case 'channelidx' %TODO: add channelidx for each timepoint
             
         case 'acqtime' % A list of the acquisition timepoints. Units are in Matlab's numeric date number internal representation is in datestr(now,0)
-            dt={md.TimePoint(:).AcqTime};
-            ind=find(ismember(dt,'NaN'));
-            if ~isempty(ind)
-                dt{ind}='00-Jan-0000';
+            dtcell={md.TimePoint(:).AcqTime};
+            dt=nan(size(dtcell));
+            ix=find(~ismember(dtcell,'NaN')); %#ok<EFIND>
+            if ~isempty(ix)
+                dt(ix)=datenum(dtcell(ix));
             end
-            dt=datenum(dt);
-            dt(dt==0)=NaN;
             varargout{i}=dt; 
         case 'timepointnum' % the number of timepoints there are
             varargout{i}=length(md.TimePoint);

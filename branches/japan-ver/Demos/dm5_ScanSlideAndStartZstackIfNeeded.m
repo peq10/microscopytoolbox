@@ -13,7 +13,7 @@ clear global
 clear
 close all 
 clc
-ScopeConfigFileName='Demos/Roboscope_demo.cfg';
+ScopeConfigFileName=fullfile('Demos','Roboscope_demo.cfg');
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)
@@ -27,7 +27,7 @@ set(rS,'resolveErrors',false);
 
 % determine if I need to create movies of this demos and if its fake acq
 set(rS,'printscreen',getpref('roboscope','moviefolder',''),...
-    'fakeAcq','/home/rwollman/Photos/Patagonia');
+    'fakeAcq',['Demos' filesep 'Patagonia'] );
 
 % clean any images in that folder
 delete(['Demos' filesep 'Junk' filesep '*'])
@@ -69,10 +69,10 @@ GenericTsk=Task(...
 
 % In general checkFunction should return a scalar logical. 
 GenericTsk=set(GenericTsk,'spawn_flag',true,...
-                          'spawn_testFcn',@(x) deal(rand<0.2,[]),...
+                          'spawn_testFcn',@(x) deal(rand<0.5,[]),...
                           'spawn_tskFcn','acq_Zstack',...
                           'spawn_filenameaddition','_Zstk',...
-                          'spawn_attributes2modify',struct('stagez',-5:2:5)...
+                          'spawn_attributes2modify',struct('stagez',-1:2:1)...
                           );
                       
 %% Create an array of Tasks 
@@ -89,6 +89,7 @@ for i=1:length(Pos)
 end
 
 %% add the Task
+set(rS,'schedulingmethod','greedy');
 addTasks(rS,TskGrid(randperm(length(TskGrid))));
 
 %% Define what type of plotting we want

@@ -12,7 +12,7 @@
 clear 
 close all 
 clc
-ScopeConfigFileName='Demos/Roboscope_demo.cfg';
+ScopeConfigFileName=fullfile('Demos','Roboscope_demo.cfg');
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)
@@ -23,7 +23,7 @@ set(rS,'rootfolder',[pwd filesep 'Demos' filesep 'Junk']);
 
 % determine if I need to create movies of this demos and if its fake acq
 set(rS,'printscreen',getpref('roboscope','moviefolder',''),...
-    'fakeAcq','/home/rwollman/Photos/Patagonia');
+    'fakeAcq',['Demos' filesep 'Patagonia']);
 
 % clean any images in that folder
 delete(['Demos' filesep 'Junk' filesep '*'])
