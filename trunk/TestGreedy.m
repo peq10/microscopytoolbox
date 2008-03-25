@@ -15,7 +15,7 @@ try
 catch
 end
 delete(get(0,'Children')) % a more aggressive form of close (doesn't ask for confirmation)
-ScopeConfigFileName='ScopeWithStageFocusThroughMMserial.cfg';
+ScopeConfigFileName='MM_Roboscope.cfg';
 
 % call the constractor of the Scope 
 global rS; % name of the scope (rS=roboScope)

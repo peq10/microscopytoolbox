@@ -9,6 +9,7 @@ use Data::Compare;
 use List::Compare;
 use IO::LockedFile;
 use Switch;
+
 #use IO::Uncompress::Bunzip2;
 #use Graph::Easy;
 
@@ -59,8 +60,8 @@ sub connectToDB {
 # outputs: 
 #    ($db) a DBI database handle
 #
-$db=DBI->connect("dbi:Pg:dbname=$Config->{DBname}" ,"", "",{AutoCommit => 0,RaiseError => 0}) or
-        die "Can't connect to $Config->{DBname}: $DBI::errstr";
+$db=DBI->connect("dbi:Pg:dbname=getDBname()" ,"", "",{AutoCommit => 0,RaiseError => 0}) or
+        die "Can't connect to getDBname(): $DBI::errstr";
 # prepare the statement handles hash
 %Queries=(
     CollNameType => $db->prepare('SELECT filename,name,type FROM collections WHERE filename= ?'),
@@ -76,7 +77,10 @@ $db=DBI->connect("dbi:Pg:dbname=$Config->{DBname}" ,"", "",{AutoCommit => 0,Rais
     InsertCollQdata => $db->prepare('INSERT INTO coll_qdata (type,coll,value,label) VALUES (?,?,?,?)'),
     InsertImgQdata => $db->prepare('INSERT INTO img_qdata (type,img,value,label) VALUES (?,?,?,?)'),
     InsertCollFileNameType => $db->prepare('INSERT into collections (filename,name,type) VALUES (?,?,?)'),
-    InsertCollQdataType => $db->prepare('INSERT into coll_qdata_types (name,description) VALUES (?,?)')
+    InsertCollQdataType => $db->prepare('INSERT into coll_qdata_types (name,description) VALUES (?,?)'),
+    SelectAllViewNames => $db->prepare('SELECT view_name,id,executable from job_types'),
+    InsertNewJob => $db->prepare('INSERT into jobs (filename,job_type_id) VALUES (?,?)'),
+    UpdateJobStatus => $db->prepare('UPDATE jobs set status= ? WHERE id = ')
     ) or die "Could not prepare queries";
 }
 
@@ -109,13 +113,10 @@ sub parseConfigFile {
 #    ($Config) a ref for hash
 #
 # Hash keys are: 
-#   SourceFolder - where to move images from 
-#   TargetFolder - where to put images in (root folder)
+#   DataRootFolder - where to put images in (root folder)
 #   DBname       - database name
 #   verbose      - determine level of output (currently has only 1 and 0 levels)
-#   checkMount   - should the ImportManager check to see if SourceFolder is mounted properly
-#   mountCommand - what to execute to mount the source folder
-#
+#   
 # Basically it just parses the file lines that must be XXX=YYY such that XXX is the Key and YYY is the value
 #
     open(FIN,$_[0]) or die "Couldn't open filename $_[0]\n";
@@ -129,11 +130,12 @@ sub parseConfigFile {
     return $Config;
 }
 
+sub getDBname { return $Config->{DBname}; }
+sub getDataRootFolder { return $Config->{DataRootFolder}; }
+sub getVerbose { return $Config->{verbose};}
 sub compress {}
 sub deompress {}
-sub isCompressed {}
-sub ListNewFiles {}
-sub Sleep {}
+sub isCompressed { return 0; } # for now, nothing is compressed....
 
 ############ Class that defines the behavior of Qdata data type ##########
 package III::Qdata;
@@ -653,12 +655,71 @@ sub merge2file {}
 
 ##################### Job  class ######################
 
-package III::Job;
+package III::JobQueue;
 use III;
+# The job queue is a "Virtual Class" in the sense that it must be inhereted to be useful
+# There are few basic functionality methods out of which 2 methdos are useful and could
+# be used in the child classes as well (the constructor (new) and the CreateNewJobs)
+# the other two methods MUST be overloaded in any subclass to have a meaning, e.g.
+# submitting and getting the running job status 
 
-sub new {}
-sub updateDB {}
-sub createInputFile {}
+# JobQueue DATA STRUCTURE:
+#
+# MaxJobNum => the maximum number of jobs to run at the same time
+# Queue => a arrayref to an array of hashrefs of currently running jobs
+
+sub new {};
+sub CreateNewJobs{
+# Methods does the following:
+# 1. Find out how many job openning (empty slots) there are N. If 0 return. 
+# 2. Get a list of view from the DB
+# 3. From the view build a list of job hashrefs (upto N) each having the fields: executable, inputfilename, job_id, job_type_id
+#    Implicitly run createInputFile for each new job.
+
+};
+
+
+sub SubmitAllJobs{}; 
+sub GetRunningJobsStatus{};
+
+# "Private" methods
+sub updateJobStatusInDB {};
+sub createInputFile {}; # a "private" methods that will be only used in CreateNewJobs
+                        # for every new job that needs to be created.
+
+
+# OLD STUFF FROM THE ERA OF A JOB OBJECT                        
+## 1. get the names of all views from the job_types table
+#my $class=shift;
+#
+#$Queries{SelectAllViewNames}->execute();
+#my $listOfViews = $Queries{CollNameType}->fetchall_arrayref;
+#
+#my ($filename,$job_type_id,$executable);
+#$filename='';
+#$_=$filename;
+#my $row;
+## loop around all view names
+#foreach $row in (@$listOvViews) {
+#    $filename=$db->do('SELECT filename from $row[0] LIMIT 1') or die $db->errstr;
+#    $_=$filename;
+#    if ~m// { break;}
+#}
+#
+## check to see that a filename was found
+## if so create a job entry with $row[1],$row
+#
+#my $jobTypeId=$row[1];
+#my $executable=$row[2];
+#
+#$Queries{InsertNewJob}->execute($filename,$jobTypeId);
+#
+## finish the OO stuff (blessing the reference etc. )
+#%job=(job_type_id => $jobTypeId,
+#      executable => $executable,
+#      filename => $filename);
+
+
 
 
 

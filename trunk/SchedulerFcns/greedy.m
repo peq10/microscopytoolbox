@@ -1,5 +1,16 @@
-function ordr = greedy(x,y,t,id,xcurrent,ycurrent,tasks_duration,tcurrent)
+function ordr = greedy(schdle_data)
 %GREEDY - a type of scheduler that is , well greedy...
+
+x=schdle_data.x;
+y=schdle_data.y;
+t=schdle_data.t-now;
+id=schdle_data.id;
+xcurrent=schdle_data.xCurrent;
+ycurrent=schdle_data.yCurrent;
+tcurrent=schdle_data.yCurrent;
+tasks_duration=schdle_data.duration;
+
+%%
 
 % min time for task
 

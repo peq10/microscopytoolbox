@@ -1,17 +1,26 @@
-function removeTasks(rSin,idx)
-%REMOVETASK Summary of this function goes here
-%   Detailed explanation goes here
+function removeTasks(rSin,property,value)
+% removeTasks:  removes tasks based on specific criteria
+%    uses getTasks for task identification so similar syntax appleis
+%    this means that the speical temrs ('all','next') are possible in
+%    addition to the property value. 
+%  
+% example: 
+%    removeTasks(rS,'all')
+%    removeTasks(rS,'fncstr','acq_crazy')
+
 
 % this trick make sure rS is updated 
 % notice that rSin MUST be the same global rS object. 
 global rS;
 rS=rSin;
 
-if ischar(idx) && strcmp(idx,'all')
-    [bla,idx]=getTasks(rS,'all',0); 
+if ~exist('value','var') || isempty(value)
+    value=0;
 end
 
-% get the indexes of what about to stay. 
-idx=setdiff(1:length(rS.TaskBuffer),idx);
+[bla,indx]=getTasks(rS,property,value);
 
-rS.TaskBuffer=rS.TaskBuffer(idx); 
+% get the indexes of what about to stay. 
+indx=setdiff(1:length(rS.TaskBuffer),indx);
+
+rS.TaskBuffer=rS.TaskBuffer(indx); 

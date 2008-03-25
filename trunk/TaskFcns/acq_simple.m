@@ -1,66 +1,38 @@
-function acq_spindleHunt(Tsk) 
+function Tsk=acq_simple(Tsk) 
 
-global rS;
+global rS; % give access to the Scope functionality 
 
 %% get the crnt acq details 
-[X,Y,Exposure,Channels,Binning]=get(Tsk,'stageX',...
-                                          'stageY',...
-                                          'exposuretime',...
-                                          'ChannelNames',...
-                                          'Binning');
-Z=guessFocalPlane(rS,X,Y);
+[X,Y,Exposure,Channels]=get(Tsk,'stageX',...
+                                'stageY',...
+                                'exposuretime',...
+                                'Channels');
 
 %% goto XYZ
-set(rS,'xy',[X Y],'z',Z,'binning',Binning);
+set(rS,'xy',[X Y]);
 
-%% update status figures
-figure(1)
-plot(X,Y,'-or');
-figure(2)
-plotFocalPlaneGrid(rS);
-
-%% autofocus
-autofocus(rS,1);
-z=get(rS,'z');
-z=z+get(Tsk,'zshift');
-set(rS,'z',z);
-z=get(rS,'z');
-z=z+get(Tsk,'zshift');
-set(rS,'z',z);
-
-%% update Tsk object so the value I write to disk are actual not theoretical
-FcsScr.QdataType='FocusScore';
-FcsScr.Value=get(rS,'focusscore');
-FcsScr.QdataDescription='';
-
-Zguess.QdataType='FocalPlaneGuess';
-Zguess.Value=Z;
-Zguess.QdataDescription='';
-
-qdata=[FcsScr Zguess];
-
-Tsk=set(Tsk,'planetime',now,...
-            'stagex',get(rS,'x'),...
-            'stagey',get(rS,'y'),...
-            'stagez',get(rS,'z'),...
-            'qdata',qdata);
-        
 %% snap image
 img=acqImg(rS,Channels,Exposure);
 
-%% show image in figure 3
-figure(3)
-imshow(img(:,:,1),[],'initialmagnification','fit')
+%% check if spawning is needed
+if get(Tsk,'spawn_flag')
+    spawned=spawn(Tsk,img);
+    if spawned, disp('spawned a task'); end
+    Tsk=set(Tsk,'spawn_happened',spawned);
+end
 
-%% set Task to executed and update rS
-replaceTasks(rS,set(Tsk,'executed',true));
+%% update Task metadata
+Tsk=updateMetaData(Tsk);
 
-%% update Task Status
-figure(4)
-plotTaskStatus(rS)
+%% Write to disk
+if get(Tsk,'writeImageToFile')
+    writeTiff(Tsk,img,get(rS,'rootfolder'));
+end
 
-%% Write image to disk
-writeTiff(Tsk,img,get(rS,'rootfolder')); 
+%% plot 
+if get(Tsk,'plotDuringTask')
+    plotAll(rS);
+end
 
-%% show image
-% showImg(Tsk,img(:,:,1),2)
+
+

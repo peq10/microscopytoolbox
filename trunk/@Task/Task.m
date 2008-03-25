@@ -1,10 +1,14 @@
-function Tsk = Task(md,fcn,UserData)
+function Tsk = Task(md,fcn)
 %TASK Constructor of the Task class
 %   Where (n is the number iof Tasks to create):
 %
-%  md  -  a MetaData object (basically the base class object)
+%  md  -  a MetaData object (basically the base class object) if empty uses
+%         metadata default values. 
 %  fcn -  str or fcn_handle of the actual task execution job
-%  UserData - optional user data that will be accessed.                                                   
+%
+% example: 
+%           Tsk=Task([],'acq_simple')
+ 
 global rS;
 
 %% check if MetaData is supplied
@@ -46,23 +50,21 @@ end
 %% create the Tsk struct
 
 % get the ID from the rS object
-Tsk.id=getNewTaskIDs(rS);
+Tsk.id=get(rS,'NewTaskID');
 
 % get function handles
 Tsk.fcn=fcn;
 
 % run time: acqTime and stageMoveTime and fucosTime
-Tsk.acqTime=0;
-Tsk.focusTime=0;
-%TODO: calculate or do something with those
+Tsk.duration=1/86400; %default value for a task duration is 10 sec
+Tsk.waitTime=0; % the time we waited for this Task to start
 
 % z-shift where to image - can have either scalar or array with number of
 % channels
 Tsk.Zshift=0;
 
-% executed
-Tsk.executed=false;
-
+% status
+Tsk.status='undef';
 Tsk.timedep=false;
 
 % behavior if a timed task and is called after the time it should have happened
@@ -74,6 +76,25 @@ if exist('UserData','var')
 else
     Tsk.UserData=[];
 end
+
+% write behaviour - flag that says if during task execution (do(Task)) to
+% perform writeTiff operation. 
+Tsk.writeImageToFile=true; 
+
+% plot behaviour - flag that says if during task execution (do(Task)) to
+% perform plotting using Roboscope plotAll. 
+Tsk.plotDuringTask=true; 
+
+% spawnning - Task can spawn new tasks. Here are the fields that control
+% this behaviour
+Tsk.spawn.flag=false; % don't spawn by default. 
+Tsk.spawn.filenameAddition='_spawned';
+Tsk.spawn.Attributes2Modify=struct([]);
+Tsk.spawn.TskFcn='';
+Tsk.spawn.TestFcn=@(x) false;
+Tsk.spawn.happened=false; 
+
+
 
 
 %% create the object from the struct array
