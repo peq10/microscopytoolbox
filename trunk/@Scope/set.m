@@ -32,7 +32,7 @@ for i=1:2:n
                 error([varargin{i+1} ' is not a legitimate LightPath configuration, check config file']);
             end
             rS.mmc.setConfig(rS.LightPathName,varargin{i+1});
-          case 'units' % input must be a struct with the following fields: {'stageXY','stageZ','exposureTime','acqTime'}; Allowed values for spatial fileds (stage) are: mili-meter micro-meter, nano-meter. For temporal fileds: msec, sec, min, hours
+        case 'units' % input must be a struct with the following fields: {'stageXY','stageZ','exposureTime','acqTime'}; Allowed values for spatial fileds (stage) are: mili-meter micro-meter, nano-meter. For temporal fileds: msec, sec, min, hours
             units=varargin{i+1};
             if ~isstruct(units), error('Units must be a struct'); end
             if ~isempty(setxor(fields(units),{'stageXY','stageZ','exposureTime','acqTime'}))
@@ -133,16 +133,6 @@ for i=1:2:n
         case 'stagespeed.x' % TODO: implement stagtespeed.X via mmc
         case 'stagespeed.y' % TODO: implement stagtespeed.y via mmc
         case 'stagespeed.z' % TODO: implement stagtespeed.z via mmc
-            
-% %% This section was             
-%             [bla,ax]=strtok(varargin{i},'.');
-%             param.axis=upper(ax(2));
-%             param.speed=varargin{i+1}/1000; 
-%             ok=cmdStg(rS,'setspeed',param);
-%             if ~ok
-%                 warning('Could not set stage speed appropriatly.') %#ok
-%             end
-
         case 'channel' % a string of a channel group name (as defined in MM config file) get them using get(rS,'avaliablechannels')
              % check that config is char
             if ~ischar(varargin{i+1}), error('Channel state must be char!'); end
@@ -169,12 +159,7 @@ for i=1:2:n
                 error('rootFolder must be a string and a legit folder, please check');
             end
             rS.rootFolder=varargin{i+1};
-        case 'focusrange'
-            keyboard
-        case 'focusspeed'
-        case 'focussearchdirection'
-        case 'focususehilldetect'
-        case 'focushilldetectheight'
+        case 'focusparam'
              setFocusParams(rS,varargin{i},varargin{i+1});
         case 'lastimage' % an image
             rS.lastImage=varargin{i+1};
