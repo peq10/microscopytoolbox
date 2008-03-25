@@ -1,6 +1,9 @@
 function waitFor(rS,dv)
-%WAITFOR Summary of this function goes here
-%   Detailed explanation goes here
+% waitFor : pauses and waits for devices to stop being busy
+%   currently only supports the stage but could easily add more device. 
+%
+%   example: 
+%           waitFor(rS,'stage');
 
 switch dv
     case 'stage'

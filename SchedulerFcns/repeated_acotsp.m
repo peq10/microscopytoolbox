@@ -1,12 +1,25 @@
-function ordr = repeated_acotsp(x,y,t,id,x_current,y_current,tasks_duration,t_current)
+function ordr = repeated_acotsp(schdle_data)
 % assumes that I need to go in circles
+
+x=schdle_data.x;
+y=schdle_data.y;
+t=schdle_data.t;
+id=schdle_data.id;
+x_current=schdle_data.xCurrent;
+y_current=schdle_data.yCurrent;
+
 
 %% sort them all based on time & divinde into blocks
 xy=[x y];
 [xyunq,bla,ix]=unique(xy,'rows');
+% xyunqorg=xyunq;
+dup=floor(20/size(xyunq,1))+1;
+xyunq=repmat(xyunq,dup,1);
 tunq=unique(t); 
 tic
 blockOrdr=acotsp(xyunq(:,1),xyunq(:,2),nan(size(xyunq(:,1))),(1:size(xyunq,1))',x_current,y_current);
+blockOrdr=blockOrdr(1:dup:end);
+% xyunq=xyunqorg;
 %%
 xyunq=xyunq(blockOrdr,:);
 tic

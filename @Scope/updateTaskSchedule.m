@@ -1,5 +1,5 @@
 function updateTaskSchedule( rSin)
-%UPDATETASKSCHEDULE update the current TaskBuffer schedule 
+% updateTaskSchedule : recalculates the  schedule 
 %based on the current SchedulerFcn
 
 % this trick make sure rS is updated 
@@ -9,27 +9,47 @@ rS=rSin;
 
 %% get info about tasks in buffer
 
+%% 
+PastTasks=get(rS,'PastTasksDuration');
+durVector=PastTasks.durVector;
+fncStrUnq=PastTasks.fncStrUnq;
+
+NonExecTasks=getTasks(rS,'status','inqueue');
 % get the IDs,x,y of all non-executed tasks. 
-x=[];
-y=[]; 
-t=[];
-id=[];
-duration=[];
-for i=1:length(rS.TaskBuffer)
-    exec=get(rS.TaskBuffer(i),'executed'); 
-    if ~exec
-        x=[x; get(rS.TaskBuffer(i),'stageX')]; 
-        y=[y; get(rS.TaskBuffer(i),'stageY')];
-        t=[t; get(rS.TaskBuffer(i),'planetime')];
-        id=[id; get(rS.TaskBuffer(i),'ID')];
-        duration=[duration; get(rS.TaskBuffer(i),'duration')];
+x=get(NonExecTasks,'stageX');
+if iscell(x), x=[x{:}]'; end
+y=get(NonExecTasks,'stagey');
+if iscell(y), y=[y{:}]'; end
+t=get(NonExecTasks,'acqTime');
+if iscell(t), t=[t{:}]'; end
+id=get(NonExecTasks,'ID');
+if iscell(id), id=[id{:}]'; end
+
+fncStr=get(NonExecTasks,'fcnstr');
+if ~iscell(fncStr),fncStr={fncStr}; end
+
+duration=zeros(length(NonExecTasks),1);
+for i=1:length(NonExecTasks)
+    ix=find(strcmp(fncStrUnq,fncStr{i})); %#ok<EFIND>
+    if ~isempty(ix) && ~isempty(durVector{ix})
+        dur=median(durVector{ix});
+    else
+        dur=get(NonExecTasks(i),'duration');
     end
+    duration(i)=dur;
 end
 
 %% get current scheduling method as function handle
 schedulerFcn = str2func(get(rS,'schedulingMethod')); 
 
 %% run this function
+
+% construct the schedule data struct
 [xCurrent,yCurrent]=get(rS,'x','y');
-rS.TaskSchedule=schedulerFcn(x,y,t,id,xCurrent,yCurrent,duration,now);
+schdle_data=struct('x',x,'y',y,'t',t,'id',id,...
+               'xCurrent',xCurrent,'yCurrent',yCurrent,...
+               'tCurrent',now,'duration',duration);
+           
+% call the scheduler function with stuct as input
+rS.TaskSchedule=schedulerFcn(schdle_data);
 

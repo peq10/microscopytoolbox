@@ -1,5 +1,8 @@
 function autofocus(rSin,updateFocalPlaneGridFlag)
 % rS autofocus based on rS currnet properties
+% main thing is the focusmethod
+
+f=str2func(get(rS,'focusmethod'));
 
 % to use the global rS
 global rS;

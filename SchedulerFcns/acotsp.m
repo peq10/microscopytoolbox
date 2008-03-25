@@ -1,8 +1,17 @@
-function order=acotsp(x,y,t,id,x_current,y_current,tasks_duration,t_current)
+function order=acotsp(schdle_data)
 % a scheduling function based on Ant Colony Optimization
 % for solving Traveler Salesperson Problem
 % It totaly ignores the times, just return the task in an optimal order
 % based on their distnaces
+
+%% parse inputs
+x=schdle_data.x;
+y=schdle_data.y;
+id=schdle_data.id;
+x_current=schdle_data.xCurrent;
+y_current=schdle_data.yCurrent;
+
+%%
 
 if range(x)+range(y)==0
     order=id;
@@ -23,6 +32,9 @@ fclose(fid);
 
 % run ACOTSP
 cmd=sprintf('acotsp -i Tasks.tsp -r 1 -t 3 -g %i > acotsp.log',min(length(id),20));
+if isunix
+    cmd=['./' cmd];
+end
 msg=system(cmd); %#ok<NASGU>
 if msg==0
     tr = dlmread('Tour.txt');
@@ -30,7 +42,7 @@ if msg==0
     tr=tr+1;
 else
     warning('Scheduling failed!!!!! no idea why... ')
-    keyboard
+%     keyboard
     tr=1:length(x);
 end
 
