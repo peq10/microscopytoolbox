@@ -140,11 +140,6 @@ for i=1:length(varargin)
             str=char(rS.mmc.getSerialPortAnswer(rS.COM,char(13)));
             str=regexprep(str,':A','');
             varargout=[varargout; {str2double(str)}];
-        case 'focusrange' % TODO implement this focus parameters via mmc
-        case  'focusspeed' % TODO implement this focus parameters via mmc
-        case 'focussearchdirection' % TODO implement this focus parameters via mmc
-        case  'focususehilldetect' % TODO implement this focus parameters via mmc
-        case  'focushilldetectheight' % TODO implement this focus parameters via mmc
         case  'focustime'  % TODO implement this focus parameters via mmc
 %          OLD IMPLEMETATION USING getFocusParam, need to move to mmc 
 %           varargout=[varargout; {getFocusParams(rS,varargin{i})}];

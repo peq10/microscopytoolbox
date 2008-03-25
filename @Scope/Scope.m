@@ -99,13 +99,12 @@ rS.FocalPlaneGridSize=25;
 % rS.mmc.setState('Objective',ObjectiveLbl);
 
 % load the pixel sizes from file
-fid=fopen('PixelSizeList.csv');
-C=textscan(fid,'%s %f');
-fclose(fid);
-rS.pxlsz.label=C{1};
-rS.pxlsz.um=C{2};
+rS.pxlsz.label='10x';
+rS.pxlsz.um=0.1;
 
-rS.focusParams=[]; %will be updated in first call for getFocusParams
+% Focus mnethod and parameters
+rS.focusMethod='noAutoFocus';
+rS.focusParams=struct('placeholder',1); %will be updated in first call for getFocusParams
 
 %% create the object from struct
 rS=class(rS,'Scope');
@@ -119,4 +118,5 @@ rS=class(rS,'Scope');
 addpath TaskFcns
 addpath SchedulerFcns
 addpath(['ThirdParty' filesep 'utilities'])
+
 

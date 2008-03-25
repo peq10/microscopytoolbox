@@ -2,21 +2,18 @@ function autofocus(rSin,updateFocalPlaneGridFlag)
 % rS autofocus based on rS currnet properties
 % main thing is the focusmethod
 
-f=str2func(get(rS,'focusmethod'));
-
 % to use the global rS
 global rS;
 rS=rSin;
 
-% set channel to focusing channel
-crnt_chnl=get(rS,'channel');
-set(rS,'channel','white');
+% get the current focus method as a function handle
+f=str2func(get(rS,'focusmethod'));
 
-% this is a "hack" its ASI specific, need to change where there is a autofocus device
-rS.mmc.setSerialPortCommand(rS.COM,'AF',char(13))
-waitFor(rS,'stage')
-set(rS,'channel',crnt_chnl);
+% autofocus
+f(rS);
 
+% update the focal plane grid if asked for. 
+% If not asked for, updating is default behavior
 if ~exist('updateFocalPlaneGridFlag','var')
     updateFocalPlaneGridFlag=1;
 end
