@@ -1,8 +1,8 @@
 function autofocus(rSin,updateFocalPlaneGridFlag)
 % rS autofocus based on rS currnet properties
-%
-% TODO: need a complete re-write based and move to using only MMC autofocus
-% devices. 
+% main thing is the focusmethod
+
+f=str2func(get(rS,'focusmethod'));
 
 % to use the global rS
 global rS;
