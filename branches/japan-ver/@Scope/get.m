@@ -16,6 +16,8 @@ varargout={};
 % X,Y,Z,Fcs,Channel,ExpTime
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'emgain' % the em-gain - must be defined in the config file.
+            varargout=[varargout; {char(rS.mmc.getCurrentConfig(rS.EMgainName))}];
         case 'fakeacq' % a folder name to read fake images from
             varargout=[varargout; {rS.fakeAcquisition}];
         case 'printscreen' % a folder name to save print-screens into.

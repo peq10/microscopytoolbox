@@ -37,6 +37,7 @@ rS.COM='COM2'; %the focus port for ASI
 rS.OBJName='OBJ'; % the GroupConfig for the objectives
 rS.ChannelName='Channel';
 rS.LightPathName='LightPath';
+rS.EMgainName='EM-gain';
 
 %% Additional properties not part of Stage or MMC:
 % task ID
@@ -49,9 +50,12 @@ rS.rootFolder='./';
 rS.resolveErrors=true;
 
 % default focus method
-rS.focusMethod='ASI';
+% must be a funciton handle to a file in the SchedulerFcn folder 
+rS.focusMethod='dualScanImageBased';
+rS.focusParam=struct();
 
 % default scheduling method
+% must be a funciton handle to a file in the SchedulerFcn folder 
 rS.schedulingMethod='greedy'; 
 
 % Units

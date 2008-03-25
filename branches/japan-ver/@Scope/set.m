@@ -15,6 +15,8 @@ if mod(n,2)~=0, error('must have PAIRS of feature name, feature value'); end
 
 for i=1:2:n
     switch lower(varargin{i})
+        case 'emgain' % a valid EM-gain value
+            rS.mmc.setConfig(rS.EMgainName,varargin{i+1});
         case 'fakeacq' % an existing folder with images
             if ~exist(varargin{i+1},'dir')
                 error('fakeAcq must be a name of a valid folder');
@@ -167,7 +169,8 @@ for i=1:2:n
                 error('rootFolder must be a string and a legit folder, please check');
             end
             rS.rootFolder=varargin{i+1};
-        case 'focusrange' 
+        case 'focusrange'
+            keyboard
         case 'focusspeed'
         case 'focussearchdirection'
         case 'focususehilldetect'
