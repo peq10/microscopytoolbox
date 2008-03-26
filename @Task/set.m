@@ -39,6 +39,11 @@ end
 %% Set the calues
 for i=1:2:length(varargin)
     switch lower(varargin{i})
+        case 'spawn_queue'
+            if ~islogical(varargin{i+1}) && ~isnumeric(varargin{i+1})
+                error('Input for spawn queue flag must be logical (or numeric and then it will be converted');
+            end
+            Tsk.spawn.QueueSpawnedFlag=logical(varargin{i+1});
         case 'spawn_happened' % logical (true/false) will be converted if numeric 
             if ~islogical(varargin{i+1}) && ~isnumeric(varargin{i+1})
                 error('Input for spawn flag must be logical (or numeric and then it will be converted');
@@ -50,7 +55,7 @@ for i=1:2:length(varargin)
             end
             Tsk.spawn.flag=logical(varargin{i+1});
         case 'spawn_attributes2modify' % struct with legal field names
-            if ~isstruct(varargin{i+1}) || ~isempty(setdiff(fieldnames(varargin{i+1}),TaskAttributes));
+            if ~isstruct(varargin{i+1}) || ~isempty(setdiff(lower(fieldnames(varargin{i+1})),TaskAttributes));
                 error('spawn_attributes2modify MUST be a struct with field names who are legel Task/MetaData settable attributes');
             end
             Tsk.spawn.Attributes2Modify=varargin{i+1};

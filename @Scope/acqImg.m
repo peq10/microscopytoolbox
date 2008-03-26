@@ -30,17 +30,17 @@ if ~isempty(get(rS,'fakeacq'))
     return
 end
 
-% if channels is not a cell array make it oue
-if ~iscell(Channel)
-    Channel={Channel};
-end
-
 [w,h,bd]=get(rS,'Width','Height','BitDepth');
 
 % if no exposure settings, use current rS setting
 if ~exist('Channel','var')
     Channel=get(rS,'channel');
 end
+% if channels is not a cell array make it oue
+if ~iscell(Channel)
+    Channel={Channel};
+end
+
 if ~exist('Exposure','var')
     Exposure=get(rS,'exposure');
 end
@@ -49,12 +49,12 @@ n=length(Channel);
 img=zeros(h,w,n); % notice the traspose element in the loop
 for i=1:n
     % set autoshutter only for whitelight
-    autoshutter=1;
-    if strcmpi(Channel{i},'White')
-        autoshutter=0;
-    end
-    set(rS,'AutoShutter',autoshutter,...
-           'Channel',Channel{i},...
+%     autoshutter=1;
+%     if strcmpi(Channel{i},'White')
+%         autoshutter=0;
+%     end
+%     set(rS,'AutoShutter',autoshutter);
+    set(rS,'Channel',Channel{i},...
            'Exposure',Exposure(i));
     rS.mmc.snapImage;
     imgtmp=rS.mmc.getImage;

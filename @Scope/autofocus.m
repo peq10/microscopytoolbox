@@ -1,4 +1,4 @@
-function autofocus(rSin,updateFocalPlaneGridFlag)
+function [inFocus,bestZ,allZ,allScrs]=autofocus(rSin,updateFocalPlaneGridFlag)
 % rS autofocus based on rS currnet properties
 % main thing is the focusmethod
 
@@ -6,11 +6,25 @@ function autofocus(rSin,updateFocalPlaneGridFlag)
 global rS;
 rS=rSin;
 
+% set autoshuuter to false
+set(rS,'autoshutter',false)
+
 % get the current focus method as a function handle
 f=str2func(get(rS,'focusmethod'));
 
 % autofocus
-f(rS);
+initZ=get(rS,'z');
+[inFocus,bestZ,allZ,allScrs]=f(rS);
+% only if autofocus function reports success, update the Z
+% otherwise fall back to original
+if inFocus
+    set(rS,'z',bestZ)
+else
+    set(rS,'z',initZ)
+end
+
+set(rS,'autoshutter',true)
+
 
 % update the focal plane grid if asked for. 
 % If not asked for, updating is default behavior

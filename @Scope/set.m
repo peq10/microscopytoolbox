@@ -104,12 +104,12 @@ for i=1:2:n
             if ~isreal(varargin{i+1}) && numel~=1 && round(varargin{i+1})<=0
                 error('''focuspointsproximity'' must be positive scalar');
             end
-            rS.FocusPointHistory=varargin{i+1};
+            rS.FocusPointsHistory=varargin{i+1};
         case 'focuspointshistory' % single number in um units
             if ~isreal(varargin{i+1}) && numel~=1 && round(varargin{i+1})<=0
                 error('''focuspointshistory'' must be positive scalar');
             end
-            rS.FocusPointHistory=varargin{i+1};
+            rS.FocusPointsHistory=varargin{i+1};
         case 'x' % single number (absolute cordinates) units are based on rS unit property
             x=varargin{i+1};
             x=transformUnits( rS, 'stageXY', x );
@@ -159,8 +159,6 @@ for i=1:2:n
                 error('rootFolder must be a string and a legit folder, please check');
             end
             rS.rootFolder=varargin{i+1};
-        case 'focusparam'
-             setFocusParams(rS,varargin{i},varargin{i+1});
         case 'lastimage' % an image
             rS.lastImage=varargin{i+1};
         case 'schedulingmethod' % a string speficiying a legal scheduling method e.g. it exist in the SchdualerFcns folder

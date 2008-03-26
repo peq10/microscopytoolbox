@@ -93,7 +93,7 @@ Tsk.spawn.Attributes2Modify=struct([]);
 Tsk.spawn.TskFcn='';
 Tsk.spawn.TestFcn=@(x) false;
 Tsk.spawn.happened=false; 
-
+Tsk.spawn.QueueSpawnedFlag=true; 
 
 
 

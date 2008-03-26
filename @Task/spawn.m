@@ -32,8 +32,11 @@ if toSpawn
         end
         NewTsk=set(NewTsk,fld{i},attr2mod.(fld{i}));
     end              
-                  
-    addTasks(rS,NewTsk);
+    if get(Tsk,'spawn_queue')              
+        addTasks(rS,NewTsk);
+    else
+        do(NewTsk);
+    end
     spawned=true;
 else
     spawned=false;

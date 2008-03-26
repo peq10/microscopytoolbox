@@ -162,7 +162,7 @@ for i=1:length(varargin)
         case 'binning' % current camera binning (MMC)
             varargout=[varargout; {str2double(rS.mmc.getProperty('DigitalCamera','Binning'))}];
         case 'autoshutter' % autoshutter (true/false) an MMC property
-            varargout=[varargout; {rS.getAutoShutter}];
+            varargout=[varargout; {rS.mmc.getAutoShutter}];
         otherwise
             warning('Throopi:Property:get:Scope',['property: ' varargin{i} ' does not exist in Scope class']) 
     end

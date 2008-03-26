@@ -11,6 +11,9 @@ global rS; % give access to the Scope functionality
 %% goto XYZ
 set(rS,'xy',[X Y]);
 
+%% autofocus 
+autofocus(rS);
+
 %% snap image
 img=acqImg(rS,Channels,Exposure);
 
