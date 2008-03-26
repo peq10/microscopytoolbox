@@ -1,8 +1,8 @@
 function outpt = transformUnits( rS, typ, inpt )
-% transformUnits : a private method that transforms units based on what rS
+% transformUnits : a method that transforms units based on what rS
 % is currently defined to. It transform all stage related stuff into
 % micro-meter, exposure time into ms and acqTime into days (thats how
-% matlab lieks it...)
+% matlab likes it...)
 %
 % Note: for acqTime, it also checks to see if maybe the user forgot to
 % supply the value in absolute time and not relative time. If the time

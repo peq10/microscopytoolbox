@@ -91,8 +91,8 @@ rS.refreshSchedule=Inf;
 % Focus points - This is a list of points where rS know it had good focus
 % existing points are needed for rS to be able to guess another point
 rS.FocusPoints=[]; %[X Y Z T]
-rS.FocusPointHistory=1/1440; %Number of days that are used in the updateFocalPlaneGrid 
-rS.FocusPointProximity=10; %the distance of points for which the history is relevant
+rS.FocusPointsHistory=1/1440; %Number of days that are used in the updateFocalPlaneGrid 
+rS.FocusPointsProximity=10; %the distance of points for which the history is relevant
 rS.FocalPlaneGridSize=25;
 
 % % set it in mmc
@@ -108,15 +108,14 @@ rS.focusParams=struct('placeholder',1); %will be updated in first call for getFo
 
 %% create the object from struct
 rS=class(rS,'Scope');
-% set(rS,'channel','white');
 
-% Init the channel property by closing and opening the tran light
-% set(rS,'channel','close')
-% set(rS,'channel','white')
+%% update all the defaults for focus functions
 
 %% add path - "Plug-in" folders
 addpath TaskFcns
 addpath SchedulerFcns
+addpath AutofocusFcns
+addpath DecisionFcns
 addpath(['ThirdParty' filesep 'utilities'])
 
 

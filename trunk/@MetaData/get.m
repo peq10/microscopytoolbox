@@ -142,25 +142,17 @@ function cl_out=reduceInput(cl_in)
 % returned a reduced matrix mat such that any dimension which is only a
 % duplication is reduced to singletom. If after reduction mat is 0 / 1 D than 
 % it also squeezes since its obvious which dimension the variability is in
-
+% 
+% Basically, it eliminates duplication in Z and T always maintain C
 
 cl_out=cell(size(cl_in));
 diffFlag=0;
 for ii=1:length(cl_in)
     % now check for each cell few possibilities
 
-    % if values are all the same, return scalar
-    if range(cl_in{ii}(:)) == 0
-        cl_out{ii}=cl_in{ii}(1);
-        % if values are the same for all z-stack (rows)
-        % return a single row
-    elseif sum(range(cl_in{ii})==0) == size(cl_in{ii},2)
+    % if Z values are all the same, return single row
+    if size(unique(cl_in{ii},'rows'),1)==1
         cl_out{ii}=cl_in{ii}(1,:);
-
-        % if values are the same for all channels (cols)
-        % return a single col
-    elseif sum(range(cl_in{ii}')==0) == size(cl_in{ii},1)
-        cl_out{ii}=cl_in{ii}(:,1);
     else
         cl_out{ii}=cl_in{ii};
     end

@@ -1,4 +1,4 @@
-function [inFocusFlag,bestZ,allZ,allScrs]=dualScanImageBased(rSin)
+function [inFocusFlag,bestZ,allZ,allScrs]=singleScanImageBased(rSin)
 % an image based / software autofocus function that does two scans
 % a coarse one to find regin and second run to find exact focus
 % in both runs it uses the gradient based score function
@@ -12,24 +12,24 @@ t0=now;
 
 try % to define all parameters based on the FocusParam struct
     % number of steps is scan must be a 2 element vecotr
-    Verbose=getFocusParams(rS,'dualScanImageBased','Verbose');
-    NumOfStepsInScan=getFocusParams(rS,'dualScanImageBased','NumOfStepsInScan');
-    ScanRange(1)=0.5*getFocusParams(rS,'dualScanImageBased','Range');
+    Verbose=getFocusParams(rS,'singleScanImageBased','Verbose');
+    NumOfStepsInScan=getFocusParams(rS,'singleScanImageBased','NumOfStepsInScan');
+    ScanRange(1)=0.5*getFocusParams(rS,'singleScanImageBased','Range');
     % the real scan would be - ScaneRange/2 -> + ScanRagne / 2
     % here for fake acq we make sure that the entire
     % stack is in scan range
     ScanRange(2)=ScanRange(1)/NumOfStepsInScan(1)*1.1; % plus imnux that value
 
     % details required for the focus
-    ROI=getFocusParams(rS,'dualScanImageBased','ROI');
-    ConvKern=getFocusParams(rS,'dualScanImageBased','ConvKern');
+    ROI=getFocusParams(rS,'singleScanImageBased','ROI');
+    ConvKern=getFocusParams(rS,'singleScanImageBased','ConvKern');
 
     % AcqParam is a struct where the field is the property name and the
-    AcqParam=getFocusParams(rS,'dualScanImageBased','AcqParam');
+    AcqParam=getFocusParams(rS,'singleScanImageBased','AcqParam');
 
 catch
     lasterr;
-    error('At least one parameters for the focus function ''dualScanImageBased'' were not define in the ''FocusParam'' struct of rS');
+    error('At least one parameters for the focus function ''singleScanImageBased'' were not define in the ''FocusParam'' struct of rS');
 end
 
 Zres=0.01; % 10 nm resolution
@@ -37,41 +37,30 @@ Zres=0.01; % 10 nm resolution
 %% defind the focus functions
 f=@(img) sum(sum(filter2(ConvKern,img(ROI(1):ROI(2),ROI(3):ROI(4)).^2))); % gradient square
 
-
 %% First coarse scan
 Zcrnt=get(rS,'z');
-Zscan1=Zcrnt+linspace(-ScanRange(1),ScanRange(1),NumOfStepsInScan(1));
+Zscan=Zcrnt+linspace(-ScanRange(1),ScanRange(1),NumOfStepsInScan(1));
 
-for i=1:NumOfStepsInScan(1)
-    Scr1(i)=getFcsScr(Zscan1(i));
+for i=1:NumOfStepsInScan
+    Scr(i)=getFcsScr(Zscan(i));
 end
-Zpos1=min(Zscan1):Zres:max(Zscan1);
-IntrpScr1=pchip(Zscan1,Scr1,Zpos1);
-[blah,ix1]=max(IntrpScr1);
-Zbst1=Zpos1(ix1);
+Zpos=min(Zscan):Zres:max(Zscan);
+IntrpScr=pchip(Zscan,Scr,Zpos);
+[blah,ix]=max(IntrpScr);
+Zbst=Zpos(ix);
 
-%% Second fine scan
-Zscan2=Zbst1+linspace(-ScanRange(2),ScanRange(2),NumOfStepsInScan(2));
-
-for i=1:NumOfStepsInScan(2)
-    Scr2(i)=getFcsScr(Zscan2(i));
-end
-% combine info from both scans
-zz=[Zscan1 Zscan2];
-[zz,ix]=unique(zz);
-ss=[Scr1 Scr2];
-ss=ss(ix);
-Zpos2=min(zz):Zres:max(zz);
-IntrpScr2=pchip(zz,ss,Zpos2);
-[blah,ix2]=max(IntrpScr2);
+zz=Zscan;
+ss=Scr;
 
 % Finally, set rS to the best Z plane 
 inFocusFlag=1; % TODO: need to include some check to see if we think the AF worked.
+ 
 allZ=zz;
 allScrs=ss;
+
 % return success flag is asked for
 inFocusFlag;
-bestZ=Zpos2(ix2);
+bestZ=Zpos(ix);
 
 %% nested functions for calculating score
 
@@ -90,4 +79,4 @@ bestZ=Zpos2(ix2);
 
     end % of nested function getFcsScr
 
-end % of main function dualScanImageBased
+end % of main function singleScanImageBased

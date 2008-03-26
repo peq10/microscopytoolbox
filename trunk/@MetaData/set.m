@@ -115,8 +115,8 @@ for i=1:2:length(varargin)
             
             % update the DimensionSize metadata
             [ordr,sz]=get(md,'dimensionorder','dimensionsize');
-            Tind=strfind(ordr,'T')-2;
-            sz(Tind)=length(varargin{i+1});
+            Cind=strfind(ordr,'C')-2;
+            sz(Cind)=length(varargin{i+1});
             md=set(md,'dimensionsize',sz);
             chnls=varargin{i+1};
             % if a channel is missing from channeldescription add it

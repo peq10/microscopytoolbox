@@ -42,6 +42,8 @@ varargout=cell(length(varargin),1);
 
 for i=1:length(varargin)
     switch lower(varargin{i})
+        case 'spawn_queue'
+            varargout{i}=Tsk.spawn.QueueSpawnedFlag;
         case 'spawn_happened' % a logical flag that sways whether a task was spawned 
             varargout{i}=Tsk.spawn.happened;
         case 'spawn_flag' % a logical flag that says whether the task should spawn new tasks. 
