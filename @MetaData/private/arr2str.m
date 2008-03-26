@@ -2,6 +2,11 @@ function str = arr2str(arr)
 %ARR2STR transforms a 1-3 dimensional array into Postgres array syntax
 
 %%
+if isstruct(arr)
+    str=struct2xml(arr);
+    return
+end
+
 if length(size(arr))>3
     error('Can only handle up to 3 dimensionsl arrays');
 end
@@ -12,6 +17,19 @@ if numel(arr)==1
     return
 end
 
+%% If input is provided as a cell array, loop around all cells and convert
+% each one seperatrly, returning a cell array of the same size
+
+if iscell(arr)
+    str=cell(size(arr));
+    for i=1:numel(att)
+        str{i}=arr2str(arr{i});
+    end
+    return
+end
+
+
+%%
 [r,c,dz]=size(arr);
 str_1d=cell(r,dz);
 
