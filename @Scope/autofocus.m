@@ -23,8 +23,9 @@ else
     set(rS,'z',initZ)
 end
 
+% return shutter to image-like behaviour
+set(rS,'channel','close')
 set(rS,'autoshutter',true)
-
 
 % update the focal plane grid if asked for. 
 % If not asked for, updating is default behavior

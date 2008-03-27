@@ -1,8 +1,8 @@
 function addFocusPoints( rSin,x,y,z,t )
-% addFocusPoints : add points to the rS.FocusPoints and delete old ones
+% addFocusPoints : add points to the rS.FocusPoints and mark old ones not to be used
 % the Scope object is constantly maintaining a list of points that it think
 % were in good focus. This method adds a point to this list. When a point
-% is added other older points might be discarded based on Scope attributes
+% is added other older points might be marked as old based on Scope attributes
 % FocusPointProximity and FocuPointHistory. The list of focal points is
 % then used to build a model of the coverslip (the get(rS,'focalplane'))
 % 
@@ -28,13 +28,13 @@ if isempty(rS.FocusPoints)
     return
 end
 
-% Find the indexes of point I want to get rid of points 
+% Find the indexes of point I want to marks as old of points 
 % (e.g. are closer then rS.FocusPointProximity and 
 %  were taken more than rS.FocuPointHistory seconds ago)
 curr_xy=rS.FocusPoints(:,1:2)';
-D=distance(curr_xy,[x; y]);
+D=distance(curr_xy,[x'; y']);
 T=(t-rS.FocusPoints(:,4));
-ix=find((D>get(rS,'FocusPointsProximity')).*(T<get(rS,'FocusPointsHistory'))); 
+ix=find((D<get(rS,'FocusPointsProximity')).*(T>get(rS,'FocusPointsHistory'))); 
 rS.FocusPoints(ix,5)=0; %#ok<FNDSB>
 
 % add current point

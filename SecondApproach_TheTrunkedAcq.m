@@ -20,22 +20,26 @@ setFocusParams(rS,'singleScanImageBased_WithMaxObjectSize',...
                   'Verbose',true,...
                   'MaxObjectSize',1000,...
                   'Range',100,...
-                  'NumOfStepsInScan',[10 10],...
+                  'NumOfStepsInScan',3,...
                   'ROI',[100 200 100 200],...
                   'AcqParam',struct('Channel','Cy3-eye','Exposure',100),...
                   'ConvKern',[0 -1 0; -1 0 1; 0 1 0])
 
 %% Define a "Generic Task" 
 GenericTsk=Task(...
-                MetaData('Channels',{'FITC','Cy3','Cy5'},...
+                MetaData('Channels',{'Cy3'},...
                         'Exposure',[100 100 100]),...
-                'acq_simple');
+                'acq_burst_with_af');
+% number oif images to take before analyzing the data
+GenericTsk=set(GenericTsk,'UserData',struct('imgNumInBurst',2));
 % spawning behavior
+% data related to spawned function behavior
+UserData=struct('dX',100,'MiniGridSize',3);
 GenericTsk=set(GenericTsk,'spawn_queue',false,... meaning it would do the spawned task immediantly and not aadd it to the queue
                           'spawn_flag',true,... it would try to spawn new tasks
-                          'spawn_testFcn',@isNumberOfObjectsPrime,... % function to test
+                          'spawn_testFcn',@areTheTwoColoredSpotsMoving_usingTrack,... % function to test
                           'spawn_tskFcn','acq_burst',...
-                          'spawn_filenameaddition','_burst',...
+                          'spawn_filenameaddition','',...
                           'spawn_attributes2modify',struct('UserData',struct('imgNumInBurst',3))...
                           );
                       
@@ -64,10 +68,6 @@ addTasks(rS,TskGrid);
 %
 % Figure number of 0 creates a new figure every draw 
 
-plotInfo(1).num=1;
-plotInfo(1).type='route';
-plotInfo(1).position=[10   597   450   309];
-
 plotInfo(2).num=2;
 plotInfo(2).type='planned schedule';
 plotInfo(2).position=[10   200   350   309];
@@ -76,9 +76,9 @@ plotInfo(3).num=3;
 plotInfo(3).type='image';
 plotInfo(3).position=[505   406   695   567];
 
-plotInfo(4).num=4;
-plotInfo(4).type='focal plane';
-plotInfo(4).position=[393   100   353   222];
+plotInfo(1).num=4;
+plotInfo(1).type='focal plane';
+plotInfo(1).position=[393   100   353   222];
 
 set(rS,'plotInfo',plotInfo);
 
