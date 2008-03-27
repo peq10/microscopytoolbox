@@ -1,34 +1,43 @@
-function acq_timelapse(Tsk) 
-%SIMPLEACQ callback function to be used by by AcqSeq objects
-%   
-% Outline: 
-% 1. get the current number in the sequence
-% 2. goto the right xyz position, 
-% 3. autofocus
-% 4. expose & snap an image
-% 5. save to disk
+function Tsk=acq_timelapse(Tsk) 
 
-global rS;
+global rS; % give access to the Scope functionality 
 
 %% get the crnt acq details 
-[X,Y,Z,Exposure,Channels,Binning]=get(Tsk,'stageX',...
-                                          'stageY',...
-                                          'stageZ',...
-                                          'exposuretime',...
-                                          'ChannelNames',...
-                                          'Binning');
+[X,Y,Exposure,Channels,UserData]=get(Tsk,'stageX',...
+                                         'stageY',...
+                                         'exposuretime',...
+                                         'Channels',...
+                                         'UserData');
+T=UserData.T;
+                                     
 %% goto XYZ
-set(rS,'xy',[X Y],'z',Z);
-figure(1)
-plot(X,Y,'or');
-%% autofocus
+set(rS,'xy',[X Y]);
+
+%% autofocus 
 autofocus(rS);
 
-%% snap images
+%% snap image
 img=acqImg(rS,Channels,Exposure);
 
-%% Write image to disk
-writeTiff(Tsk,img,get(rS,'rootfolder')); 
-set(rS,'lastImage',img); 
+%% check if spawning is needed
+if get(Tsk,'spawn_flag')
+    spawned=spawn(Tsk,img);
+    if spawned, disp('spawned a task'); end
+    Tsk=set(Tsk,'spawn_happened',spawned);
+end
 
-showImg(Tsk,img(:,:,1),2)
+%% update Task metadata
+Tsk=updateMetaData(Tsk);
+
+%% Write to disk
+if get(Tsk,'writeImageToFile')
+    writeTiff(Tsk,img,get(rS,'rootfolder'));
+end
+
+%% plot 
+if get(Tsk,'plotDuringTask')
+    plotAll(rS);
+end
+
+
+

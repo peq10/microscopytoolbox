@@ -35,6 +35,7 @@ if toSpawn
     if get(Tsk,'spawn_queue')              
         addTasks(rS,NewTsk);
     else
+        NewTsk=set(NewTsk,'acqTime',now);
         do(NewTsk);
     end
     spawned=true;

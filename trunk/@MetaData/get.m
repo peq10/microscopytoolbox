@@ -107,10 +107,10 @@ for i=1:length(varargin)
             dt={md.TimePoint(:).AcqTime};
             ind=find(ismember(dt,'NaN'));
             if ~isempty(ind)
-                dt{ind}='00-Jan-0000';
+                dt{ind}='00-Jan-0001';
             end
             dt=datenum(dt);
-            dt(dt==0)=NaN;
+            dt(dt==datenum('00-Jan-0001'))=NaN;
             varargout{i}=dt; 
         case 'timepointnum' % the number of timepoints there are
             varargout{i}=length(md.TimePoint);

@@ -1,4 +1,4 @@
-function setFocusParams(rSin,focusMethod,ParamName,ParamValue)
+function setFocusParams(rSin,focusMethod,varargin)
 %setFocusParam a method that add/sets a specific sub-propertiy, e.g. 
 % In this version, all the focus parameters are kept in rS
 % in the future (with matlab new OOP) focus would be a class not a function!
@@ -15,6 +15,8 @@ rS = rSin;
 % in the future (with matlab new OOP) focus would be a class not a function!
 % therefore it would be much easier to handle all this "where to keep focus propertiues":
 % thing...
-rS.focusParams.(focusMethod).(ParamName)=ParamValue;
+for i=1:2:length(varargin)
+    rS.focusParams.(focusMethod).(varargin{i})=varargin{i+1};
+end
 
 
