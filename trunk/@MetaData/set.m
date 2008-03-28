@@ -125,7 +125,7 @@ for i=1:2:length(varargin)
             if isempty(chnldes), chnldes=struct('stam',[]); end
             df=setdiff(varargin{i+1},fieldnames(chnldes));
             for ii=1:length(df)
-                chnldes.(df{ii})='';
+                chnldes.(regexprep(df{ii},'-','_'))='';
             end
             chnldes=rmfield(chnldes,setdiff(fieldnames(chnldes),chnls));
             md=set(md,'channeldescription',chnldes);

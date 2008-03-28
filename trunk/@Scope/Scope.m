@@ -5,12 +5,23 @@ function rS = Scope(config_file)
 %
 % All devices etc must be configured in the MMC config_file
 
+%% names of devices in the configuration file. 
+rS.XYstageName='XYStage';
+rS.ZstageName='TE2000-Focus';
+rS.COM='COM2'; %the focus port for ASI 
+rS.OBJName='Objectives'; % the GroupConfig for the objectives
+rS.ChannelName='Channels';
+rS.LightPathName='LightPath'; % ConfigGroup of the light path
+rS.EMgainName='EM-Gain';
+
 
 %% Here we initialize the MMC core part of rS
 % if config file is empty - start witht he GUI otherwise
 % start using the cnfig file directly. 
 
 import mmcorej.*;
+
+% rS.mmc=CMMCore;
 rS.gui=[];
 try
     if nargin ==0 || isempty(config_file)
@@ -30,14 +41,6 @@ catch
     error('An error occured when loading devices - rS is not a functional Roboscope! \n %s',lasterr);
 end
 
-%% names of devices in the configuration file. 
-rS.XYstageName='XY-Stage';
-rS.ZstageName='Z-Stage';
-rS.COM='COM2'; %the focus port for ASI 
-rS.OBJName='OBJ'; % the GroupConfig for the objectives
-rS.ChannelName='Channel';
-rS.LightPathName='LightPath';
-rS.EMgainName='EM-gain';
 
 %% Additional properties not part of Stage or MMC:
 % task ID

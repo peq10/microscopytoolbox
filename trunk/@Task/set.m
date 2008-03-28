@@ -135,6 +135,6 @@ for i=1:2:length(varargin)
                 Tsk=set(Tsk,'timedependent',true);
             end
         otherwise
-            warning('Cannot set property %s',varargin{i});
+            warning('Cannot set property %s',varargin{i}); %#ok<WNTAG>
     end
 end

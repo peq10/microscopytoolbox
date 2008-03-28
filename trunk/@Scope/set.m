@@ -168,6 +168,7 @@ for i=1:2:n
             rS.schedulingMethod=varargin{i+1};
         case 'focusmethod' % a legal focus methods TODO: not check of legality is implemented. 
             rS.focusMethod=varargin{i+1};
+
         case 'binning' % a positive scalar integer
             if ~isreal(varargin{i+1}) && numel~=1 && round(varargin{i+1})<1
                 error('''binning'' must be positive integer scalar');

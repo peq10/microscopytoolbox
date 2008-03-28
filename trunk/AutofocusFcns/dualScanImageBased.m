@@ -14,12 +14,8 @@ try % to define all parameters based on the FocusParam struct
     % number of steps is scan must be a 2 element vecotr
     Verbose=getFocusParams(rS,'dualScanImageBased','Verbose');
     NumOfStepsInScan=getFocusParams(rS,'dualScanImageBased','NumOfStepsInScan');
-    ScanRange(1)=0.5*getFocusParams(rS,'dualScanImageBased','Range');
-    % the real scan would be - ScaneRange/2 -> + ScanRagne / 2
-    % here for fake acq we make sure that the entire
-    % stack is in scan range
-    ScanRange(2)=ScanRange(1)/NumOfStepsInScan(1)*1.1; % plus imnux that value
-
+    ScanRange=getFocusParams(rS,'dualScanImageBased','Range');
+    SNR=getFocusParams(rS,'dualScanImageBased','SNR');
     % details required for the focus
     ROI=getFocusParams(rS,'dualScanImageBased','ROI');
     ConvKern=getFocusParams(rS,'dualScanImageBased','ConvKern');
@@ -35,7 +31,7 @@ end
 Zres=0.01; % 10 nm resolution
 
 %% defind the focus functions
-f=@(img) sum(sum(filter2(ConvKern,img(ROI(1):ROI(2),ROI(3):ROI(4)).^2))); % gradient square
+f=@(img) sum(sum(filter2(ConvKern,img(ROI(1):ROI(2),ROI(3):ROI(4))).^2)); % gradient square
 
 
 %% First coarse scan
@@ -66,18 +62,22 @@ IntrpScr2=pchip(zz,ss,Zpos2);
 [blah,ix2]=max(IntrpScr2);
 
 % Finally, set rS to the best Z plane 
-inFocusFlag=1; % TODO: need to include some check to see if we think the AF worked.
 allZ=zz;
 allScrs=ss;
 % return success flag is asked for
-inFocusFlag;
 bestZ=Zpos2(ix2);
+
+if prctile(allScrs,90)/prctile(allScrs,10)>SNR
+    inFocusFlag=1; % TODO: need to include some check to see if we think the AF worked.
+else
+    inFocusFlag=0;
+end
 
 %% nested functions for calculating score
 
     function scr=getFcsScr(z)
         set(rS,'Z',z);
-                acqParamFldName=fieldnames(AcqParam);
+        acqParamFldName=fieldnames(AcqParam);
         % change rS to autofocus state
         for ii=1:length(acqParamFldName)
             set(rS,acqParamFldName{ii},AcqParam.(acqParamFldName{ii}));
