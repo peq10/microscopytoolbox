@@ -1,4 +1,4 @@
-function [toSpawn,xtraData]=areTheTwoColoredSpotsMoving(img)
+function [toSpawn,xtraData]=areTheSpotsMoving(img)
 
 %% Define parameters:
 lpkh=1000/2^16;  %min peak height
@@ -10,8 +10,7 @@ maxdistance=20; % Maximum distance (might help with matching outliers)
 bps_param=[1,20]; % parameters for the bpass function
 pkfnd_param=[0.1 1]; % parameter for the pkfnd function
 
-%% find peaks in both timepoints (why not find them in both colors separately?)
-
+%% find peaks in both timepoints 
 imgleft=img(:,1:256,1);
 imgright=img(:,257:512,1);
 [pk1,allpk1]=findGoodPeaks(imgleft,imgright,hpkh,lpkh,edgdist,pkdist,bps_param,pkfnd_param);
@@ -47,7 +46,7 @@ pk2_algn=[pk2 ones(size(pk2,1),1)]*tfrm.tdata.Tinv;%*tfrm.tdata.Tinv;
 pk2_algn=pk2_algn(:,1:2);
 
 imgrgb=cat(3,imadjust(imgleft),imadjust(imgright),zeros(size(imgleft)));
-figure(5)
+figure(6)
 set(5,'position',[1241  339  420 598]);
 clf
 imshow(imgrgb)
@@ -66,43 +65,3 @@ if toSpawn
     ix=find((d > mindistance) .* (d < maxdistance));
     plot(pk1(ix,1),pk1(ix,2),'ws','markersize',20)
 end
-
-%% %%%%%%%%%%%%%%%%%%%%%%% sub function %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [pkgood,pk]=findGoodPeaks(leftim,rightim,hpkh,lpkh,edgdist,pkdst,bps_param,pkfnd_param)
-% this function uses the peakfnd function to find peaks in both images
-% based on Andrew's code
-imgsz=size(leftim);
-%% Find peaks in the left hand image
-% b = bpass(leftim,1,5);   % 5 is the diameter of the blob you want to find.
-b = bpass(leftim,bps_param(1),bps_param(2));
-% pk = pkfnd(b,60,5);  % 60 is a threshold value, 5 is the diameter of
-pk = pkfnd(b,pkfnd_param(1),pkfnd_param(2));
-if isempty(pk)
-    pkgood=[];
-    return
-end
-ix=sub2ind(imgsz,pk(:,2),pk(:,1)); % we specify it as row colum not xy that why the order is 2 1
-pkint=[pk leftim(ix) rightim(ix)]; %pkint has the intensity in the point in the lef tna d right image
-
-%% Peaklist clean up
-
-% do the closets peak calculation
-dst=distance(pk',pk'); %#ok<NODEF>
-diag_ix=sub2ind(size(dst),1:size(dst,1),1:size(dst,1));
-dst(diag_ix)=Inf; % mark distance to itself as Inf to make sure its not the closest
-mndst=min(dst,[],2); % the [],2) is to get it as a colum vector, its a symetric matrix anyway
-
-% all the conditions in one find argument - gp:= good peaks
-gp = pkint(:,3) < hpkh & ... left peak not to high
-     pkint(:,3) > lpkh & ... left peak not to low
-     pkint(:,4) < hpkh & ... right peak not to high
-     pkint(:,4) > lpkh & ... right peak not to low
-     pkint(:,2) > edgdist & ... not to close to upper edge
-     pkint(:,1) > edgdist & ... not to close to left edge
-     pkint(:,2) < imgsz(1)-edgdist & ... not to close to upper edge
-     pkint(:,1) < imgsz(2)-edgdist & ... not to close to left edge
-          mndst > pkdst; % no other peak within pkdst pixels away
- 
-pkgood=pk(gp,:);
-
-

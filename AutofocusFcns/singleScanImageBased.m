@@ -35,7 +35,8 @@ end
 Zres=0.01; % 10 nm resolution
 
 %% defind the focus functions
-f=@(img) sum(sum(filter2(ConvKern,img(ROI(1):ROI(2),ROI(3):ROI(4)).^2))); % gradient square
+f2=@(img) filter2(ConvKern,img(ROI(1):ROI(2),ROI(3):ROI(4))).^2; % gradient square
+f=@(img) sum(sum(filter2(ConvKern,img(ROI(1):ROI(2),ROI(3):ROI(4))).^2)); % gradient square
 
 %% First coarse scan
 Zcrnt=get(rS,'z');
@@ -66,7 +67,7 @@ bestZ=Zpos(ix);
 
     function scr=getFcsScr(z)
         set(rS,'Z',z);
-                acqParamFldName=fieldnames(AcqParam);
+        acqParamFldName=fieldnames(AcqParam);
         % change rS to autofocus state
         for ii=1:length(acqParamFldName)
             set(rS,acqParamFldName{ii},AcqParam.(acqParamFldName{ii}));
@@ -74,6 +75,13 @@ bestZ=Zpos(ix);
         img=acqImg(rS); % calling without parameters since we just set them up
         % and acqImg will use stuff as defined in rS as default
         scr=f(img);
+
+%         subplot(1,2,1)
+%         flt=f2(img);
+%         imshow(img(ROI(1):ROI(2),ROI(3):ROI(4)),[])
+%         subplot(1,2,2)
+%         imshow(flt,[])
+%         drawnow
         if Verbose, fprintf('time: %s z: %g scr: %g\n',datestr(now-t0,13),z,scr); end
 
 

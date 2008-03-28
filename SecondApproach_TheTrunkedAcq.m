@@ -1,53 +1,71 @@
 %% Init
+close all
 addpath ThirdParty\utilities\
 global rS;
 keep rS % delete everything but rS, rS could be a Scope or a empty double
         % from the global definition
-ScopeConfigFileName='ScopeWithStageFocusThroughMMserial.cfg';
+ScopeConfigFileName='Roboscope_NoIntensilight.cfg';
 
 % if rS isn't a call the constractor of the Scope
 if ~strcmp(class(rS),'Scope')
-    rS=Scope(ScopeConfigFileName);
+    rS=Scope;%(ScopeConfigFileName);
 end
 set(rS,'resolveErrors',false,...
        'schedulingmethod','greedy');
 initFocalPlane(rS);
 disp('Scope initialized');
 
+set(rS,'rootfolder','C:\Roy\Roboscope\Data\Test');
+
+%% All kind of parameters that control acquisition
+numOfImagesInBurstMode=50;
+numOfSecTowaitBetweenmages=30;
+distanceBetweenGridPoints=250;
+GridSize=[3 3]; %rox by column
+
 %% Define focus parameters
-set(rS,'focusMethod','singleScanImageBased_WithMaxObjectSize');
-setFocusParams(rS,'singleScanImageBased_WithMaxObjectSize',...
-                  'Verbose',true,...
-                  'MaxObjectSize',1000,...
-                  'Range',100,...
-                  'NumOfStepsInScan',3,...
-                  'ROI',[100 200 100 200],...
-                  'AcqParam',struct('Channel','Cy3-eye','Exposure',100),...
+set(rS,'focusMethod','dualScanImageBased');
+setFocusParams(rS,'dualScanImageBased',...
+                  'SNR',1.8,...
+                  'Verbose',false,...
+                  'Range',[3 0.75],...
+                  'NumOfStepsInScan',[15 15],...
+                  'ROI',[50 450 300 450],...
+                  'AcqParam',struct('Channel','Dual-Cy3-Cy5','Exposure',10,'EMGain','100'),...
                   'ConvKern',[0 -1 0; -1 0 1; 0 1 0])
 
 %% Define a "Generic Task" 
 GenericTsk=Task(...
-                MetaData('Channels',{'Cy3'},...
-                        'Exposure',[100 100 100]),...
-                'acq_burst_with_af');
-% number oif images to take before analyzing the data
-GenericTsk=set(GenericTsk,'UserData',struct('imgNumInBurst',2));
-% spawning behavior
-% data related to spawned function behavior
-UserData=struct('dX',100,'MiniGridSize',3);
+                MetaData('Channels',{'Dual-Cy3-Cy5'},...
+                        'Exposure',100),...
+                'acq_simple');
+            
+GenericTsk=set(GenericTsk,'UserData',struct('imgNumInBurst',numOfImagesInBurstMode,...
+                                            'secToWait',numOfSecTowaitBetweenmages));
+
+%% define the two level of spawning - second level defined first 
+%(since its data has to go to the first level)          
+
+% things that are changed between first and second level
+attrToModify=struct('spawn_flag',true,... changing the default (usually a spawned task doesn't spawn.
+                    'spawn_testFcn',@areTheSpotsMoving,... % function to test
+                    'spawn_filenameaddition','_burst',...
+                    'spawn_tskFcn','acq_burst'... % in third level we burst
+                    );
+                
 GenericTsk=set(GenericTsk,'spawn_queue',false,... meaning it would do the spawned task immediantly and not aadd it to the queue
                           'spawn_flag',true,... it would try to spawn new tasks
-                          'spawn_testFcn',@areTheTwoColoredSpotsMoving_usingTrack,... % function to test
-                          'spawn_tskFcn','acq_burst',...
+                          'spawn_testFcn',@areThereTwoColoredSpots,... % function to test
+                          'spawn_tskFcn','acq_wait_acq',...
                           'spawn_filenameaddition','',...
-                          'spawn_attributes2modify',struct('UserData',struct('imgNumInBurst',3))...
+                          'spawn_attributes2modify',attrToModify...
                           );
                       
 %% define Grid
-rows=3;
-cols=3;
+rows=GridSize(1);
+cols=GridSize(2);
 cntr=[0 0];
-dX=1000;
+dX=distanceBetweenGridPoints;
 Pos=createAcqPattern('grid',cntr,rows,cols,dX,zeros(rows*cols,1));
 
 %% create array of tasks in grid

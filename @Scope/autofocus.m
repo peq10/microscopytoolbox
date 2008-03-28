@@ -7,7 +7,7 @@ global rS;
 rS=rSin;
 
 % set autoshuuter to false
-set(rS,'autoshutter',false)
+% set(rS,'autoshutter',false)
 
 % get the current focus method as a function handle
 f=str2func(get(rS,'focusmethod'));
@@ -20,12 +20,13 @@ initZ=get(rS,'z');
 if inFocus
     set(rS,'z',bestZ)
 else
+    disp('didn''t find focus - return to original potision');
     set(rS,'z',initZ)
 end
 
 % return shutter to image-like behaviour
-set(rS,'channel','close')
-set(rS,'autoshutter',true)
+% set(rS,'channel','close')
+% set(rS,'autoshutter',true)
 
 % update the focal plane grid if asked for. 
 % If not asked for, updating is default behavior
