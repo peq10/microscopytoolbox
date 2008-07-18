@@ -35,7 +35,7 @@ our $CollXML=XML::Simple->new(
                                  # I think I got it right, but if not, just change isEmpty method                               
             RootName => 'CollData' );
             
-our $Empty_CD="CollData.xml";
+our $Empty_CD="default_cd.xml";
             
 # the XLS that can parse (In/Out) the image metadata XML 
 our $ImgXML=XML::Simple->new(
@@ -48,7 +48,7 @@ our $ImgXML=XML::Simple->new(
             RootName => 'ImgData');
 
 
-our $Empty_MD="ImgData.xml";
+our $Empty_MD="default_md.xml";
 
 ############ General Functionality ################
 
@@ -568,7 +568,23 @@ sub merge2file {
         return 1;
     }
     
-    # create a filehandle with flock 
+    # create a filehandle with flock
+    #  Get a lock on the lock file
+    my $lockfile = $filename . ".lock";
+    open (LOCK, ">$lockfile");
+    flock LOCK, 2;
+
+	#  Write data to data file.
+	open (DATA,">>$filename") 
+		or die ("Was unable to open $filename file for writing: $!\n");
+	for $data (@new_data) {
+		print DATA "$data\n"
+	}  #  End for
+	close DATA;
+	
+	#  Release lock
+	flock LOCK, 8;
+	close LOCK;
     my $fh = new IO::LockedFile(">$filename") or die "Couldn't open locked file for R/W";
     
     # update CollType and CollName
@@ -632,15 +648,62 @@ use III;
 #    $md the metadata for the image and for the collections
 #
 #
-sub new {  
-    my $self  = shift;
-    my $filename;
-        my $info = image_info($filename);
-        if (my $error = $info->{error}) {
-            die "Can't parse image info: $error\n";
-        }
-        my $xls=XML::Simple->new(ForceArray => ['Qdata','ChannelInfo','Relation','Collection' ],KeyAttr => {});
-        my $xml=$xls->XMLin($info->{ImageDescription});
+sub new {
+    # define the object - get its class
+    my $class = shift;
+
+    # set default input argument
+    my ($filename,$source,$cd,%data);
+    # if its single input argument, means that its from FS
+    if (scalar(@_) == 0 )   { $filename=$III::Empty_MD; $source='FROM_FS';}
+    elsif (scalar(@_) == 1 ){ $filename=shift; $source='FROM_FS';}
+    elsif (scalar(@_) == 2 ){ $filename=shift; $source=shift;}
+    else {print "error III::MD::new can only get 0/1/2 input arguments"}
+    
+    # uncompress if needed
+    #($source eq 'FROM_FS') && III::isCompressed($filename) && III::unCompress($filename);
+    
+    # based on $source, create a new MD data structure. 
+    if ($source eq 'FROM_DB') {
+        # start by making an empty CD object
+        $md=III::MD->new();
+    
+        # First deal with regular scalar values
+        $Queries{CollNameType}->execute($filename);
+        my @CollNameType = $Queries{CollNameType}->fetchrow_array;
+        $data{FileName}=$CollNameType[0];
+        $data{CollName}=$CollNameType[1]; 
+        $data{CollType}=$CollNameType[2];
+            
+        # Now do qdata
+        $Queries{CollQdata}->execute($filename);
+        my $QdataRows = $Queries{CollQdata}->fetchall_arrayref({});
+        my @Qdata;
+        foreach my $row (@$QdataRows) {push(@Qdata,III::Qdata->new($row));}
+        $data{Qdata}=\@Qdata;
+    
+        # Get the Images 
+        $Queries{ImgList}->execute($filename);
+        my $Img = $Queries{ImgList}->fetchall_arrayref;
+        $data{SubImg}=$Img;
+   
+        # Get the sub relations
+        $Queries{SubColl}->execute($filename);
+        my $subs = $Queries{SubColl}->fetchall_arrayref;
+        my @deref_subs=map $_->[0],@$subs;
+        $data{SubColl}=\@deref_subs;
+        
+        # Get the dom relations
+        $Queries{DomColl}->execute($filename);
+        my $doms = $Queries{DomColl}->fetchall_arrayref;
+        my @deref_doms = map $_->[0],@$doms;
+        $data{DomColl}=\@deref_doms;
+        
+        # now update the values in %data and return the $cd
+        $cd->set(\%data);
+        return $cd;
+      
+    }
    
 }
 
@@ -651,7 +714,14 @@ sub diff {}
 sub sync {}
 sub merge2file {}
 
-    
+     my $self  = shift;
+    my $filename;
+        my $info = image_info($filename);
+        if (my $error = $info->{error}) {
+            die "Can't parse image info: $error\n";
+        }
+        my $xls=XML::Simple->new(ForceArray => ['Qdata','ChannelInfo','Relation','Collection' ],KeyAttr => {});
+        my $xml=$xls->XMLin($info->{ImageDescription});
 
 ##################### Job  class ######################
 

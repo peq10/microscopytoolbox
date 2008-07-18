@@ -18,9 +18,12 @@ III->connectToDB();
 
 while (1) {
 
-# get list of new files
+# get list of new / changed files
 $NewFiles=ListNewFiles($wenttosleepat);
 
+# Update DB with new / modified files byt creating an object for each file
+# and syncing it with the DB. Note that syncing can also changes other file in
+# the FS to make sure its all nice and consistent. 
 foreach my $filename (@$NewFiles) {
     if ($filename =~ /.xml/) { # its a collection
         $coll=III::CD->new($filename,'FROM_FS');
@@ -40,7 +43,7 @@ III->disconnectFromDB();
 
 sub ListNewFiles {
 # Queries the FS for any file that have been created or changes
-# in the last @_[0] seconds. 
+# since the time: @_[0] seconds. 
     my $time=shift;
     my( $wanted, $list_reporter ) = find_by_modified_after( $time );
     File::Find::find( $wanted, III );

@@ -37,6 +37,12 @@ end
 prop=prop(ind);
     
 function prop=getPropsFromFile(filename)
+
+% check input
+if ~exist(filename,'file')
+    prop={'none','place holder'};
+    return
+end
 % used to actually extract the prperties from a giver set/get file
 [bla,L]=grep('-s','case',filename); %#ok<SETNU,NASGU>
 for i=1:length(L.match)
