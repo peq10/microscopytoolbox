@@ -1,4 +1,4 @@
-<CollData>
+<CD>
     <FileName></FileName>
     <CollType></CollType>
     <CollName></CollName>
@@ -6,9 +6,9 @@
     <DomColl></DomColl>
     <SubImg></SubImg>
     <Qdata>
-        <type></type>
-        <value></value>
-        <label></label>
-        <description></description>
+        <QdataType></QdataType>
+        <Value></Value>
+        <Label></Label>
+        <QdataDescription></QdataDescription>
     </Qdata>
-</CollData>
+</CD>

@@ -10,13 +10,12 @@ function md = MetaData( varargin )
 %      md=MetaData('PropertyName',PropertyValue,...) - Build a default and
 %                                                      changes it accordngly
 
-
 % Here I deal with the case of an empty MetaData object
 % All default values are defined in the default.xml file in the private
 % folder
 
 if nargin ==0
-    md=MetaData('private/default.xml');
+    md=MetaData('private/default_md.xml');
     set(md,'CreationDate',datestr(now,0));
     return
 end

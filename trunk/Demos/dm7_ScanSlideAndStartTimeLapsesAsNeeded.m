@@ -13,7 +13,7 @@
 clear global
 clear
 close all 
-clc
+clccellClicker.m
 ScopeConfigFileName='Demos/Roboscope_demo.cfg';
 
 % call the constractor of the Scope 

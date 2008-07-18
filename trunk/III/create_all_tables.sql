@@ -175,13 +175,6 @@ CREATE TABLE timepoint_qdata (
 ---- THIS SECTION DEALS WITH JOBS TRACKING AND PROCESSING ----
 --------------------------------------------------------------
 
--- This table holds the tables that it is legal to spawn jobs based on
-CREATE TABLE job_type_based_on_table ( name varchar primary key );
-INSERT into job_type_based_on_table (name) values ('images');
-INSERT into job_type_based_on_table (name) values ('collections');
-INSERT into job_type_based_on_table (name) values ('img_qdata');
-INSERT into job_type_based_on_table (name) values ('coll_qdata');
-
 -- Job type - this table contains the type of analyis that should be performed
 -- It has few parts: 
 -- part I - id, executable and static argument (static in the sense that they are the same for all jobs.
@@ -199,13 +192,13 @@ CREATE TABLE job_types (
                                     -- a trigger on insert will turn it also into a view for ease of use. 
                                     -- the view should have one column named input_id that store a list of input to run on. 
         -- part III - dynamic part of the 
-	inputqryfcn varchar -- this is the name of an external function to run that queries the DB and create the inputs for this job
+	inputqryfcn varchar, -- this is the name of an external function to run that queries the DB and create the inputs for this job
                         -- This function will be run by the JobManager to create the file with all the info 
                         -- for the job, it should be an execulable that runs on the head-node and gets as input
                         -- the input_id from the jobs table. 
                         -- If Null - than the filename is provided as input without any other arguments (including argv)
         run_times integer DEFAULT 1,
-        max_simultanious_nodes DEFAULT 1
+        max_simultanious_nodes integer DEFAULT 1
 );
 
 -- Legal Job status
@@ -235,7 +228,7 @@ CREATE TABLE jobs (
 CREATE TABLE job_log (
     id serial primary key,
     job_id integer references jobs (id) NOT NULL,
-    status varchar NOT NULL,
+    status varchar NOT NULL references (job_status),
     time timestamp DEFAULT CURRENT_TIMESTAMP,
 );
 

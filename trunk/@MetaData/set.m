@@ -118,6 +118,7 @@ for i=1:2:length(varargin)
             Cind=strfind(ordr,'C')-2;
             sz(Cind)=length(varargin{i+1});
             md=set(md,'dimensionsize',sz);
+            % update the channel description (if empty, create defaults)
             chnls=varargin{i+1};
             % if a channel is missing from channeldescription add it
             % and if channel description has to many fields, remove them

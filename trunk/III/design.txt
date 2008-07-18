@@ -12,13 +12,13 @@ projects. Basically, it provides a mechanism to deal with large datasets (~10^6 
 
 What III is not good for?
 -------------------------
-Web based access to images, multi-user datacenters, providing infrastructure for imaging facilities and so on. Most of the later functionality is provided by projects like OME and such and altough it is potentially possible to do some of the things III is ment for using those projects, it seems easier to write it from scratch. By losing all the web functionality, the system becomes much easier to install maintain etc.
+Web based access to images, multi-user datacenters, providing infrastructure for imaging facilities and so on. Most of the later functionality is provided by projects like OME and such and altough it is potentially possible to do some of the things III is ment for using those projects, it seems easier to write it from scratch. By losing all the web functionality, the system becomes much easier to install, maintain etc.
 
 How does it do that?
 --------------------
 Basically by providing a few classes and scripts that uses them. The user of the III system is a programer administrator who will extend or customize the III system to his own need and hardware set up. The basic idea is that we need to have some comman ground between everything (database, image ananlysis modules, etc). The common ground is provided by the two classes: MetaData and CollectionData. Those classes are implemented in both perl and matlab (with almost the same interface, few changes exist and are documented in the class descriptions). 
 
-Beside the two basic classes, III provides a job scheduling mechanism, some data redundency (between the FS and the DB) and small other things. III can be tailored and extended to specific installations, it provides mechanism to run analysis on single server, a PVM cluster, using SGE queue and (someday) even to run on Amazon EC2.
+Beside the two basic data classes (MD and CD), III provides a job scheduling mechanism, some data redundency (between the FS and the DB) and small other things. III can be tailored and extended to specific installations, it provides mechanism to run analysis on single server, a PVM cluster, using SGE queue and (someday) even to run on Amazon EC2.
 
 Restrictions
 -------------------------------------
@@ -28,7 +28,7 @@ Typical usage of III
 --------------------
 User needs to: 
 1. Create xml files that would categorize the different types of collection that would e part of this project (plates, wells, genes, ...) and put them in the FS. 
-2. Transfer images (with the proper xml in the tiff header) to the FS. The images can come from any source as long as they aare the write format. 
+2. Transfer images (with the proper xml in the tiff header) to the FS. The images can come from any source as long as they are the right format. 
 3. Define the analysis jobs in following three steps (see below) but basically if the analysis works directly on images than its a very simple step. 
 
 Thats it. 
@@ -44,11 +44,11 @@ JobManager_X.pl - a mechanism to start and manage jobs. There are several types 
 How to write analysis modules / job types?
 ------------------------------------------
 Perhaps the main restriction of III is that all analysis modules must either modify the metadata in some existing files or create new images / collection files using the specified MetaData / CollectionData formats. 
-This means that for matlab based image analysis, all jobs will need to use the MetaData and CollectionData classes. But that's exactly why they exist... 
+This means that for matlab based image analysis, all jobs will need to use the MetaData and CollData classes. But that's exactly why they exist... 
 
 Defining a new job is requires the following three steps: 
 
-1. Create the executable you want to use and make sure that this executable accepts, if we are in "matlab land" it would probably be a compiled (deployed) code. The executable should be such that it accept a single filename as input argument (see more in step 3). 
+1. Create the executable you want to use. If we are in "matlab land" it would probably be a compiled (deployed) code. The executable should be such that it accept a single filename as input argument (see more in step 3). 
 
 2. Decide on what images / collections you want your analysis to be performed and write the appropriate inputquery for it. examples: 
 
@@ -67,15 +67,15 @@ the average cell size is more then 100:
                   AND img_qdata.type = 'cell_num' 
                   AND img_qdata.value[0] >= 50
 	INTERSECT 
-	SELECT filename,average(img_qdata.value[0]) as avgcell FROM images 
+	SELECT filename FROM images 
 	        JOIN img_qdata USING (img_qdata.id) 
 		WHERE img_type = 'segmented'   
 		  AND img_qdata_type = 'cell_area'
-		  AND avg > 100
+		  AND average(img_qdata.value[0]) > 100
 		GROUP BY filename;
 
 altough its could be complicated, it specifically defines on which image or collection we are working on. 
-As input, a job can get either a single file name (either an image or collection) of a tmp file with some data. 
+As input, a job can get either a single file name (either an image or collection) or a tmp file with some data. 
 
 "Under the hood" this query will be stored in a VIEW that uses this query but uses an additional: 
 ... EXCEPT ALL SELECT filename FROM jobs WHERE job_type_id = 'the-job-type-id' 
@@ -115,10 +115,10 @@ a: It should create the skeleton collection for you when syncing the image. Sinc
 
 Open design question - stuff to think about:
 ============================================
-* How to define new job types (and do I want to call them ananlysis modules?). Do I really need a trigger for the job_type view? or would the core that would parse a new job defenition would create the view for me. 
+* How to define new job types (and do I want to call them analysis modules?). Do I really need a trigger for the job_type view? or would the core that would parse a new job defenition would create the view for me. 
 * How are files transfered to the FS - is it only for the user to solve...? or is there a general importer solution?
-* Filenames - currently they include the full path and this als oprovides the primary key, still debatable...
-* Client to view image? 
+* Filenames - currently they include the full path and this also provides the primary key, still debatable...
+* Client to view image?  - there is a matlab one, web based one?
 * Error / exception managment, especially with jobs, if an error acured do we start the job again? report it? what?
 * Library of image analysis functionallity adapted to III system  - do I want to have this as part of III? 
 
